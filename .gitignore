@@ -1,4 +1,5 @@
 ./src/compile_commands.json
 ./schema.*
 ./src/.cache/
-./prod/
+prod/*
+./prod/*
