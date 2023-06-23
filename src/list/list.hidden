@@ -9,23 +9,23 @@
                                       nome_funz##_dynamic_int,          \
                                       nome_funz##_dynamic_float,        \
                                       nome_funz##_dynamic_double,       \
-                                      nome_funz##_dynamic_pvoid,        \
+                                      nome_funz##_dynamic_long,        \
                                       nome_funz##_dynamic_array_char,   \
                                       nome_funz##_dynamic_array_int,    \
                                       nome_funz##_dynamic_array_float,  \
                                       nome_funz##_dynamic_array_double, \
-                                      nome_funz##_dynamic_array_pvoid,  \
+                                      nome_funz##_dynamic_array_long,  \
                                       nome_funz##_dynamic_generic,      \
                                       nome_funz##_table_char,           \
                                       nome_funz##_table_int,            \
                                       nome_funz##_table_float,          \
                                       nome_funz##_table_double,         \
-                                      nome_funz##_table_pvoid,          \
+                                      nome_funz##_table_long,          \
                                       nome_funz##_table_array_char,     \
                                       nome_funz##_table_array_int,      \
                                       nome_funz##_table_array_float,    \
                                       nome_funz##_table_array_double,   \
-                                      nome_funz##_table_array_pvoid,    \
+                                      nome_funz##_table_array_long,    \
                                       nome_funz##_table_generic,};
 
 /* lista
@@ -52,24 +52,24 @@ typedef enum{
     type_dynamic_int          =1,
     type_dynamic_float        =2,
     type_dynamic_double       =3,
-    type_dynamic_pvoid        =4,
+    type_dynamic_long        =4,
     type_dynamic_array_char   =5,
     type_dynamic_array_int    =6,
     type_dynamic_array_float  =7,
     type_dynamic_array_double =8,
-    type_dynamic_array_pvoid  =9,
+    type_dynamic_array_long  =9,
     type_dynamic_generic      =10,
 
     type_table_char           =11,
     type_table_int            =12,
     type_table_float          =13,
     type_table_double         =14,
-    type_table_pvoid          =15,
+    type_table_long          =15,
     type_table_array_char     =16,
     type_table_array_int      =17,
     type_table_array_float    =18,
     type_table_array_double   =19,
-    type_table_array_pvoid    =20,
+    type_table_array_long    =20,
     type_table_generic        =21,
   } type_list_data;
 

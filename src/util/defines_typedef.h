@@ -14,6 +14,13 @@ typedef unsi*        punsi;
 
 typedef int*         pint;
 
+typedef long*        plong;
+
 typedef char*        pchar;
+
+typedef float*       pfloat;
+
+typedef double*       pdouble;
+
 
 #endif

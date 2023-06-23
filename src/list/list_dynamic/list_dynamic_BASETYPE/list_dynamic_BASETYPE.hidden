@@ -1,0 +1,38 @@
+#ifndef _LISTA_DYNAMIC_BASETYPE_HIDDEN
+#define _LISTA_DYNAMIC_BASETYPE_HIDDEN
+
+#include "../../../util/defines_typedef.h"
+
+/* FUNZIONAMENTO
+ * E' la versione piu' "classica" della lista. Ogni elemento (spiegato meglio
+ * dopo nel typedef) contiene il valore da salvare e l'indirizzo all'elemento
+ * successivo.
+ * C'e' quindi solo un piccolo overhead dovuto al puntatore all'elemento successivo
+ * per ogni elemento della lista.
+ *
+ * Nel pensare alle funzioni ho trovato che spesso era utile un elemento dummy.
+ * Siccome l'elemento dummy contiene un paddr, un size e un puntatore all'elemento
+ * successivo, posso mettere l'indirizzo dell'ultimo elemento (utile per inserimento
+ * in coda) nel pvoid, il numero di elementi della lista nel size e nel puntatore
+ * all'elemento successivo l'indirizzo del primo elemento "vero".
+ *
+ * La lista_leggera diventa cosi' semplicemente un puntatore a elem.
+ *
+ * L'ultimo elemento della lista e' contrassegnato da un NULL come pnext
+ * */
+
+
+/* elem:  ciascun elemento di cui e' costituita la lista
+ * paddr: indirizzo al valore da salvare nella lista
+ * size:  dimensione dell'elemento da salvare nella lista
+ * pnext: indirizzo all'elemento successivo della lista
+ * */
+typedef struct _elem_BASETYPE {BASETYPE val; struct _elem_BASETYPE *pnext;} elem_BASETYPE;
+typedef elem_BASETYPE*                                             pelem_BASETYPE;
+
+typedef struct _list_dynamic_BASETYPE {pelem_BASETYPE pinizio;
+                                       pelem_BASETYPE pfine;
+                                       unsi n_elem;} list_dynamic_BASETYPE;
+typedef list_dynamic_BASETYPE* plist_dynamic_BASETYPE;
+
+#endif

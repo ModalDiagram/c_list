@@ -57,14 +57,14 @@ typedef enum{
   } type_resize;
 
 /* pcustom_print: funzione con cui stampare un elemento della lista
- * paddr:         indirizzo dell'elemento da stampare
+ * value:         valore dell'elemento da stampare, da castare al tipo che contiene la lista
  * size:          rappresenza rispettivamente:
  *                - type_data_generic: dimensione dell'elemento da stampare
  *                - type_data_array_*: dimensione dell'array da stampare
  *
  * E' presa in input da print_list.
  * Deve tornare 1 se stampa bene o altrimenti. */
-typedef int (*pcustom_print)(pvoid paddr, unsi size);
+typedef int (*pcustom_print)(ALL_TYPE value, unsi size);
 
 /* pcustom_compare: funzione con cui comparare due elementi della lista
  * pvalue1:         indirizzo del primo elemento da comparare
@@ -248,7 +248,7 @@ int sort_list(pvoid plist, pcustom_compare pinput_compare);
  *
  * pinput_print: funzione con cui stampare il valore contenuto in un elemento della lista.
  *               E' una funzione del tipo
- *               int (*pcustom_print)(pvoid pvalue, unsi size)
+ *               int (*pcustom_print)(ALL_TYPE value, unsi size)
  *               che deve tornare 1 se stampa bene o 0 altrimenti.
  *
  * NB: pinput_print puo' essere NULL e in questo caso

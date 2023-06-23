@@ -1,6 +1,6 @@
 #!/bin/bash
 
-types=(char int float double pvoid)
+types=(char int float double long)
 
 while read -r file; do
   if [[ "$file" == *BASETYPE* ]]; then
@@ -8,7 +8,7 @@ while read -r file; do
     for type in "${types[@]}"; do
       mkdir -p "$(dirname "${file//BASETYPE/$type}")"
       touch "${file//BASETYPE/$type}"
-      sed "s/BASETYPE/$type/" "$file" > "${file//BASETYPE/$type}"
+      sed "s/BASETYPE/$type/g" "$file" > "${file//BASETYPE/$type}"
     done
   fi
 done < <(find ./list_copied/ -type f)

@@ -10,24 +10,24 @@
 #include "./list_table/list_table_array_int/list_table_array_int.h"
 #include "./list_table/list_table_array_float/list_table_array_float.h"
 #include "./list_table/list_table_array_double/list_table_array_double.h"
-#include "./list_table/list_table_array_pvoid/list_table_array_pvoid.h"
+#include "./list_table/list_table_array_long/list_table_array_long.h"
 #include "./list_table/list_table_char/list_table_char.h"
 #include "./list_table/list_table_int/list_table_int.h"
 #include "./list_table/list_table_float/list_table_float.h"
 #include "./list_table/list_table_double/list_table_double.h"
-#include "./list_table/list_table_pvoid/list_table_pvoid.h"
+#include "./list_table/list_table_long/list_table_long.h"
 
 #include "./list_dynamic/list_dynamic_generic/list_dynamic_generic.h"
 #include "./list_dynamic/list_dynamic_array_char/list_dynamic_array_char.h"
 #include "./list_dynamic/list_dynamic_array_int/list_dynamic_array_int.h"
 #include "./list_dynamic/list_dynamic_array_float/list_dynamic_array_float.h"
 #include "./list_dynamic/list_dynamic_array_double/list_dynamic_array_double.h"
-#include "./list_dynamic/list_dynamic_array_pvoid/list_dynamic_array_pvoid.h"
+#include "./list_dynamic/list_dynamic_array_long/list_dynamic_array_long.h"
 #include "./list_dynamic/list_dynamic_char/list_dynamic_char.h"
 #include "./list_dynamic/list_dynamic_int/list_dynamic_int.h"
 #include "./list_dynamic/list_dynamic_float/list_dynamic_float.h"
 #include "./list_dynamic/list_dynamic_double/list_dynamic_double.h"
-#include "./list_dynamic/list_dynamic_pvoid/list_dynamic_pvoid.h"
+#include "./list_dynamic/list_dynamic_long/list_dynamic_long.h"
 
 CREA_ARRAY(malloc_list)
 CREA_ARRAY(malloc_list_with_resize)
@@ -81,8 +81,8 @@ pvoid malloc_list(type_list type_list, pchar type_string, unsi dim_array){
             else {type_new_list = type_dynamic_array_double;}
           }
         else if(!(strcmp(type_string, "PVOID"))){
-            if(dim_array == 1){type_new_list = type_dynamic_pvoid;}
-            else {type_new_list = type_dynamic_array_pvoid;}
+            if(dim_array == 1){type_new_list = type_dynamic_long;}
+            else {type_new_list = type_dynamic_array_long;}
           }
         else if(!(strcmp(type_string, "GENERIC"))){
             type_new_list = type_dynamic_generic;
@@ -107,8 +107,8 @@ pvoid malloc_list(type_list type_list, pchar type_string, unsi dim_array){
             else {type_new_list = type_table_array_double;}
           }
         else if(!(strcmp(type_string, "PVOID"))){
-            if(dim_array == 1){type_new_list = type_table_pvoid;}
-            else {type_new_list = type_table_array_pvoid;}
+            if(dim_array == 1){type_new_list = type_table_long;}
+            else {type_new_list = type_table_array_long;}
           }
         else if(!(strcmp(type_string, "GENERIC"))){
             type_new_list = type_table_generic;
@@ -187,7 +187,9 @@ pchar get_type_list(pvoid plist){
  * Torna 1 se tutto va bene, 0 altrimenti.
  * */
 int insert_first(pvoid plist, ALL_TYPE value, unsi size){
-    return 0;
+    pmy_list plist_casted = (pmy_list) plist;
+
+    return insert_first_arr[plist_casted->tlist](plist_casted->plist, value, size);
   }
 
 /* extract_first: estrae l'elemento in cima alla lista
@@ -204,7 +206,9 @@ int insert_first(pvoid plist, ALL_TYPE value, unsi size){
  *
  * Torna 1 se tutto va bene, 0 altrimenti */
 int extract_first(pvoid plist, ALL_TYPE* pvalue, punsi psize){
-    return 0;
+    pmy_list plist_casted = (pmy_list) plist;
+
+    return extract_first_arr[plist_casted->tlist](plist_casted->plist, pvalue, psize);
   }
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo
@@ -299,5 +303,7 @@ int sort_list(pvoid plist, pcustom_compare pinput_compare){
  * Torna 1 se tutto va bene, 0 altrimenti
  * */
 int print_list(pvoid plist, pcustom_print pinput_print){
-    return 0;
+    pmy_list plist_casted = (pmy_list) plist;
+
+    return print_list_arr[plist_casted->tlist](plist_casted->plist, pinput_print);
   }

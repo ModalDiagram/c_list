@@ -3,29 +3,25 @@
 #include "./../../../util/defines_typedef.h"
 #include "./../../../all_type/define_all_type.h"
 #include "./../../list.h"
+#include "list_dynamic_BASETYPE.hidden"
 
 /* Sono fornite le seguenti funzioni membro: */
 
-/* malloc_list: istanzia una nuova lista che puo' contenere dati dei tipi:
- *              "CHAR", "INT", "FLOAT", "DOUBLE", "ADDRESS", "GENERIC",
- *              o loro array.
- * type_list:   tipo di lista da instanziare, tra:
- *              - type_list_dynamic
- *              - type_list_table
- * type_string: stringa che descrive il tipo di dato che la lista contiene. Deve
- *              essere una delle stringhe riportate sopra.
- * dim_array:   quanti valori deve contenere ciascun elemento della lista.
- *              Si inserisca ad esempio 1 per avere una lista con tanti elementi
- *              quanto sono i valori inseriti.
- *              Le liste con vettori sono piu' veloci a parita' di dati, ma
- *              i vettori devono avere tutti la stessa dimensione
+/* malloc_list_dynamic_BASETYPE: istanzia una nuova lista di tipo type_list_dynamic
+ *              che contiene elementi di tipo BASETYPE
+ * dim_array:   non viene utilizzato in questo caso perche' la lista contiene un
+ *              solo elemento, ma il parametro serve per funzioni di altre classi
  *
  * return:      puntatore alla nuova lista, NULL se l'istanziamento non
  *              va a buon fine
  * */
 pvoid malloc_list_dynamic_BASETYPE(unsi dim_array){
-    printf("Mi trovo in INT singolo\n");
-    return NULL;
+    plist_dynamic_BASETYPE pnew_list;
+
+    if((pnew_list = malloc(sizeof(list_dynamic_BASETYPE))) == NULL) return NULL;
+    pnew_list->pinizio = pnew_list->pfine = NULL;
+    pnew_list->n_elem = 0;
+    return pnew_list;
   }
 
 /* malloc_list_with_resize: crea una nuova lista come sopra, e specifica il tipo di
@@ -77,7 +73,20 @@ void free_list_dynamic_BASETYPE(pvoid plist){
  * Torna 1 se tutto va bene, 0 altrimenti.
  * */
 int insert_first_dynamic_BASETYPE(pvoid plist, ALL_TYPE value, unsi size){
-    return 0;
+    plist_dynamic_BASETYPE plist_casted;
+    pelem_BASETYPE pnew_elem;
+
+    plist_casted = (plist_dynamic_BASETYPE) plist;
+    if((pnew_elem = malloc(sizeof(elem_BASETYPE))) == NULL) return 0;
+
+    pnew_elem->pnext = plist_casted->pinizio;
+    plist_casted->pinizio = pnew_elem;
+
+    pnew_elem->val = (BASETYPE) value;
+
+    if(!((plist_casted->n_elem)++)) plist_casted->pfine = pnew_elem;
+
+    return 1;
   }
 
 /* extract_first: estrae l'elemento in cima alla lista
@@ -94,7 +103,18 @@ int insert_first_dynamic_BASETYPE(pvoid plist, ALL_TYPE value, unsi size){
  *
  * Torna 1 se tutto va bene, 0 altrimenti */
 int extract_first_dynamic_BASETYPE(pvoid plist, ALL_TYPE* pvalue, punsi psize){
-    return 0;
+    plist_dynamic_BASETYPE plist_casted = (plist_dynamic_BASETYPE) plist;
+    pelem_BASETYPE pelem_to_remove;
+
+    pelem_to_remove = plist_casted->pinizio;
+    plist_casted->pinizio = pelem_to_remove->pnext;
+
+    (*((pBASETYPE) pvalue)) = pelem_to_remove->val;
+    free(pelem_to_remove);
+
+    if(!(--(plist_casted->n_elem))) plist_casted->pfine = NULL;
+
+    return 1;
   }
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo
@@ -189,5 +209,21 @@ int sort_list_dynamic_BASETYPE(pvoid plist, pcustom_compare pinput_compare){
  * Torna 1 se tutto va bene, 0 altrimenti
  * */
 int print_list_dynamic_BASETYPE(pvoid plist, pcustom_print pinput_print){
-    return 0;
+    plist_dynamic_BASETYPE plist_casted = (plist_dynamic_BASETYPE) plist;
+    pelem_BASETYPE pelem_moving = plist_casted->pinizio;
+
+    printf("Numero di elementi: %u\n", plist_casted->n_elem);
+    if (plist_casted->pinizio == NULL) return 1;
+    if(pinput_print != NULL){
+      pinput_print(pelem_moving->val, 0);
+      pelem_moving = pelem_moving->pnext;
+      while(pelem_moving != NULL){
+        printf("->");
+        pinput_print(pelem_moving->val, 0);
+        pelem_moving = pelem_moving->pnext;
+      }
+      printf("\n");
+    }
+
+    return 1;
   }
