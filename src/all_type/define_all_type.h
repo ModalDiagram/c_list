@@ -1,0 +1,1 @@
+#define ALL_TYPE long double
