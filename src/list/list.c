@@ -205,7 +205,7 @@ int insert_first(pvoid plist, ALL_TYPE value, unsi size){
  *                - altri:             niente
  *
  * Torna 1 se tutto va bene, 0 altrimenti */
-int extract_first(pvoid plist, ALL_TYPE* pvalue, punsi psize){
+int extract_first(pvoid plist, ALL_TYPE pvalue, punsi psize){
     pmy_list plist_casted = (pmy_list) plist;
 
     return extract_first_arr[plist_casted->tlist](plist_casted->plist, pvalue, psize);

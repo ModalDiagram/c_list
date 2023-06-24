@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "./../../../util/defines_typedef.h"
 #include "./../../../all_type/define_all_type.h"
 #include "./../../list.h"
+#include "list_dynamic_generic.hidden"
 
 /* Sono fornite le seguenti funzioni membro: */
 
@@ -24,7 +26,12 @@
  *              va a buon fine
  * */
 pvoid malloc_list_dynamic_generic(unsi dim_array){
-    return NULL;
+    plist_dynamic_generic pnew_list;
+
+    if((pnew_list = malloc(sizeof(list_dynamic_generic))) == NULL) return NULL;
+    pnew_list->pstart = pnew_list->pend = NULL;
+    pnew_list->n_elem = 0;
+    return pnew_list;
   }
 
 /* malloc_list_with_resize: crea una nuova lista come sopra, e specifica il tipo di
@@ -76,7 +83,24 @@ void free_list_dynamic_generic(pvoid plist){
  * Torna 1 se tutto va bene, 0 altrimenti.
  * */
 int insert_first_dynamic_generic(pvoid plist, ALL_TYPE value, unsi size){
-    return 0;
+    plist_dynamic_generic plist_casted;
+    pelem_generic         pnew_elem;
+
+    plist_casted = (plist_dynamic_generic) plist;
+    if((pnew_elem = malloc(sizeof(elem_generic))) == NULL) return 0;
+
+    if((pnew_elem->paddr = (pvoid) malloc(size)) == NULL){
+        free(pnew_elem);
+        return 0;
+      }
+    memcpy(pnew_elem->paddr, TO_PVOID(value), (pnew_elem->size) = size);
+
+    pnew_elem->pnext = plist_casted->pstart;
+    plist_casted->pstart = pnew_elem;
+
+    if(!((plist_casted->n_elem)++)) plist_casted->pend = pnew_elem;
+
+    return 1;
   }
 
 /* extract_first: estrae l'elemento in cima alla lista
@@ -92,8 +116,23 @@ int insert_first_dynamic_generic(pvoid plist, ALL_TYPE value, unsi size){
  *                - altri:             niente
  *
  * Torna 1 se tutto va bene, 0 altrimenti */
-int extract_first_dynamic_generic(pvoid plist, ALL_TYPE* pvalue, punsi psize){
-    return 0;
+int extract_first_dynamic_generic(pvoid plist, ALL_TYPE pvalue, punsi psize){
+    plist_dynamic_generic plist_casted = (plist_dynamic_generic) plist;
+    pelem_generic         pelem_to_remove;
+    ppvoid                ppvalue_input = TO_PVOID(pvalue);
+
+    pelem_to_remove = plist_casted->pstart;
+    plist_casted->pstart = pelem_to_remove->pnext;
+
+    if((*ppvalue_input = malloc(pelem_to_remove->size)) == NULL) return 0;
+    printf("size %u\n", pelem_to_remove->size);
+    memcpy(*ppvalue_input, pelem_to_remove->paddr, (*psize) = pelem_to_remove->size);
+    free(pelem_to_remove->paddr);
+    free(pelem_to_remove);
+
+    if(!(--(plist_casted->n_elem))) plist_casted->pend = NULL;
+
+    return 1;
   }
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo
@@ -188,5 +227,21 @@ int sort_list_dynamic_generic(pvoid plist, pcustom_compare pinput_compare){
  * Torna 1 se tutto va bene, 0 altrimenti
  * */
 int print_list_dynamic_generic(pvoid plist, pcustom_print pinput_print){
-    return 0;
+    plist_dynamic_generic plist_casted = (plist_dynamic_generic) plist;
+    pelem_generic pelem_moving = plist_casted->pstart;
+
+    printf("Number of elements: %u\n", plist_casted->n_elem);
+    if (plist_casted->pstart == NULL) return 1;
+    if(pinput_print != NULL){
+      pinput_print(TO_ALLTYPE(pelem_moving->paddr), 0);
+      pelem_moving = pelem_moving->pnext;
+      while(pelem_moving != NULL){
+        printf("->");
+        pinput_print(TO_ALLTYPE(pelem_moving->paddr), 0);
+        pelem_moving = pelem_moving->pnext;
+      }
+      printf("\n");
+    }
+
+    return 1;
   }

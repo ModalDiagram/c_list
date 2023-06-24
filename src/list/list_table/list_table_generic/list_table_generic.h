@@ -83,7 +83,7 @@ int insert_first_table_generic(pvoid plist, ALL_TYPE value, unsi size);
  *                - altri:             niente
  *
  * Torna 1 se tutto va bene, 0 altrimenti */
-int extract_first_table_generic(pvoid plist, ALL_TYPE* pvalue, punsi psize);
+int extract_first_table_generic(pvoid plist, ALL_TYPE pvalue, punsi psize);
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo
  *                 elemento della lista uguale a quello fornito in input

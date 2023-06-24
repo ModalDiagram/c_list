@@ -81,7 +81,7 @@ int insert_first_table_generic(pvoid plist, ALL_TYPE value, unsi size){
 
 /* extract_first: estrae l'elemento in cima alla lista
  * plist:         lista dal cui inizio estrarre l'elemento
- * pvalue:        indirizzo in cui verra' scritto rispettivamente:
+ * pvalue:        indirizzo in cui verra' scritto risettivamente:
  *                - type_data_generic: indirizzo dell'elemento estratto
  *                - type_data_array_*: indirizzo dell'array estratto
  *                - altri:             valore dell'elemento estratto
@@ -92,7 +92,7 @@ int insert_first_table_generic(pvoid plist, ALL_TYPE value, unsi size){
  *                - altri:             niente
  *
  * Torna 1 se tutto va bene, 0 altrimenti */
-int extract_first_table_generic(pvoid plist, ALL_TYPE* pvalue, punsi psize){
+int extract_first_table_generic(pvoid plist, ALL_TYPE pvalue, punsi psize){
     return 0;
   }
 

@@ -4,6 +4,11 @@
 #include "../util/defines_typedef.h"
 #include "../all_type/define_all_type.h"
 
+#define TO_ALLTYPE(value) \
+ ((ALL_TYPE)((long)( value )))
+#define TO_PVOID(value) \
+ ((pvoid)((long)( value )))
+
 /* Questa libreria fornisce all'utente l'oggetto "list".
  * La complessita' delle funzioni non dipende dalla lunghezza della lista:
  * - nell'inserimento e rimozione in testa
@@ -173,7 +178,7 @@ int insert_first(pvoid plist, ALL_TYPE value, unsi size);
  *                - altri:             niente
  *
  * Torna 1 se tutto va bene, 0 altrimenti */
-int extract_first(pvoid plist, ALL_TYPE* pvalue, punsi psize);
+int extract_first(pvoid plist, ALL_TYPE pvalue, punsi psize);
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo
  *                 elemento della lista uguale a quello fornito in input

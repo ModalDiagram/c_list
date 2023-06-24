@@ -19,7 +19,7 @@ pvoid malloc_list_dynamic_BASETYPE(unsi dim_array){
     plist_dynamic_BASETYPE pnew_list;
 
     if((pnew_list = malloc(sizeof(list_dynamic_BASETYPE))) == NULL) return NULL;
-    pnew_list->pinizio = pnew_list->pfine = NULL;
+    pnew_list->pstart = pnew_list->pend = NULL;
     pnew_list->n_elem = 0;
     return pnew_list;
   }
@@ -79,12 +79,12 @@ int insert_first_dynamic_BASETYPE(pvoid plist, ALL_TYPE value, unsi size){
     plist_casted = (plist_dynamic_BASETYPE) plist;
     if((pnew_elem = malloc(sizeof(elem_BASETYPE))) == NULL) return 0;
 
-    pnew_elem->pnext = plist_casted->pinizio;
-    plist_casted->pinizio = pnew_elem;
+    pnew_elem->pnext = plist_casted->pstart;
+    plist_casted->pstart = pnew_elem;
 
     pnew_elem->val = (BASETYPE) value;
 
-    if(!((plist_casted->n_elem)++)) plist_casted->pfine = pnew_elem;
+    if(!((plist_casted->n_elem)++)) plist_casted->pend = pnew_elem;
 
     return 1;
   }
@@ -102,17 +102,18 @@ int insert_first_dynamic_BASETYPE(pvoid plist, ALL_TYPE value, unsi size){
  *                - altri:             niente
  *
  * Torna 1 se tutto va bene, 0 altrimenti */
-int extract_first_dynamic_BASETYPE(pvoid plist, ALL_TYPE* pvalue, punsi psize){
+int extract_first_dynamic_BASETYPE(pvoid plist, ALL_TYPE pvalue, punsi psize){
     plist_dynamic_BASETYPE plist_casted = (plist_dynamic_BASETYPE) plist;
     pelem_BASETYPE pelem_to_remove;
+    pBASETYPE pvalue_input = (pBASETYPE)TO_PVOID(pvalue);
 
-    pelem_to_remove = plist_casted->pinizio;
-    plist_casted->pinizio = pelem_to_remove->pnext;
+    pelem_to_remove = plist_casted->pstart;
+    plist_casted->pstart = pelem_to_remove->pnext;
 
-    (*((pBASETYPE) pvalue)) = pelem_to_remove->val;
+    (*pvalue_input) = pelem_to_remove->val;
     free(pelem_to_remove);
 
-    if(!(--(plist_casted->n_elem))) plist_casted->pfine = NULL;
+    if(!(--(plist_casted->n_elem))) plist_casted->pend = NULL;
 
     return 1;
   }
@@ -210,10 +211,10 @@ int sort_list_dynamic_BASETYPE(pvoid plist, pcustom_compare pinput_compare){
  * */
 int print_list_dynamic_BASETYPE(pvoid plist, pcustom_print pinput_print){
     plist_dynamic_BASETYPE plist_casted = (plist_dynamic_BASETYPE) plist;
-    pelem_BASETYPE pelem_moving = plist_casted->pinizio;
+    pelem_BASETYPE pelem_moving = plist_casted->pstart;
 
-    printf("Numero di elementi: %u\n", plist_casted->n_elem);
-    if (plist_casted->pinizio == NULL) return 1;
+    printf("Number of elements: %u\n", plist_casted->n_elem);
+    if (plist_casted->pstart == NULL) return 1;
     if(pinput_print != NULL){
       pinput_print(pelem_moving->val, 0);
       pelem_moving = pelem_moving->pnext;

@@ -92,7 +92,7 @@ int insert_first_dynamic_array_BASETYPE(pvoid plist, ALL_TYPE value, unsi size){
  *                - altri:             niente
  *
  * Torna 1 se tutto va bene, 0 altrimenti */
-int extract_first_dynamic_array_BASETYPE(pvoid plist, ALL_TYPE* pvalue, punsi psize){
+int extract_first_dynamic_array_BASETYPE(pvoid plist, ALL_TYPE pvalue, punsi psize){
     return 0;
   }
 
