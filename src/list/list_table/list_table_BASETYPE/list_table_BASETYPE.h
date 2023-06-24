@@ -26,20 +26,24 @@
  * */
 pvoid malloc_list_table_BASETYPE(unsi dim_array);
 
-/* malloc_list_with_resize: crea una nuova lista come sopra, e specifica il tipo di
- *                          resize della tabella che contiene la lista.
- * type_resize:             tipo di resize della tabella. Di default è type_resize_default,
- *                          ma puo' essere selezionato tra:
- *                          - type_resize_default: la tabella si espande automaticamente
- *                          quando piena
- *                          - type_resize_manual: le funzioni di inserimento tornano
- *                          errore quando la tabella e' piena. Essa va espansa manualmente
- *                          con la funzione expand_table
+/* malloc_list_specify_table: crea una nuova lista come sopra, e specifica il tipo di
+ *                            resize della tabella che contiene la lista.
+ * type_resize:               tipo di resize della tabella. Di default è type_resize_default,
+ *                            ma puo' essere selezionato tra:
+ *                            - type_resize_default: la tabella si espande automaticamente
+ *                            quando piena
+ *                            - type_resize_manual: le funzioni di inserimento tornano
+ *                            errore quando la tabella e' piena. Essa va espansa manualmente
+ *                            con la funzione expand_table
+ * dim_table:                 numero di elementi che puo' contenere la tabella creata,
+ *                            nel caso in cui questa non esistesse e dovesse essere creata.
+ *                            Se la tabella e' stata gia' creata, ad esempio semplicemente
+ *                            con malloc_list(), essa ha la dimensione di default TABLE_DEFAULT_DIM
  *
  * return:      puntatore alla nuova lista, NULL se l'istanziamento non
  *              va a buon fine
  * */
-pvoid malloc_list_with_resize_table_BASETYPE(unsi dim_array, type_resize type_resize);
+pvoid malloc_list_specify_table_table_BASETYPE(unsi dim_array, type_resize type_resize, unsi dim_table);
 
 /* change_resize_table: cambia il tipo di resize della tabella che contiene plist.
  * type_resize:         tipo di resize da impostare per la tabella. Puo' essere:

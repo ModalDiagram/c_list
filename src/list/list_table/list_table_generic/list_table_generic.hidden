@@ -67,10 +67,6 @@
  * dei vuoti.
  */
 
-/* Dimensione della zona di memoria da allocare all'istanziamento della prima
- * lista_veloce e in cui saranno contenute anche le successive lista_veloce */
-#define NUM_ELEMENTI_TABELLA 1000
-
 /* STRUTTURA LISTA:
  * tecnicamente basterebbe l'indice del primo elemento per individuare la lista.
  * Tuttavia, se salviamo anche l'indice dell'ultimo elemento della lista, l'inserimento in

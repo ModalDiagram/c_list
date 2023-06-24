@@ -75,7 +75,7 @@ typedef enum{
 
 // puntatori a fuzioni, utilizzati per generalizzare l'oggetto list
 typedef pvoid (*type_malloc_list)(unsi dim_array);
-typedef pvoid (*type_malloc_list_with_resize)(unsi dim_array, type_resize type_resize);
+typedef pvoid (*type_malloc_list_specify_table)(unsi dim_array, type_resize type_resize, unsi dim_table);
 typedef pvoid (*type_change_resize_table)(pvoid plist, type_resize type_resize);
 typedef void (*type_free_list)(pvoid plist);
 typedef int (*type_insert_first)(pvoid plist, ALL_TYPE value, unsi size);
