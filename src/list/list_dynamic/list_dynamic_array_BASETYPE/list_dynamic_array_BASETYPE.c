@@ -8,6 +8,8 @@
 
 #define GET_PNEXT(pvalue) (*((ppvoid)(((pBASETYPE) pvalue )+size_array)))
 
+static unsi size_type = sizeof(BASETYPE);
+
 /* Sono fornite le seguenti funzioni membro: */
 
 /* malloc_list: istanzia una nuova lista che puo' contenere dati dei tipi:
@@ -108,9 +110,9 @@ int insert_first_dynamic_array_BASETYPE(pvoid plist, ALL_TYPE value, unsi size){
 
     plist_casted = (plist_dynamic_array_BASETYPE) plist;
     size_array = plist_casted->size_array;
-    if((pnew_elem = malloc(size_array * sizeof(BASETYPE) + sizeof(pvoid))) == NULL) return 0;
+    if((pnew_elem = malloc(size_array * size_type + sizeof(pvoid))) == NULL) return 0;
 
-    memcpy(pnew_elem, TO_PVOID(value), size_array*sizeof(BASETYPE));
+    memcpy(pnew_elem, TO_PVOID(value), size_array*size_type);
 
     GET_PNEXT(pnew_elem) = plist_casted->pstart;
     plist_casted->pstart = pnew_elem;
@@ -141,10 +143,9 @@ int extract_first_dynamic_array_BASETYPE(pvoid plist, ALL_TYPE pvalue, punsi psi
 
     pelem_to_remove = plist_casted->pstart;
     plist_casted->pstart = GET_PNEXT(pelem_to_remove);
-    if(plist_casted->pstart == NULL) printf("NUllo dopo estrazione");
 
-    if((*ppvalue_input = malloc(size_array*sizeof(BASETYPE))) == NULL) return 0;
-    memcpy(*ppvalue_input, pelem_to_remove, size_array*sizeof(BASETYPE));
+    if((*ppvalue_input = malloc(size_array*size_type)) == NULL) return 0;
+    memcpy(*ppvalue_input, pelem_to_remove, size_array*size_type);
     free(pelem_to_remove);
 
     if(!(--(plist_casted->n_elem))) plist_casted->pend = NULL;
@@ -245,20 +246,23 @@ int sort_list_dynamic_array_BASETYPE(pvoid plist, pcustom_compare pinput_compare
  * */
 int print_list_dynamic_array_BASETYPE(pvoid plist, pcustom_print pinput_print){
     plist_dynamic_array_BASETYPE plist_casted = (plist_dynamic_array_BASETYPE) plist;
+    pvoid pelem_moving = plist_casted->pstart;
+    unsi size_array = plist_casted->size_array;
 
     printf("Number of elements: %u\n", plist_casted->n_elem);
     printf("Number of elements of array contained: %u\n", plist_casted->size_array);
-    if (plist_casted->pstart == NULL) return 1;
-    /*if(pinput_print != NULL){
-      pinput_print(pelem_moving->val, 0);
-      pelem_moving = pelem_moving->pnext;
+    if (pelem_moving == NULL) return 1;
+
+    if(pinput_print != NULL){
+      pinput_print(TO_ALLTYPE(pelem_moving), size_array);
+      pelem_moving = GET_PNEXT(pelem_moving);
       while(pelem_moving != NULL){
         printf("->");
-        pinput_print(pelem_moving->val, 0);
-        pelem_moving = pelem_moving->pnext;
+        pinput_print(TO_ALLTYPE(pelem_moving), size_array);
+        pelem_moving = GET_PNEXT(pelem_moving);
       }
       printf("\n");
-    }*/
+    }
 
     return 1;
   }

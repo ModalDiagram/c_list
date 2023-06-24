@@ -7,19 +7,9 @@
 
 /* Sono fornite le seguenti funzioni membro: */
 
-/* malloc_list: istanzia una nuova lista che puo' contenere dati dei tipi:
- *              "CHAR", "INT", "FLOAT", "DOUBLE", "ADDRESS", "GENERIC",
- *              o loro array.
- * type_list:   tipo di lista da instanziare, tra:
- *              - type_list_dynamic
- *              - type_list_table
- * type_string: stringa che descrive il tipo di dato che la lista contiene. Deve
- *              essere una delle stringhe riportate sopra.
- * dim_array:   quanti valori deve contenere ciascun elemento della lista.
- *              Si inserisca ad esempio 1 per avere una lista con tanti elementi
- *              quanto sono i valori inseriti.
- *              Le liste con vettori sono piu' veloci a parita' di dati, ma
- *              i vettori devono avere tutti la stessa dimensione
+/* malloc_list: istanzia una nuova lista che contiene array di lunghezza fissata
+ *              di elementi di tipo BASETYPE
+ * dim_array:   numero di elementi di ciascun array contenuto nella lista
  *
  * return:      puntatore alla nuova lista, NULL se l'istanziamento non
  *              va a buon fine

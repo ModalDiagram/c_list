@@ -8,6 +8,18 @@ int print_float(ALL_TYPE value, unsi size){
     return 1;
   }
 
+int print_array_float(ALL_TYPE value, unsi size){
+    pfloat parray = TO_PVOID(value);
+    int i;
+
+    printf("Array: ");
+    for (i = 0; i < size; i++) {
+      printf("%f,", parray[i]);
+    }
+    printf("\n");
+    return 1;
+  }
+
 int print_generic(ALL_TYPE value, unsi size){
     printf("%f",*(pfloat)TO_PVOID(value));
     return 1;
@@ -39,8 +51,8 @@ void test_float(){
     float f = 3.0;
 
     if((plist = malloc_list(type_list_dynamic, "FLOAT", 1)) == NULL) printf("Non creata.\n");
-    insert_first(plist, (ALL_TYPE) 2.4, 29);
-    insert_first(plist, (ALL_TYPE) 4.4, 29);
+    insert_first(plist, TO_ALLTYPE(2.4), 29);
+    insert_first(plist, TO_ALLTYPE(4.4), 29);
     print_list(plist, print_float);
     extract_first(plist, TO_ALLTYPE(&f), NULL);
     print_list(plist, print_float);
@@ -62,9 +74,9 @@ void test_array_float(){
     if((plist = malloc_list(type_list_dynamic, "FLOAT", 3)) == NULL) printf("Non creata.\n");
     insert_first(plist, TO_ALLTYPE(parray), 0);
     /* printf("Float %f\n", GET_FLOAT(parray)); */
-    print_list(plist, print_float);
+    print_list(plist, print_array_float);
     extract_first(plist, TO_ALLTYPE(&poutput), NULL);
-    print_list(plist, print_float);
+    print_list(plist, print_array_float);
     printf("Estratto {%f, %f, %f}\n", poutput[0], poutput[1], poutput[2]);
     free_list(plist);
     for(;;){

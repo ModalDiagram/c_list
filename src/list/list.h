@@ -4,11 +4,6 @@
 #include "../util/defines_typedef.h"
 #include "../all_type/define_all_type.h"
 
-#define TO_ALLTYPE(value) \
- ((ALL_TYPE)((long)( value )))
-#define TO_PVOID(value) \
- ((pvoid)((long)( value )))
-
 /* Questa libreria fornisce all'utente l'oggetto "list".
  * La complessita' delle funzioni non dipende dalla lunghezza della lista:
  * - nell'inserimento e rimozione in testa
@@ -38,6 +33,25 @@
  *   l'elemento contenuto nella lista
  */
 
+/* Di seguito sono riportati due define che permettono di passare da una variabile di
+ * tipo puntatore alla variabile ALL_TYPE (che puo' assumere tutti i tipi di dato
+ * contenibili in queste liste) e viceversa.
+ *
+ * TO_ALLTYPE(value) serve per passare un puntatore a una funzione che accetta
+ * argomenti di tipo all_type, basta fornire alla funzione TO_ALLTYPE(value), ad
+ * esempio per inserire un array in una lista usiamo:
+ * - insert_first(pmia_lista_array, TO_ALLTYPE(array), ...)
+ *
+ * TO_PVOID(value) serve per castare a pvoid una variabile presa in input come ALL_TYPE,
+ * ad esempio in pinput_print(ALL_TYPE value, unsi size), per trattare value
+ * come pfloat uso
+ * - (pfloat) TO_PVOID(value)
+ * */
+#define TO_ALLTYPE(value) \
+ ((ALL_TYPE)((long)( value )))
+#define TO_PVOID(value) \
+ ((pvoid)((long)( value )))
+
 /* type_list: tipo della lista da istanziare, descritti precedentemente */
 typedef enum{
     type_list_dynamic=0,
@@ -54,7 +68,8 @@ typedef enum{
  *                        attraverso shrink_table
  *
  * type_resize_default e' il tipo di resize delle tabella appena create, ma puo' essere
- * cambiato attraverso la funzione change_resize_table
+ * cambiato attraverso la funzione change_resize_table o scelto quando si crea la lista con
+ * malloc_list_with_resize
  * */
 typedef enum{
     type_resize_default=0,
@@ -62,21 +77,30 @@ typedef enum{
   } type_resize;
 
 /* pcustom_print: funzione con cui stampare un elemento della lista
- * value:         valore dell'elemento da stampare, da castare al tipo che contiene la lista
- * size:          rappresenza rispettivamente:
- *                - type_data_generic: dimensione dell'elemento da stampare
- *                - type_data_array_*: dimensione dell'array da stampare
+ * value:         valore dell'elemento da stampare
+ * size:          rappresenta rispettivamente:
+ *                - dato generic: dimensione dell'elemento da stampare
+ *                - dato array:   dimensione dell'array da stampare
+ *                - altri dati:   non specificato
  *
  * E' presa in input da print_list.
- * Deve tornare 1 se stampa bene o altrimenti. */
+ * Deve tornare 1 se stampa bene o altrimenti.
+ *
+ * NB: per evitare errori di casting, bisogna usare TO_PVOID(value) per castare
+ * value a pvoid invece di (pvoid) value, ad esempio nel caso in cui vogliamo stampare
+ * un elemento di una lista contenente array.
+ * */
 typedef int (*pcustom_print)(ALL_TYPE value, unsi size);
 
 /* pcustom_compare: funzione con cui comparare due elementi della lista
- * pvalue1:         indirizzo del primo elemento da comparare
- * size1:           rappresenza rispettivamente:
- *                  - type_data_generic: dimensione del primo elemento da comparare
- *                  - type_data_array_*: dimensione del primo array da comparare
- * pvalue2:         indirizzo del secondo elemento da comparare
+ * value1:          rappresenta rispettivamente:
+ *                  - dato array:   indirizzo del primo array da comparare
+ *                  - dato generic: indirizzo del primo elemento da comparare
+ *                  - altri dati:   valore del primo dato da comparare
+ * size1:           rappresenta rispettivamente:
+ *                  - dato generico: dimensione del primo elemento da comparare
+ *                  - dato array:    dimensione del primo array da comparare
+ * value2:          come value1 ma del secondo elemento da comparare
  * size2:           come size1 ma del secondo elemento da comparare
  * presult:         indirizzo in cui salvare il risultato del compare, che deve essere:
  *                  0  se sono uguali
@@ -84,15 +108,20 @@ typedef int (*pcustom_print)(ALL_TYPE value, unsi size);
  *                  <0 se il secondo è maggiore
  *
  * E' presa in input ad esempio da sort_list e get_max.
- * Deve tornare 1 se stampa bene o altrimenti. */
-typedef int (*pcustom_compare)(pvoid pvalue1, unsi size1,
-                               pvoid pvalue2, unsi size2,
+ * Deve tornare 1 se stampa bene o altrimenti.
+ *
+ * NB: per evitare errori di casting, bisogna usare TO_PVOID(value) per castare
+ * value a pvoid invece di (pvoid) value, ad esempio nel caso in cui vogliamo comparare
+ * due elementi di una lista che contiene array.
+ * */
+typedef int (*pcustom_compare)(ALL_TYPE value1, unsi size1,
+                               ALL_TYPE value2, unsi size2,
                                pint  presult);
 
 /* Sono fornite le seguenti funzioni membro: */
 
 /* malloc_list: istanzia una nuova lista che puo' contenere dati dei tipi:
- *              "CHAR", "INT", "FLOAT", "DOUBLE", "ADDRESS", "GENERIC",
+ *              "CHAR", "INT", "FLOAT", "DOUBLE", "LONG", "GENERIC",
  *              o loro array.
  * type_list:   tipo di lista da instanziare, tra:
  *              - type_list_dynamic
@@ -156,12 +185,16 @@ pchar get_type_list(pvoid plist);
 
 /* insert_first: inserisce un elemento in cima alla lista.
  * plist:        lista al cui inizio inserire l'elemento
- * value:        elemento da inserire, da castare a (ALL_TYPE)
+ * value:        elemento da inserire
  * size:         deve essere rispettivamente:
  *               - type_data_generic: dimensione del dato da inserire
  *               - altri:             non ha importanza
  *
  * Torna 1 se tutto va bene, 0 altrimenti.
+ *
+ * NB: per evitare errori di casting, value va inserito come TO_ALLTYPE(value), ad esempio
+ * - insert_first(mia_lista_double, TO_ALLTYPE(2.4), 0)
+ * - insert_first(mia_lista_generic, TO_ALLTYPE(&var_da_inserire), sizeof(var_da_inserire))
  * */
 int insert_first(pvoid plist, ALL_TYPE value, unsi size);
 
@@ -171,13 +204,19 @@ int insert_first(pvoid plist, ALL_TYPE value, unsi size);
  *                - type_data_generic: indirizzo dell'elemento estratto
  *                - type_data_array_*: indirizzo dell'array estratto
  *                - altri:             valore dell'elemento estratto
- *                pvalue va castato a (ALL_TYPE*) per evitare warning
  * psize:         indirizzo in cui verra' scritto rispettivamente:
  *                - type_data_generic: size dell'elemento estratto
  *                - type_data_array_*: numero di elementi dell'array estratto
  *                - altri:             niente
  *
- * Torna 1 se tutto va bene, 0 altrimenti */
+ * Torna 1 se tutto va bene, 0 altrimenti
+ *
+ * NB: per evitare errori di casting, pvalue va inserito come TO_ALLTYPE(pvalue), ad esempio
+ * - extract_first(mia_lista_double, TO_ALLTYPE(&d), NULL)
+ * dove d e' la variabile in cui salvare il valore estratto. psize non e' importante
+ * in questo caso dato che si tratta di una lista di double e non generic.
+ *
+ * */
 int extract_first(pvoid plist, ALL_TYPE pvalue, punsi psize);
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo

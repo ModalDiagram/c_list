@@ -10,18 +10,27 @@
  * C'e' quindi solo un piccolo overhead dovuto al puntatore all'elemento successivo
  * per ogni elemento della lista.
  *
- * Nel pensare alle funzioni ho trovato che spesso era utile un elemento dummy.
- * Siccome l'elemento dummy contiene un paddr, un size e un puntatore all'elemento
- * successivo, posso mettere l'indirizzo dell'ultimo elemento (utile per inserimento
- * in coda) nel pvoid, il numero di elementi della lista nel size e nel puntatore
- * all'elemento successivo l'indirizzo del primo elemento "vero".
- *
- * La lista_leggera diventa cosi' semplicemente un puntatore a elem.
- *
  * L'ultimo elemento della lista e' contrassegnato da un NULL come pnext
  * */
 
+/* CARATTERISTICA LISTA DI ARRAY:
+ * non posso creare una struttura corrispondente agli elementi della lista perche'
+ * questa dovrebbe avere dimensione variabile in base alla lunghezza dell'array contenuto.
+ * Allora gestisco la memoria manualmente:
+ * 1) per ogni elemento alloco la memoria di sizeof(tipo)*size_array + sizeof(pvoid)
+ * 2) per scrivere il valore uso memcpy(elem, array_input, sizeof(tipo)*size_array)
+ *    cosi' da copiare l'intero array preso in input
+ * 3) Per leggere e scrivere l'indirizzo dell'elemento successivo non uso elem->pnext,
+ *    ma GET_PNEXT(elem), dove PNEXT e' definito nel .c e consiste nello spostarsi
+ *    di sizeof(tipo)*size_array e leggere il valore successivo come pvoid
+ * */
 
+
+/* list_dynamic_array_BASETYPE: struttura che contiene le informazioni sulla lista
+ * pstart:               indirizzo del primo elemento della lista
+ * pend:                 indirizzo dell'ultimo elemento della lista
+ * n_elem:               numero di elementi contenuti nella lista
+ * */
 typedef struct _list_dynamic_array_BASETYPE {
     pvoid pstart;
     pvoid pend;

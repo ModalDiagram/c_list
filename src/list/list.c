@@ -183,12 +183,16 @@ pchar get_type_list(pvoid plist){
 
 /* insert_first: inserisce un elemento in cima alla lista.
  * plist:        lista al cui inizio inserire l'elemento
- * value:        elemento da inserire, da castare a (ALL_TYPE)
+ * value:        elemento da inserire
  * size:         deve essere rispettivamente:
  *               - type_data_generic: dimensione del dato da inserire
  *               - altri:             non ha importanza
  *
  * Torna 1 se tutto va bene, 0 altrimenti.
+ *
+ * NB: per evitare errori di casting, value va inserito come TO_ALLTYPE(value), ad esempio
+ * - insert_first(mia_lista_double, TO_ALLTYPE(2.4), 0)
+ *
  * */
 int insert_first(pvoid plist, ALL_TYPE value, unsi size){
     pmy_list plist_casted = (pmy_list) plist;
@@ -202,13 +206,19 @@ int insert_first(pvoid plist, ALL_TYPE value, unsi size){
  *                - type_data_generic: indirizzo dell'elemento estratto
  *                - type_data_array_*: indirizzo dell'array estratto
  *                - altri:             valore dell'elemento estratto
- *                pvalue va castato a (ALL_TYPE*) per evitare warning
  * psize:         indirizzo in cui verra' scritto rispettivamente:
  *                - type_data_generic: size dell'elemento estratto
  *                - type_data_array_*: numero di elementi dell'array estratto
  *                - altri:             niente
  *
- * Torna 1 se tutto va bene, 0 altrimenti */
+ * Torna 1 se tutto va bene, 0 altrimenti
+ *
+ * NB: per evitare errori di casting, pvalue va inserito come TO_ALLTYPE(pvalue), ad esempio
+ * - extract_first(mia_lista_double, TO_ALLTYPE(&d), NULL)
+ * dove d e' la variabile in cui salvare il valore estratto. psize non e' importante
+ * in questo caso dato che si tratta di una lista di double e non generic.
+ *
+ * */
 int extract_first(pvoid plist, ALL_TYPE pvalue, punsi psize){
     pmy_list plist_casted = (pmy_list) plist;
 
