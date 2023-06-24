@@ -25,6 +25,12 @@ void test_generic(){
     print_list(plist, print_generic);
     extract_first(plist, TO_ALLTYPE(&pextract), &size_extract);
     printf("Estratto %f con size %u\n", *pextract, size_extract);
+    free_list(plist);
+    for(;;){
+        plist = malloc_list(type_list_dynamic, "GENERIC", 1);
+        insert_first(plist, TO_ALLTYPE(&f), sizeof(float));
+        free_list(plist);
+      }
 
   }
 
@@ -41,11 +47,36 @@ void test_float(){
     extract_first(plist,TO_ALLTYPE(&f), NULL);
     print_list(plist, print_float);
     printf("Estratto %f\n", f);
+    for(;;){
+        plist = malloc_list(type_list_dynamic, "FLOAT", 1);
+        insert_first(plist, TO_ALLTYPE(2.4), 0);
+        free_list(plist);
+      }
+  }
+
+void test_array_float(){
+    pvoid plist;
+    float parray[3] = {1, 2, 23};
+    pfloat poutput;
+
+    if((plist = malloc_list(type_list_dynamic, "FLOAT", 3)) == NULL) printf("Non creata.\n");
+    insert_first(plist, TO_ALLTYPE(parray), 0);
+    /* printf("Float %f\n", GET_FLOAT(parray)); */
+    print_list(plist, print_float);
+    extract_first(plist, TO_ALLTYPE(&poutput), NULL);
+    print_list(plist, print_float);
+    printf("Estratto {%f, %f, %f}\n", poutput[0], poutput[1], poutput[2]);
+    free_list(plist);
+    for(;;){
+        plist = malloc_list(type_list_dynamic, "FLOAT", 3);
+        insert_first(plist, TO_ALLTYPE(parray), 0);
+        free_list(plist);
+      }
   }
 
 int main(int argc, char *argv[])
 {
-    test_generic();
+    test_array_float();
 
     return 0;
   }

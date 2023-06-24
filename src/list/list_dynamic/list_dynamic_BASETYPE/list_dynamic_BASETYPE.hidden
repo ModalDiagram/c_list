@@ -27,12 +27,18 @@
  * size:  dimensione dell'elemento da salvare nella lista
  * pnext: indirizzo all'elemento successivo della lista
  * */
-typedef struct _elem_BASETYPE {BASETYPE val; struct _elem_BASETYPE *pnext;} elem_BASETYPE;
-typedef elem_BASETYPE*                                             pelem_BASETYPE;
+typedef struct _elem_BASETYPE {
+    BASETYPE val; 
+    struct _elem_BASETYPE *pnext;
+  } elem_BASETYPE;
 
-typedef struct _list_dynamic_BASETYPE {pelem_BASETYPE pstart;
-                                       pelem_BASETYPE pend;
-                                       unsi n_elem;} list_dynamic_BASETYPE;
+typedef elem_BASETYPE* pelem_BASETYPE;
+
+typedef struct _list_dynamic_BASETYPE {
+    pelem_BASETYPE pstart;
+    pelem_BASETYPE pend;
+    unsi n_elem;
+  } list_dynamic_BASETYPE;
 typedef list_dynamic_BASETYPE* plist_dynamic_BASETYPE;
 
 #endif

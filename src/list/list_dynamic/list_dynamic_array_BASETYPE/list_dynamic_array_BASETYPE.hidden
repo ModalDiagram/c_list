@@ -1,5 +1,5 @@
-#ifndef _LISTA_DYNAMIC_generic_HIDDEN
-#define _LISTA_DYNAMIC_generic_HIDDEN
+#ifndef _LISTA_DYNAMIC_BASETYPE_HIDDEN
+#define _LISTA_DYNAMIC_BASETYPE_HIDDEN
 
 #include "../../../util/defines_typedef.h"
 
@@ -22,24 +22,13 @@
  * */
 
 
-/* elem:  ciascun elemento di cui e' costituita la lista
- * paddr: indirizzo al valore da salvare nella lista
- * size:  dimensione dell'elemento da salvare nella lista
- * pnext: indirizzo all'elemento successivo della lista
- * */
-typedef struct _elem_generic {
-    pvoid paddr;
-    unsi size;
-    struct _elem_generic *pnext;
-  } elem_generic;
-typedef elem_generic*                                             pelem_generic;
-
-typedef struct _list_dynamic_generic {
-    pelem_generic pstart;
-    pelem_generic pend;
+typedef struct _list_dynamic_array_BASETYPE {
+    pvoid pstart;
+    pvoid pend;
     unsi n_elem;
-  } list_dynamic_generic;
+    unsi size_array;
+  } list_dynamic_array_BASETYPE;
 
-typedef list_dynamic_generic* plist_dynamic_generic;
+typedef list_dynamic_array_BASETYPE* plist_dynamic_array_BASETYPE;
 
 #endif

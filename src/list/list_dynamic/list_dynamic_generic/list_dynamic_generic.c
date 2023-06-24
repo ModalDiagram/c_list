@@ -70,15 +70,30 @@ pvoid change_resize_table_dynamic_generic(pvoid plist, type_resize type_resize){
  *
  * return:    non ritorna niente */
 void free_list_dynamic_generic(pvoid plist){
+    plist_dynamic_generic plist_casted = (plist_dynamic_generic) plist;
+    pelem_generic         pelem_moving, pelem_tmp;
+
+    pelem_moving = plist_casted->pstart;
+    if(pelem_moving != NULL){
+        pelem_tmp = pelem_moving->pnext;
+        while(pelem_tmp != NULL){
+            free(pelem_moving->paddr);
+            free(pelem_moving);
+            pelem_moving = pelem_tmp;
+            pelem_tmp = pelem_moving->pnext;
+          }
+        free(pelem_moving->paddr);
+        free(pelem_moving);
+      }
+    free(plist_casted);
+
     return;
   }
 
-/* insert_first: inserisce un elemento in cima alla lista.
+/* insert_first_dynamic_generic: inserisce un elemento di tipo generic in cima alla lista.
  * plist:        lista al cui inizio inserire l'elemento
- * value:        elemento da inserire, da castare a (ALL_TYPE)
- * size:         deve essere rispettivamente:
- *               - type_data_generic: dimensione del dato da inserire
- *               - altri:             non ha importanza
+ * value:        indirizzo dell'elemento da inserire
+ * size:         size dell'elemento generic da inserire
  *
  * Torna 1 se tutto va bene, 0 altrimenti.
  * */
@@ -103,17 +118,10 @@ int insert_first_dynamic_generic(pvoid plist, ALL_TYPE value, unsi size){
     return 1;
   }
 
-/* extract_first: estrae l'elemento in cima alla lista
+/* extract_first_dynamic_generic: estrae l'elemento di tipo generic in cima alla lista
  * plist:         lista dal cui inizio estrarre l'elemento
- * pvalue:        indirizzo in cui verra' scritto rispettivamente:
- *                - type_data_generic: indirizzo dell'elemento estratto
- *                - type_data_array_*: indirizzo dell'array estratto
- *                - altri:             valore dell'elemento estratto
- *                pvalue va castato a (ALL_TYPE*) per evitare warning
- * psize:         indirizzo in cui verra' scritto rispettivamente:
- *                - type_data_generic: size dell'elemento estratto
- *                - type_data_array_*: numero di elementi dell'array estratto
- *                - altri:             niente
+ * pvalue:        indirizzo in cui verra' scritto l'indirizzo dell'elemento estratto
+ * psize:         indirizzo in cui verra' scritto rispettivamente la size dell'elemento estratto
  *
  * Torna 1 se tutto va bene, 0 altrimenti */
 int extract_first_dynamic_generic(pvoid plist, ALL_TYPE pvalue, punsi psize){
@@ -125,7 +133,6 @@ int extract_first_dynamic_generic(pvoid plist, ALL_TYPE pvalue, punsi psize){
     plist_casted->pstart = pelem_to_remove->pnext;
 
     if((*ppvalue_input = malloc(pelem_to_remove->size)) == NULL) return 0;
-    printf("size %u\n", pelem_to_remove->size);
     memcpy(*ppvalue_input, pelem_to_remove->paddr, (*psize) = pelem_to_remove->size);
     free(pelem_to_remove->paddr);
     free(pelem_to_remove);

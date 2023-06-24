@@ -60,6 +60,21 @@ pvoid change_resize_table_dynamic_BASETYPE(pvoid plist, type_resize type_resize)
  *
  * return:    non ritorna niente */
 void free_list_dynamic_BASETYPE(pvoid plist){
+    plist_dynamic_BASETYPE plist_casted = (plist_dynamic_BASETYPE) plist;
+    pelem_BASETYPE         pelem_moving, pelem_tmp;
+
+    pelem_moving = plist_casted->pstart;
+    if(pelem_moving != NULL){
+        pelem_tmp = pelem_moving->pnext;
+        while(pelem_tmp != NULL){
+            free(pelem_moving);
+            pelem_moving = pelem_tmp;
+            pelem_tmp = pelem_moving->pnext;
+          }
+        free(pelem_moving);
+      }
+    free(plist_casted);
+
     return;
   }
 

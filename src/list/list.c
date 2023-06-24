@@ -161,6 +161,10 @@ pvoid change_resize_table(pvoid plist, type_resize type_resize){
  *
  * return:    non ritorna niente */
 void free_list(pvoid plist){
+    pmy_list plist_casted = (pmy_list) plist;
+
+    free_list_arr[plist_casted->tlist](plist_casted->plist);
+    free(plist);
     return;
   }
 
