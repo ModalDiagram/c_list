@@ -3,9 +3,13 @@
 #include "./../../../util/defines_typedef.h"
 #include "./../../../all_type/define_all_type.h"
 #include "./../../list.h"
+#include "list_table_generic.hidden"
 
-static pvoid ptabella = NULL;
-static int   idx_lista_vuoti;
+#define DEBUG_LIST_TABLE_GENERIC
+#define IDX_FINE_LISTA 0
+
+static pvoid ptable = NULL;
+static unsi  idx_lista_vuoti = 1;
 
 /* Sono fornite le seguenti funzioni membro: */
 
@@ -27,7 +31,80 @@ static int   idx_lista_vuoti;
  *              va a buon fine
  * */
 pvoid malloc_list_table_generic(unsi dim_array){
-  return NULL;
+  pelem_table_generic pfirst_elem_of_new_list;
+  plista_table_generic  pnew_list;
+
+  if(ptable == NULL)
+   {
+    #ifdef DEBUG_LIST_TABLE_GENERIC
+    printf("---- DEBUG ----\n");
+    printf("Tabella non esiste\n");
+    printf("---- FINE DEBUG ----\n");
+    #endif
+    if((create_table(NUM_ELEMENTI_TABELLA)) == NULL) return NULL;
+   }
+
+  if(idx_lista_vuoti == IDX_FINE_LISTA)
+   {
+    printf("Memoria preallocata esaurita\n");
+    return NULL;
+   }
+
+  /* STEP 1 */
+  if((pnew_list = (plista_table_generic) malloc(sizeof(plista_table_generic))) == NULL) return NULL;
+  pnew_list->n_elem = 0;
+  pnew_list->idx_primo = idx_lista_vuoti;
+  pnew_list->idx_ultimo = idx_lista_vuoti;
+
+  /* STEP 2 */
+  pfirst_elem_of_new_list = ((pelem_table_generic) ptable) + idx_lista_vuoti;
+  idx_lista_vuoti = pfirst_elem_of_new_list->idx_next;
+
+  /* STEP 3 */
+  pfirst_elem_of_new_list->idx_next = IDX_FINE_LISTA;
+
+  #ifdef DEBUG_LIST_TABLE_GENERIC
+  printf("---- DEBUG ----\n");
+  printf("Nuova lista creata, indice: %d\n", pnew_list->idx_primo);
+  printf("---- FINE DEBUG ----\n");
+  #endif
+  return (pvoid) pnew_list;
+ }
+
+/* create_table: alloca la memoria della tabella
+ * dim:          numero massimo di elementi contenuti nella tabella
+ *
+ * return:       torna l'indirizzo della tabella
+ *
+ * FUNZIONAMENTO:
+ * 1) Alloco lo spazio di un array di elem_tabella (definiti in lista_veloce.hidden)
+ *    di dimensione presa in input
+ * 2) Inizializzo la tabella: e' fatta solo dalla lista dai vuoti. Questa inizia
+ *    all'indice 0 e ha per elementi successivi gli indici 1->2->3->... fino
+ *    all'ultimo che ha per elemento successivo -1
+ * */
+pvoid create_table(unsi dim)
+ {
+  pelem_table_generic pelem_tmp;
+  int                 i;
+
+
+  /* STEP 1 */
+  if((ptable = malloc(sizeof(elem_table_generic)*dim)) == NULL) return NULL;
+
+  /* STEP 2 */
+  for (i = 1, pelem_tmp = (pelem_table_generic) ptable; i < dim; i++, pelem_tmp++){
+    pelem_tmp->idx_next = i;
+   }
+  pelem_tmp->idx_next = IDX_FINE_LISTA;
+
+  #ifdef DEBUG_LISTA_VELOCE
+  printf("---- DEBUG ----\n");
+  printf("Creo tabella\n");
+  printf("---- FINE DEBUG ----\n");
+  #endif
+
+  return ptable;
  }
 
 /* malloc_list_with_resize: crea una nuova lista come sopra, e specifica il tipo di

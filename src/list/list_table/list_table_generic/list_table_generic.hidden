@@ -1,7 +1,8 @@
 #ifndef _LISTA_VELOCE_HIDDEN
 #define _LISTA_VELOCE_HIDDEN
 
-#include "../defines_typedef.h"
+#include "./../../../util/defines_typedef.h"
+#include "./../../../all_type/define_all_type.h"
 
 /* FUNZIONAMENTO
  * E' piu' veloce della lista_leggera perche' lavoriamo con una tabella e i suoi
@@ -81,12 +82,12 @@
  * di aiuto come print_lista ed eventuali controlli in funzioni come
  * insert_nth e extract_nth
  * */
-typedef struct _lista_idx {
+typedef struct _lista_table_generic {
   unsi idx_primo;
   unsi idx_ultimo;
   unsi n_elem;
- } lista_idx;
-typedef lista_idx* plista_idx;
+ } lista_table_generic;
+typedef lista_table_generic* plista_table_generic;
 
 /* STRUTTURA ELEMENTO:
  * la tabella e' essenzialmente un array di elementi fatti da:
@@ -94,17 +95,21 @@ typedef lista_idx* plista_idx;
  * - size:     size dell'elemento da conservare
  * - idx_next: indirizzo dell'elemento successivo della lista
  * */
-typedef struct _elem_tabella{pvoid paddr; unsi size; int idx_next;} elem_tabella;
-typedef elem_tabella*                                               pelem_tabella;
+typedef struct _elem_table_generic{
+  pvoid paddr;
+  unsi size;
+  unsi idx_next;
+ } elem_table_generic;
+typedef elem_table_generic* pelem_table_generic;
 
 /* Di seguito le funzioni usate internamente: */
 
-/* crea_tabella: alloca la memoria della tabella
+/* create_table: alloca la memoria della tabella
  * dim:          numero di elementi della tabella, ovvero di possibili elementi totali
  *               delle liste della tabella
  *
  * return:       torna l'indirizzo della tabella
  * */
-pvoid crea_tabella(unsi dim);
+pvoid create_table(unsi dim);
 
 #endif
