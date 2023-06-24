@@ -6,7 +6,7 @@
 #include "./../../list.h"
 #include "list_dynamic_array_BASETYPE.hidden"
 
-#define GET_PNEXT(pvalue) (((pBASETYPE) pvalue )+size_array)
+#define GET_PNEXT(pvalue) (*((ppvoid)(((pBASETYPE) pvalue )+size_array)))
 
 /* Sono fornite le seguenti funzioni membro: */
 
@@ -79,11 +79,11 @@ void free_list_dynamic_array_BASETYPE(pvoid plist){
 
     pelem_moving = plist_casted->pstart;
     if(pelem_moving != NULL){
-        pelem_tmp = *((ppvoid)GET_PNEXT(pelem_moving));
+        pelem_tmp = GET_PNEXT(pelem_moving);
         while(pelem_tmp != NULL){
             free(pelem_moving);
             pelem_moving = pelem_tmp;
-            pelem_tmp = *((ppvoid)GET_PNEXT(pelem_moving));
+            pelem_tmp = GET_PNEXT(pelem_moving);
           }
         free(pelem_moving);
       }
@@ -104,7 +104,6 @@ void free_list_dynamic_array_BASETYPE(pvoid plist){
 int insert_first_dynamic_array_BASETYPE(pvoid plist, ALL_TYPE value, unsi size){
     plist_dynamic_array_BASETYPE plist_casted;
     pvoid pnew_elem;
-    ppvoid ppnext_elem;
     unsi  size_array;
 
     plist_casted = (plist_dynamic_array_BASETYPE) plist;
@@ -113,7 +112,7 @@ int insert_first_dynamic_array_BASETYPE(pvoid plist, ALL_TYPE value, unsi size){
 
     memcpy(pnew_elem, TO_PVOID(value), size_array*sizeof(BASETYPE));
 
-    *((ppvoid) GET_PNEXT(pnew_elem)) = plist_casted->pstart;
+    GET_PNEXT(pnew_elem) = plist_casted->pstart;
     plist_casted->pstart = pnew_elem;
 
     if(!((plist_casted->n_elem)++)) plist_casted->pend = pnew_elem;
@@ -141,7 +140,7 @@ int extract_first_dynamic_array_BASETYPE(pvoid plist, ALL_TYPE pvalue, punsi psi
     unsi size_array = plist_casted->size_array;
 
     pelem_to_remove = plist_casted->pstart;
-    plist_casted->pstart = *((ppvoid)GET_PNEXT(pelem_to_remove));
+    plist_casted->pstart = GET_PNEXT(pelem_to_remove);
     if(plist_casted->pstart == NULL) printf("NUllo dopo estrazione");
 
     if((*ppvalue_input = malloc(size_array*sizeof(BASETYPE))) == NULL) return 0;
