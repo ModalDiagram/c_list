@@ -106,6 +106,6 @@ typedef elem_table_generic* pelem_table_generic;
  *
  * return:       torna l'indirizzo della tabella
  * */
-pvoid create_table(unsi dim);
+pvoid create_table(type_resize type_resize, unsi dim);
 
 #endif

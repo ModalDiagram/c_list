@@ -13,64 +13,6 @@ static unsi  idx_lista_vuoti = 1;
 
 /* Sono fornite le seguenti funzioni membro: */
 
-/* malloc_list: istanzia una nuova lista che puo' contenere dati dei tipi:
- *              "CHAR", "INT", "FLOAT", "DOUBLE", "ADDRESS", "GENERIC",
- *              o loro array.
- * type_list:   tipo di lista da instanziare, tra:
- *              - type_list_dynamic
- *              - type_list_table
- * type_string: stringa che descrive il tipo di dato che la lista contiene. Deve
- *              essere una delle stringhe riportate sopra.
- * dim_array:   quanti valori deve contenere ciascun elemento della lista.
- *              Si inserisca ad esempio 1 per avere una lista con tanti elementi
- *              quanto sono i valori inseriti.
- *              Le liste con vettori sono piu' veloci a parita' di dati, ma
- *              i vettori devono avere tutti la stessa dimensione
- *
- * return:      puntatore alla nuova lista, NULL se l'istanziamento non
- *              va a buon fine
- * */
-pvoid malloc_list_table_generic(unsi dim_array){
-  pelem_table_generic pfirst_elem_of_new_list;
-  plista_table_generic  pnew_list;
-
-  if(ptable == NULL)
-   {
-    #ifdef DEBUG_LIST_TABLE_GENERIC
-    printf("---- DEBUG ----\n");
-    printf("Tabella non esiste\n");
-    printf("---- FINE DEBUG ----\n");
-    #endif
-    if((create_table(TABLE_DEFAULT_DIM)) == NULL) return NULL;
-   }
-
-  if(idx_lista_vuoti == IDX_FINE_LISTA)
-   {
-    printf("Memoria preallocata esaurita\n");
-    return NULL;
-   }
-
-  /* STEP 1 */
-  if((pnew_list = (plista_table_generic) malloc(sizeof(plista_table_generic))) == NULL) return NULL;
-  pnew_list->n_elem = 0;
-  pnew_list->idx_primo = idx_lista_vuoti;
-  pnew_list->idx_ultimo = idx_lista_vuoti;
-
-  /* STEP 2 */
-  pfirst_elem_of_new_list = ((pelem_table_generic) ptable) + idx_lista_vuoti;
-  idx_lista_vuoti = pfirst_elem_of_new_list->idx_next;
-
-  /* STEP 3 */
-  pfirst_elem_of_new_list->idx_next = IDX_FINE_LISTA;
-
-  #ifdef DEBUG_LIST_TABLE_GENERIC
-  printf("---- DEBUG ----\n");
-  printf("Nuova lista creata, indice: %d\n", pnew_list->idx_primo);
-  printf("---- FINE DEBUG ----\n");
-  #endif
-  return (pvoid) pnew_list;
- }
-
 /* create_table: alloca la memoria della tabella
  * dim:          numero massimo di elementi contenuti nella tabella
  *
@@ -83,7 +25,7 @@ pvoid malloc_list_table_generic(unsi dim_array){
  *    all'indice 0 e ha per elementi successivi gli indici 1->2->3->... fino
  *    all'ultimo che ha per elemento successivo -1
  * */
-pvoid create_table(unsi dim)
+pvoid create_table(type_resize type_resize, unsi dim)
  {
   pelem_table_generic pelem_tmp;
   int                 i;
@@ -92,8 +34,12 @@ pvoid create_table(unsi dim)
   /* STEP 1 */
   if((ptable = malloc(sizeof(elem_table_generic)*dim)) == NULL) return NULL;
 
+  pelem_tmp = (pelem_table_generic) ptable;
+  pelem_tmp->idx_next = type_resize;
+  pelem_tmp++;
+
   /* STEP 2 */
-  for (i = 1, pelem_tmp = (pelem_table_generic) ptable; i < dim; i++, pelem_tmp++){
+  for (i = 2, pelem_tmp = (pelem_table_generic) ptable; i < dim; i++, pelem_tmp++){
     pelem_tmp->idx_next = i;
    }
   pelem_tmp->idx_next = IDX_FINE_LISTA;
@@ -125,7 +71,64 @@ pvoid create_table(unsi dim)
  *              va a buon fine
  * */
 pvoid malloc_list_specify_table_table_generic(unsi dim_array, type_resize type_resize, unsi dim_table){
-  return NULL;
+  pelem_table_generic pfirst_elem_of_new_list;
+  plista_table_generic  pnew_list;
+
+  if(ptable == NULL){
+    #ifdef DEBUG_LIST_TABLE_GENERIC
+    printf("---- DEBUG ----\n");
+    printf("Tabella non esiste\n");
+    printf("---- FINE DEBUG ----\n");
+    #endif
+    if((create_table(type_resize, dim_table)) == NULL) return NULL;
+   }
+
+  if(idx_lista_vuoti == IDX_FINE_LISTA)
+   {
+    printf("Memoria preallocata esaurita\n");
+    return NULL;
+   }
+
+  /* STEP 1 */
+  if((pnew_list = (plista_table_generic) malloc(sizeof(plista_table_generic))) == NULL) return NULL;
+  pnew_list->n_elem = 0;
+  pnew_list->idx_primo = idx_lista_vuoti;
+  pnew_list->idx_ultimo = idx_lista_vuoti;
+
+  /* STEP 2 */
+  pfirst_elem_of_new_list = ((pelem_table_generic) ptable) + idx_lista_vuoti;
+  idx_lista_vuoti = pfirst_elem_of_new_list->idx_next;
+
+  /* STEP 3 */
+  pfirst_elem_of_new_list->idx_next = IDX_FINE_LISTA;
+
+  #ifdef DEBUG_LIST_TABLE_GENERIC
+  printf("---- DEBUG ----\n");
+  printf("Nuova lista creata, indice: %d\n", pnew_list->idx_primo);
+  printf("---- FINE DEBUG ----\n");
+  #endif
+  return (pvoid) pnew_list;
+ }
+
+/* malloc_list: istanzia una nuova lista che puo' contenere dati dei tipi:
+ *              "CHAR", "INT", "FLOAT", "DOUBLE", "ADDRESS", "GENERIC",
+ *              o loro array.
+ * type_list:   tipo di lista da instanziare, tra:
+ *              - type_list_dynamic
+ *              - type_list_table
+ * type_string: stringa che descrive il tipo di dato che la lista contiene. Deve
+ *              essere una delle stringhe riportate sopra.
+ * dim_array:   quanti valori deve contenere ciascun elemento della lista.
+ *              Si inserisca ad esempio 1 per avere una lista con tanti elementi
+ *              quanto sono i valori inseriti.
+ *              Le liste con vettori sono piu' veloci a parita' di dati, ma
+ *              i vettori devono avere tutti la stessa dimensione
+ *
+ * return:      puntatore alla nuova lista, NULL se l'istanziamento non
+ *              va a buon fine
+ * */
+pvoid malloc_list_table_generic(unsi dim_array){
+    return malloc_list_specify_table_table_generic(dim_array, type_resize_default, TABLE_DEFAULT_DIM);
  }
 
 /* change_resize_table: cambia il tipo di resize della tabella che contiene plist.
