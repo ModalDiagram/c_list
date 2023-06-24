@@ -24,8 +24,8 @@
  *              va a buon fine
  * */
 pvoid malloc_list_table_array_BASETYPE(unsi dim_array){
-    return NULL;
-  }
+  return NULL;
+ }
 
 /* malloc_list_with_resize: crea una nuova lista come sopra, e specifica il tipo di
  *                          resize della tabella che contiene la lista.
@@ -41,8 +41,8 @@ pvoid malloc_list_table_array_BASETYPE(unsi dim_array){
  *              va a buon fine
  * */
 pvoid malloc_list_with_resize_table_array_BASETYPE(unsi dim_array, type_resize type_resize){
-    return NULL;
-  }
+  return NULL;
+ }
 
 /* change_resize_table: cambia il tipo di resize della tabella che contiene plist.
  * type_resize:         tipo di resize da impostare per la tabella. Puo' essere:
@@ -55,16 +55,16 @@ pvoid malloc_list_with_resize_table_array_BASETYPE(unsi dim_array, type_resize t
  *
  * */
 pvoid change_resize_table_table_array_BASETYPE(pvoid plist, type_resize type_resize){
-    return NULL;
-  }
+  return NULL;
+ }
 
 /* free_list: libera la memoria occupata dalla lista
  * plista:    lista da liberare
  *
  * return:    non ritorna niente */
 void free_list_table_array_BASETYPE(pvoid plist){
-    return;
-  }
+  return;
+ }
 
 /* insert_first: inserisce un elemento in cima alla lista.
  * plist:        lista al cui inizio inserire l'elemento
@@ -76,8 +76,8 @@ void free_list_table_array_BASETYPE(pvoid plist){
  * Torna 1 se tutto va bene, 0 altrimenti.
  * */
 int insert_first_table_array_BASETYPE(pvoid plist, ALL_TYPE value, unsi size){
-    return 0;
-  }
+  return 0;
+ }
 
 /* extract_first: estrae l'elemento in cima alla lista
  * plist:         lista dal cui inizio estrarre l'elemento
@@ -93,8 +93,8 @@ int insert_first_table_array_BASETYPE(pvoid plist, ALL_TYPE value, unsi size){
  *
  * Torna 1 se tutto va bene, 0 altrimenti */
 int extract_first_table_array_BASETYPE(pvoid plist, ALL_TYPE pvalue, punsi psize){
-    return 0;
-  }
+  return 0;
+ }
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo
  *                 elemento della lista uguale a quello fornito in input
@@ -120,8 +120,8 @@ int search_first_table_array_BASETYPE(pvoid plist,
                          pvoid  paddr_searched, unsi  size_searched,
                          ppvoid ppaddr_found,   punsi psize_found,
                          pcustom_compare pinput_compare){
-    return 0;
-  }
+  return 0;
+ }
 
 /* get_max:        trova il massimo della lista (cioe' l'elemento che e' piu' grande di
  *                 tutti gli altri secondo pinput_compare)
@@ -143,8 +143,8 @@ int search_first_table_array_BASETYPE(pvoid plist,
  * fornita con la funzione add_functions se presente
  * */
 int get_max_table_array_BASETYPE(pvoid plist, ppvoid ppaddr_max, punsi psize_max, pcustom_compare pinput_compare){
-    return 0;
-  }
+  return 0;
+ }
 
 /* sort_list:      ordina la lista secondo pinput_compare
  * plist:          lista da ordinare
@@ -162,8 +162,8 @@ int get_max_table_array_BASETYPE(pvoid plist, ppvoid ppaddr_max, punsi psize_max
  * fornita con la funzione add_functions se presente
  * */
 int sort_list_table_array_BASETYPE(pvoid plist, pcustom_compare pinput_compare){
-    return 0;
-  }
+  return 0;
+ }
 
 /* print_list:    stampa la lista e le sue proprieta' nel formato
  *                type_list: ...
@@ -188,5 +188,5 @@ int sort_list_table_array_BASETYPE(pvoid plist, pcustom_compare pinput_compare){
  * Torna 1 se tutto va bene, 0 altrimenti
  * */
 int print_list_table_array_BASETYPE(pvoid plist, pcustom_print pinput_print){
-    return 0;
-  }
+  return 0;
+ }

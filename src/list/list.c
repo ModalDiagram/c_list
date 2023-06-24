@@ -60,70 +60,70 @@ CREA_ARRAY(print_list)
  *              va a buon fine
  * */
 pvoid malloc_list(type_list type_list, pchar type_string, unsi dim_array){
-    type_list_data type_new_list;
-    pmy_list pnew_list = (pmy_list) malloc(sizeof(my_list));
+  type_list_data type_new_list;
+  pmy_list pnew_list = (pmy_list) malloc(sizeof(my_list));
 
-    if(type_list == type_list_dynamic){
-        if(!(strcmp(type_string, "INT"))){
-            if(dim_array == 1){type_new_list = type_dynamic_int;}
-            else {type_new_list = type_dynamic_array_int;}
-          }
-        else if(!(strcmp(type_string, "CHAR"))){
-            if(dim_array == 1){type_new_list = type_dynamic_char;}
-            else {type_new_list = type_dynamic_array_char;}
-          }
-        else if(!(strcmp(type_string, "FLOAT"))){
-            if(dim_array == 1){type_new_list = type_dynamic_float;}
-            else {type_new_list = type_dynamic_array_float;}
-          }
-        else if(!(strcmp(type_string, "DOUBLE"))){
-            if(dim_array == 1){type_new_list = type_dynamic_double;}
-            else {type_new_list = type_dynamic_array_double;}
-          }
-        else if(!(strcmp(type_string, "PVOID"))){
-            if(dim_array == 1){type_new_list = type_dynamic_long;}
-            else {type_new_list = type_dynamic_array_long;}
-          }
-        else if(!(strcmp(type_string, "GENERIC"))){
-            type_new_list = type_dynamic_generic;
-          }
-        else return NULL;
-      }
-    else if(type_list == type_list_table){
-        if(!(strcmp(type_string, "INT"))){
-            if(dim_array == 1){type_new_list = type_table_int;}
-            else {type_new_list = type_table_array_int;}
-          }
-        else if(!(strcmp(type_string, "CHAR"))){
-            if(dim_array == 1){type_new_list = type_table_char;}
-            else {type_new_list = type_table_array_char;}
-          }
-        else if(!(strcmp(type_string, "FLOAT"))){
-            if(dim_array == 1){type_new_list = type_table_float;}
-            else {type_new_list = type_table_array_float;}
-          }
-        else if(!(strcmp(type_string, "DOUBLE"))){
-            if(dim_array == 1){type_new_list = type_table_double;}
-            else {type_new_list = type_table_array_double;}
-          }
-        else if(!(strcmp(type_string, "PVOID"))){
-            if(dim_array == 1){type_new_list = type_table_long;}
-            else {type_new_list = type_table_array_long;}
-          }
-        else if(!(strcmp(type_string, "GENERIC"))){
-            type_new_list = type_table_generic;
-          }
-        else return NULL;
-      }
+  if(type_list == type_list_dynamic){
+    if(!(strcmp(type_string, "INT"))){
+      if(dim_array == 1){type_new_list = type_dynamic_int;}
+      else {type_new_list = type_dynamic_array_int;}
+     }
+    else if(!(strcmp(type_string, "CHAR"))){
+      if(dim_array == 1){type_new_list = type_dynamic_char;}
+      else {type_new_list = type_dynamic_array_char;}
+     }
+    else if(!(strcmp(type_string, "FLOAT"))){
+      if(dim_array == 1){type_new_list = type_dynamic_float;}
+      else {type_new_list = type_dynamic_array_float;}
+     }
+    else if(!(strcmp(type_string, "DOUBLE"))){
+      if(dim_array == 1){type_new_list = type_dynamic_double;}
+      else {type_new_list = type_dynamic_array_double;}
+     }
+    else if(!(strcmp(type_string, "PVOID"))){
+      if(dim_array == 1){type_new_list = type_dynamic_long;}
+      else {type_new_list = type_dynamic_array_long;}
+     }
+    else if(!(strcmp(type_string, "GENERIC"))){
+      type_new_list = type_dynamic_generic;
+     }
     else return NULL;
-    if((pnew_list->plist = malloc_list_arr[type_new_list](dim_array)) == NULL){
-        free(pnew_list);
-        return NULL;
-      }
+   }
+  else if(type_list == type_list_table){
+    if(!(strcmp(type_string, "INT"))){
+      if(dim_array == 1){type_new_list = type_table_int;}
+      else {type_new_list = type_table_array_int;}
+     }
+    else if(!(strcmp(type_string, "CHAR"))){
+      if(dim_array == 1){type_new_list = type_table_char;}
+      else {type_new_list = type_table_array_char;}
+     }
+    else if(!(strcmp(type_string, "FLOAT"))){
+      if(dim_array == 1){type_new_list = type_table_float;}
+      else {type_new_list = type_table_array_float;}
+     }
+    else if(!(strcmp(type_string, "DOUBLE"))){
+      if(dim_array == 1){type_new_list = type_table_double;}
+      else {type_new_list = type_table_array_double;}
+     }
+    else if(!(strcmp(type_string, "PVOID"))){
+      if(dim_array == 1){type_new_list = type_table_long;}
+      else {type_new_list = type_table_array_long;}
+     }
+    else if(!(strcmp(type_string, "GENERIC"))){
+      type_new_list = type_table_generic;
+     }
+    else return NULL;
+   }
+  else return NULL;
+  if((pnew_list->plist = malloc_list_arr[type_new_list](dim_array)) == NULL){
+    free(pnew_list);
+    return NULL;
+   }
 
-    pnew_list->tlist = type_new_list;
-    return pnew_list;
-  }
+  pnew_list->tlist = type_new_list;
+  return pnew_list;
+ }
 
 /* malloc_list_with_resize: crea una nuova lista come sopra, e specifica il tipo di
  *                          resize della tabella che contiene la lista.
@@ -139,8 +139,8 @@ pvoid malloc_list(type_list type_list, pchar type_string, unsi dim_array){
  *              va a buon fine
  * */
 pvoid malloc_list_with_resize(type_list type_list, pchar type_string, unsi dim_array, type_resize type_resize){
-    return NULL;
-  }
+  return NULL;
+ }
 
 /* change_resize_table: cambia il tipo di resize della tabella che contiene plist.
  * type_resize:         tipo di resize da impostare per la tabella. Puo' essere:
@@ -154,19 +154,19 @@ pvoid malloc_list_with_resize(type_list type_list, pchar type_string, unsi dim_a
  * */
 pvoid change_resize_table(pvoid plist, type_resize type_resize){
   return NULL;
-}
+ }
 
 /* free_list: libera la memoria occupata dalla lista
  * plista:    lista da liberare
  *
  * return:    non ritorna niente */
 void free_list(pvoid plist){
-    pmy_list plist_casted = (pmy_list) plist;
+  pmy_list plist_casted = (pmy_list) plist;
 
-    free_list_arr[plist_casted->tlist](plist_casted->plist);
-    free(plist);
-    return;
-  }
+  free_list_arr[plist_casted->tlist](plist_casted->plist);
+  free(plist);
+  return;
+ }
 
 /* get_type_list: questa funzione permette di scoprire il tipo della lista e
  *                del dato contenuto
@@ -178,8 +178,8 @@ void free_list(pvoid plist){
  *                "TABLE INT"
  * */
 pchar get_type_list(pvoid plist){
-    return 0;
-  }
+  return 0;
+ }
 
 /* insert_first: inserisce un elemento in cima alla lista.
  * plist:        lista al cui inizio inserire l'elemento
@@ -195,10 +195,10 @@ pchar get_type_list(pvoid plist){
  *
  * */
 int insert_first(pvoid plist, ALL_TYPE value, unsi size){
-    pmy_list plist_casted = (pmy_list) plist;
+  pmy_list plist_casted = (pmy_list) plist;
 
-    return insert_first_arr[plist_casted->tlist](plist_casted->plist, value, size);
-  }
+  return insert_first_arr[plist_casted->tlist](plist_casted->plist, value, size);
+ }
 
 /* extract_first: estrae l'elemento in cima alla lista
  * plist:         lista dal cui inizio estrarre l'elemento
@@ -220,10 +220,10 @@ int insert_first(pvoid plist, ALL_TYPE value, unsi size){
  *
  * */
 int extract_first(pvoid plist, ALL_TYPE pvalue, punsi psize){
-    pmy_list plist_casted = (pmy_list) plist;
+  pmy_list plist_casted = (pmy_list) plist;
 
-    return extract_first_arr[plist_casted->tlist](plist_casted->plist, pvalue, psize);
-  }
+  return extract_first_arr[plist_casted->tlist](plist_casted->plist, pvalue, psize);
+ }
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo
  *                 elemento della lista uguale a quello fornito in input
@@ -249,8 +249,8 @@ int search_first(pvoid plist,
                  pvoid  paddr_searched, unsi  size_searched,
                  ppvoid ppaddr_found,   punsi psize_found,
                  pcustom_compare pinput_compare){
-    return 0;
-  }
+  return 0;
+ }
 
 /* get_max:        trova il massimo della lista (cioe' l'elemento che e' piu' grande di
  *                 tutti gli altri secondo pinput_compare)
@@ -272,8 +272,8 @@ int search_first(pvoid plist,
  * fornita con la funzione add_functions se presente
  * */
 int get_max(pvoid plist, ppvoid ppaddr_max, punsi psize_max, pcustom_compare pinput_compare){
-    return 0;
-  }
+  return 0;
+ }
 
 /* sort_list:      ordina la lista secondo pinput_compare
  * plist:          lista da ordinare
@@ -291,8 +291,8 @@ int get_max(pvoid plist, ppvoid ppaddr_max, punsi psize_max, pcustom_compare pin
  * fornita con la funzione add_functions se presente
  * */
 int sort_list(pvoid plist, pcustom_compare pinput_compare){
-    return 0;
-  }
+  return 0;
+ }
 
 /* print_list:    stampa la lista e le sue proprieta' nel formato
  *                type_list: ...
@@ -317,7 +317,7 @@ int sort_list(pvoid plist, pcustom_compare pinput_compare){
  * Torna 1 se tutto va bene, 0 altrimenti
  * */
 int print_list(pvoid plist, pcustom_print pinput_print){
-    pmy_list plist_casted = (pmy_list) plist;
+  pmy_list plist_casted = (pmy_list) plist;
 
-    return print_list_arr[plist_casted->tlist](plist_casted->plist, pinput_print);
-  }
+  return print_list_arr[plist_casted->tlist](plist_casted->plist, pinput_print);
+ }

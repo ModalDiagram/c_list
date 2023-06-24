@@ -54,9 +54,9 @@
 
 /* type_list: tipo della lista da istanziare, descritti precedentemente */
 typedef enum{
-    type_list_dynamic=0,
-    type_list_table  =1,
-  } type_list;
+  type_list_dynamic=0,
+  type_list_table  =1,
+ } type_list;
 
 /* type_resize: tipo di resize della table
  *
@@ -72,9 +72,9 @@ typedef enum{
  * malloc_list_with_resize
  * */
 typedef enum{
-    type_resize_default=0,
-    type_resize_manual =1,
-  } type_resize;
+  type_resize_default=0,
+  type_resize_manual =1,
+ } type_resize;
 
 /* pcustom_print: funzione con cui stampare un elemento della lista
  * value:         valore dell'elemento da stampare

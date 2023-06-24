@@ -20,10 +20,10 @@
  * pnext:         indirizzo all'elemento successivo della lista
  * */
 typedef struct _elem_generic {
-    pvoid paddr;
-    unsi size;
-    struct _elem_generic *pnext;
-  } elem_generic;
+  pvoid paddr;
+  unsi size;
+  struct _elem_generic *pnext;
+ } elem_generic;
 typedef elem_generic* pelem_generic;
 
 /* list_dynamic_generic: struttura che contiene le informazioni sulla lista
@@ -32,10 +32,10 @@ typedef elem_generic* pelem_generic;
  * n_elem:               numero di elementi contenuti nella lista
  * */
 typedef struct _list_dynamic_generic {
-    pelem_generic pstart;
-    pelem_generic pend;
-    unsi n_elem;
-  } list_dynamic_generic;
+  pelem_generic pstart;
+  pelem_generic pend;
+  unsi n_elem;
+ } list_dynamic_generic;
 
 typedef list_dynamic_generic* plist_dynamic_generic;
 

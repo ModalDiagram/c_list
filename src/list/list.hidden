@@ -32,10 +32,10 @@
  * plista: puntatore alla lista
  * tstk:   tipo di lista
  * */
-typedef struct _my_list
-  {pvoid      plist;
-   type_list  tlist;
-  } my_list;
+typedef struct _my_list {
+  pvoid      plist;
+  type_list  tlist;
+ } my_list;
 
 typedef my_list* pmy_list;
 
@@ -48,30 +48,30 @@ typedef my_list* pmy_list;
  * e un unsi, la sua size.
  * */
 typedef enum{
-    type_dynamic_char         =0,
-    type_dynamic_int          =1,
-    type_dynamic_float        =2,
-    type_dynamic_double       =3,
-    type_dynamic_long        =4,
-    type_dynamic_array_char   =5,
-    type_dynamic_array_int    =6,
-    type_dynamic_array_float  =7,
-    type_dynamic_array_double =8,
-    type_dynamic_array_long  =9,
-    type_dynamic_generic      =10,
+  type_dynamic_char         =0,
+  type_dynamic_int          =1,
+  type_dynamic_float        =2,
+  type_dynamic_double       =3,
+  type_dynamic_long        =4,
+  type_dynamic_array_char   =5,
+  type_dynamic_array_int    =6,
+  type_dynamic_array_float  =7,
+  type_dynamic_array_double =8,
+  type_dynamic_array_long  =9,
+  type_dynamic_generic      =10,
 
-    type_table_char           =11,
-    type_table_int            =12,
-    type_table_float          =13,
-    type_table_double         =14,
-    type_table_long          =15,
-    type_table_array_char     =16,
-    type_table_array_int      =17,
-    type_table_array_float    =18,
-    type_table_array_double   =19,
-    type_table_array_long    =20,
-    type_table_generic        =21,
-  } type_list_data;
+  type_table_char           =11,
+  type_table_int            =12,
+  type_table_float          =13,
+  type_table_double         =14,
+  type_table_long          =15,
+  type_table_array_char     =16,
+  type_table_array_int      =17,
+  type_table_array_float    =18,
+  type_table_array_double   =19,
+  type_table_array_long    =20,
+  type_table_generic        =21,
+ } type_list_data;
 
 // puntatori a fuzioni, utilizzati per generalizzare l'oggetto list
 typedef pvoid (*type_malloc_list)(unsi dim_array);
@@ -81,9 +81,9 @@ typedef void (*type_free_list)(pvoid plist);
 typedef int (*type_insert_first)(pvoid plist, ALL_TYPE value, unsi size);
 typedef int (*type_extract_first)(pvoid plist, ALL_TYPE pvalue, punsi psize);
 typedef int (*type_search_first)(pvoid plist,
-                   pvoid  paddr_searched, unsi  size_searched,
-                   ppvoid ppaddr_found,   punsi psize_found,
-                   pcustom_compare pinput_compare);
+                                 pvoid  paddr_searched, unsi  size_searched,
+                                 ppvoid ppaddr_found,   punsi psize_found,
+                                 pcustom_compare pinput_compare);
 typedef int (*type_get_max)(pvoid plist, ppvoid ppaddr_max, punsi psize_max, pcustom_compare pinput_compare);
 typedef int (*type_sort_list)(pvoid plist, pcustom_compare pinput_compare);
 typedef int (*type_print_list)(pvoid plist, pcustom_print pinput_print);

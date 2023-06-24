@@ -1,0 +1,110 @@
+#ifndef _LISTA_VELOCE_HIDDEN
+#define _LISTA_VELOCE_HIDDEN
+
+#include "../defines_typedef.h"
+
+/* FUNZIONAMENTO
+ * E' piu' veloce della lista_leggera perche' lavoriamo con una tabella e i suoi
+ * indici invece che con puntatori ad elementi.
+ *
+ * Supponiamo di avere due lista_veloce:
+ * 1) X->Y->Z
+ * 2) X->Y
+ * e indichiamo con ADD1X l'indirizzo dell'elemento X della lista_veloce 1.
+ *
+ * La tabella sara' del tipo:
+ *
+         pvoid         unsi           int
+         paddr         size           idx
+     +-----------+---------------+-----------+
+     |  qualunque|    qualunque  |           |
+ 0   |  cosa     |    cosa       |    5      |
+     +-----------+---------------+-----------+
+     |           |               |           |
+ 1   |  ADD2Y    |    SIZE2Y     |    -1     |
+     |           |               |           |
+     +-----------+---------------+-----------+
+     |           |               |           |
+ 2   |   ADD1X   |    SIZE1X     |    4      |
+     |           |               |           |
+     +-----------+---------------+-----------+
+     |           |               |           |
+ 3   |   ADD1Z   |    SIZE1Z     |    -1     |
+     |           |               |           |
+     +-----------+---------------+-----------+
+     |           |               |           |
+ 4   |   ADD1Y   |    SIZE1Y     |    3      |
+     |           |               |           |
+     +-----------+---------------+-----------+
+     |  qualunque|    qualunque  |           |
+ 5   |  cosa     |    cosa       |    -1     |
+     +-----------+---------------+-----------+
+     |           |               |           |
+ 6   |   ADD2X   |    SIZE2X     |    1      |
+     +-----------+---------------+-----------+
+ *
+ *
+ * Ogni lista e' individuata da un intero, l'indice del primo elemento,
+ * da cui attraverso il campo idx si possono ottenere tutti gli elementi successivi
+ * fino all'ultimo che ha per idx -1.
+ *
+ * La lista 1 e' individuata dall'intero 2, la lista 2 da 6.
+ *
+ * All'interno della tabella c'e' in realta' una terza lista: la lista dei vuoti.
+ * La lista dei vuoti serve ad ottenere il primo posto libero nella tabella.
+ * I suoi elementi non hanno particolari campi paddr e size ma solo idx.
+ * In questo esempio la lista dei vuoti e' individuata dall'indice 0 ed e' del tipo:
+ * 0->5
+ * cioe' nella tabella sono libere le posizioni all'indice 0 e 5.
+ *
+ * Al momento di inserire un elemento possiamo scriverlo all'indice 0
+ * e cambiare l'indice di partenza della lista dei vuoti in 5 (successivo elemento libero).
+ *
+ * All'istanziamento di liste successive possiamo utilizzare la stessa tabella,
+ * salvando il suo indirizzo come variabile permanente. Basta fornire all'utente
+ * l'indice del primo elemento libero e cambiare l'indice di inizio della lista
+ * dei vuoti.
+ */
+
+/* Dimensione della zona di memoria da allocare all'istanziamento della prima
+ * lista_veloce e in cui saranno contenute anche le successive lista_veloce */
+#define NUM_ELEMENTI_TABELLA 1000
+
+/* STRUTTURA LISTA:
+ * tecnicamente basterebbe l'indice del primo elemento per individuare la lista.
+ * Tuttavia, se salviamo anche l'indice dell'ultimo elemento della lista, l'inserimento in
+ * coda diventa O(1) invece di O(N). Per questo l'utente esterno vedra' la lista come
+ * pvoid che punta a una struttura lista_idx contentente gli indici del primo
+ * e ultimo elemento.
+ *
+ * La struttura contiene anche il numero di elementi della lista per funzioni
+ * di aiuto come print_lista ed eventuali controlli in funzioni come
+ * insert_nth e extract_nth
+ * */
+typedef struct _lista_idx {
+  unsi idx_primo;
+  unsi idx_ultimo;
+  unsi n_elem;
+ } lista_idx;
+typedef lista_idx* plista_idx;
+
+/* STRUTTURA ELEMENTO:
+ * la tabella e' essenzialmente un array di elementi fatti da:
+ * - paddr:    indirizzo dell'elemento da conservare
+ * - size:     size dell'elemento da conservare
+ * - idx_next: indirizzo dell'elemento successivo della lista
+ * */
+typedef struct _elem_tabella{pvoid paddr; unsi size; int idx_next;} elem_tabella;
+typedef elem_tabella*                                               pelem_tabella;
+
+/* Di seguito le funzioni usate internamente: */
+
+/* crea_tabella: alloca la memoria della tabella
+ * dim:          numero di elementi della tabella, ovvero di possibili elementi totali
+ *               delle liste della tabella
+ *
+ * return:       torna l'indirizzo della tabella
+ * */
+pvoid crea_tabella(unsi dim);
+
+#endif

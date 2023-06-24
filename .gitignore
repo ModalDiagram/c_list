@@ -2,3 +2,4 @@ src/compile_commands.json
 schema.*
 src/.cache/
 prod/*
+src/lista_veloce.c
