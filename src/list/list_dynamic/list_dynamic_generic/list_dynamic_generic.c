@@ -66,8 +66,8 @@ pvoid malloc_list_specify_table_dynamic_generic(unsi dim_array, type_resize type
  *                                             attraverso shrink_table
  *
  * */
-pvoid change_resize_table_dynamic_generic(pvoid plist, type_resize type_resize){
-  return NULL;
+int change_resize_table_dynamic_generic(pvoid plist, type_resize type_resize){
+  return 0;
  }
 
 /* free_list: libera la memoria occupata dalla lista

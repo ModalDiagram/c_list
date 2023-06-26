@@ -87,9 +87,13 @@ void test_array_float(){
 
 void test_table_generic(){
   pvoid plist;
+  float f=4;
 
   /* if((plist = malloc_list(type_list_table, "GENERIC", 3)) == NULL) printf("Non creata.\n"); */
-  if((plist = malloc_list_specify_table(type_list_table, "GENERIC", 3, type_resize_default, 0)) == NULL) printf("Non creata.\n");
+  if((plist = malloc_list_specify_table(type_list_table, "GENERIC", 3, type_resize_default, 3)) == NULL) printf("Non creata.\n");
+  print_list(plist, NULL);
+  insert_first(plist, TO_ALLTYPE(&f), sizeof(float));
+  print_list(plist, NULL);
  }
 
 int main(int argc, char *argv[]){

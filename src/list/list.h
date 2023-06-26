@@ -51,6 +51,8 @@
  ((ALL_TYPE)((long)( value )))
 #define TO_PVOID(value) \
  ((pvoid)((long)( value )))
+#define TO_BASETYPE(value) \
+ ((long)( value ))
 
 /* Dimensione della zona di memoria da allocare all'istanziamento della prima
  * lista_veloce e in cui saranno contenute anche le successive lista_veloce */
@@ -172,7 +174,7 @@ pvoid malloc_list_specify_table(type_list type_list, pchar type_string, unsi dim
  *                                             attraverso shrink_table
  *
  * */
-pvoid change_resize_table(pvoid plist, type_resize type_resize);
+int change_resize_table(pvoid plist, type_resize type_resize);
 
 /* free_list: libera la memoria occupata dalla lista
  * plista:    lista da liberare

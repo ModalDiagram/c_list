@@ -42,61 +42,7 @@ CREA_ARRAY(print_list)
 
 /* Sono fornite le seguenti funzioni membro: */
 
-type_list_data find_type(type_list type_list, pchar type_string, unsi dim_array){
-  if(type_list == type_list_dynamic){
-    if(!(strcmp(type_string, "INT"))){
-      if(dim_array == 1){return type_dynamic_int;}
-      else {return type_dynamic_array_int;}
-     }
-    else if(!(strcmp(type_string, "CHAR"))){
-      if(dim_array == 1){return type_dynamic_char;}
-      else {return type_dynamic_array_char;}
-     }
-    else if(!(strcmp(type_string, "FLOAT"))){
-      if(dim_array == 1){return type_dynamic_float;}
-      else {return type_dynamic_array_float;}
-     }
-    else if(!(strcmp(type_string, "DOUBLE"))){
-      if(dim_array == 1){return type_dynamic_double;}
-      else {return type_dynamic_array_double;}
-     }
-    else if(!(strcmp(type_string, "PVOID"))){
-      if(dim_array == 1){return type_dynamic_long;}
-      else {return type_dynamic_array_long;}
-     }
-    else if(!(strcmp(type_string, "GENERIC"))){
-      return type_dynamic_generic;
-     }
-    else return -1;
-   }
-  else if(type_list == type_list_table){
-    if(!(strcmp(type_string, "INT"))){
-      if(dim_array == 1){return type_table_int;}
-      else {return type_table_array_int;}
-     }
-    else if(!(strcmp(type_string, "CHAR"))){
-      if(dim_array == 1){return type_table_char;}
-      else {return type_table_array_char;}
-     }
-    else if(!(strcmp(type_string, "FLOAT"))){
-      if(dim_array == 1){return type_table_float;}
-      else {return type_table_array_float;}
-     }
-    else if(!(strcmp(type_string, "DOUBLE"))){
-      if(dim_array == 1){return type_table_double;}
-      else {return type_table_array_double;}
-     }
-    else if(!(strcmp(type_string, "PVOID"))){
-      if(dim_array == 1){return type_table_long;}
-      else {return type_table_array_long;}
-     }
-    else if(!(strcmp(type_string, "GENERIC"))){
-      return type_table_generic;
-     }
-    else return -1;
-   }
-  else return -1;
-}
+
 /* malloc_list: istanzia una nuova lista che puo' contenere dati dei tipi:
  *              "CHAR", "INT", "FLOAT", "DOUBLE", "ADDRESS", "GENERIC",
  *              o loro array.
@@ -172,9 +118,12 @@ pvoid malloc_list_specify_table(type_list type_list, pchar type_string, unsi dim
  *                                             Deve essere ampliata manualmente
  *                                             attraverso shrink_table
  *
+ * Torna 1 se tutto va bene 0 altrimenti
  * */
-pvoid change_resize_table(pvoid plist, type_resize type_resize){
-  return NULL;
+int change_resize_table(pvoid plist, type_resize type_resize){
+  pmy_list plist_casted = (pmy_list) plist;
+
+  return change_resize_table_arr[plist_casted->tlist](plist_casted->plist, type_resize);
  }
 
 /* free_list: libera la memoria occupata dalla lista
@@ -341,4 +290,61 @@ int print_list(pvoid plist, pcustom_print pinput_print){
   pmy_list plist_casted = (pmy_list) plist;
 
   return print_list_arr[plist_casted->tlist](plist_casted->plist, pinput_print);
+ }
+
+/* Altre funzioni ausiliarie: */
+type_list_data find_type(type_list type_list, pchar type_string, unsi dim_array){
+  if(type_list == type_list_dynamic){
+    if(!(strcmp(type_string, "INT"))){
+      if(dim_array == 1){return type_dynamic_int;}
+      else {return type_dynamic_array_int;}
+     }
+    else if(!(strcmp(type_string, "CHAR"))){
+      if(dim_array == 1){return type_dynamic_char;}
+      else {return type_dynamic_array_char;}
+     }
+    else if(!(strcmp(type_string, "FLOAT"))){
+      if(dim_array == 1){return type_dynamic_float;}
+      else {return type_dynamic_array_float;}
+     }
+    else if(!(strcmp(type_string, "DOUBLE"))){
+      if(dim_array == 1){return type_dynamic_double;}
+      else {return type_dynamic_array_double;}
+     }
+    else if(!(strcmp(type_string, "PVOID"))){
+      if(dim_array == 1){return type_dynamic_long;}
+      else {return type_dynamic_array_long;}
+     }
+    else if(!(strcmp(type_string, "GENERIC"))){
+      return type_dynamic_generic;
+     }
+    else return -1;
+   }
+  else if(type_list == type_list_table){
+    if(!(strcmp(type_string, "INT"))){
+      if(dim_array == 1){return type_table_int;}
+      else {return type_table_array_int;}
+     }
+    else if(!(strcmp(type_string, "CHAR"))){
+      if(dim_array == 1){return type_table_char;}
+      else {return type_table_array_char;}
+     }
+    else if(!(strcmp(type_string, "FLOAT"))){
+      if(dim_array == 1){return type_table_float;}
+      else {return type_table_array_float;}
+     }
+    else if(!(strcmp(type_string, "DOUBLE"))){
+      if(dim_array == 1){return type_table_double;}
+      else {return type_table_array_double;}
+     }
+    else if(!(strcmp(type_string, "PVOID"))){
+      if(dim_array == 1){return type_table_long;}
+      else {return type_table_array_long;}
+     }
+    else if(!(strcmp(type_string, "GENERIC"))){
+      return type_table_generic;
+     }
+    else return -1;
+   }
+  else return -1;
  }

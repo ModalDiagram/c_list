@@ -78,12 +78,12 @@
  * di aiuto come print_lista ed eventuali controlli in funzioni come
  * insert_nth e extract_nth
  * */
-typedef struct _lista_table_generic {
-  unsi idx_primo;
-  unsi idx_ultimo;
+typedef struct _list_table_generic {
+  unsi idx_start;
+  unsi idx_end;
   unsi n_elem;
- } lista_table_generic;
-typedef lista_table_generic* plista_table_generic;
+ } list_table_generic;
+typedef list_table_generic* plist_table_generic;
 
 /* STRUTTURA ELEMENTO:
  * la tabella e' essenzialmente un array di elementi fatti da:

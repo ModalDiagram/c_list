@@ -45,7 +45,7 @@ pvoid malloc_list_specify_table_dynamic_array_BASETYPE(unsi dim_array, type_resi
  *                                             attraverso shrink_table
  *
  * */
-pvoid change_resize_table_dynamic_array_BASETYPE(pvoid plist, type_resize type_resize);
+int change_resize_table_dynamic_array_BASETYPE(pvoid plist, type_resize type_resize);
 
 /* free_list: libera la memoria occupata dalla lista
  * plista:    lista da liberare
