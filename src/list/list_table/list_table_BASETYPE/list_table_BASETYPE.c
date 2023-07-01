@@ -389,9 +389,49 @@ int insert_last_table_BASETYPE(pvoid plist, all_type value, unsi size){
  *
  * */
 int extract_last_table_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
-  return 0;
- }
+  pelem_table_BASETYPE pelem_moving, ptable_casted = (pelem_table_BASETYPE) ptable;
+  plist_table_BASETYPE plist_casted = (plist_table_BASETYPE) plist;
+  int                  idx_current, idx_end = plist_casted->idx_end;
+  pBASETYPE            pvalue_input = (pBASETYPE) pvalue.pv;
 
+  if(plist_casted->n_elem == 0){
+    return 0;
+   }
+
+  /* se la lista ha 1 solo elemento non devo liberare lo spazio (ogni lista
+   * ha almeno uno spazio), ma basta decrementare il n_elem,
+   * perche' quando aggiungero' l'elemento successivo il valore contenuto
+   * sara' sovrascritti essendo n_elem==0 */
+  pelem_moving = ptable_casted + plist_casted->idx_start;
+  if(plist_casted->n_elem == 1){
+    *pvalue_input = pelem_moving->val;
+    (plist_casted->n_elem)--;
+    return 1;
+   }
+
+  /* raggiungo l'ultimo elemento con pelem_moving e conservo in idx_current l'indice del penultimo */
+  idx_current = plist_casted->idx_start;
+  while(pelem_moving->idx_next != idx_end){
+    pelem_moving = ptable_casted + (idx_current = pelem_moving->idx_next);
+   }
+  pelem_moving = ptable_casted + pelem_moving->idx_next;
+
+  /* scrivo IDX_FINE_LISTA nell'idx_next del penultimo elemento */
+  (ptable_casted + idx_current)->idx_next = IDX_FINE_LISTA;
+
+  /* restituisco il valore estratto */
+  *pvalue_input = pelem_moving->val;
+
+  /* metto l'ultimo elemento in cima alla lista dei vuoti */
+  (pelem_moving->idx_next) = idx_void_list;
+  idx_void_list = plist_casted->idx_end;
+
+  /* aggiorno le informazioni della lista */
+  plist_casted->idx_end = idx_current;
+  (plist_casted->n_elem)--;
+
+  return 1;
+ }
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo
  *                 elemento della lista uguale a quello fornito in input

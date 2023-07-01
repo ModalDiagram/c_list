@@ -477,9 +477,54 @@ int insert_last_table_array_BASETYPE(pvoid plist, all_type value, unsi size){
  *
  * */
 int extract_last_table_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
-  return 0;
- }
+  plist_table_array_BASETYPE plist_casted = (plist_table_array_BASETYPE) plist;
+  pinfo_table                pmy_info = (pinfo_table) (plist_casted->ptable);
+  pvoid                      pelem_moving, ptable = pmy_info + 1;
+  ppvoid                     ppvalue_input = pvalue.pv;
+  unsi                       idx_current, idx_end = plist_casted->idx_end;
+  unsi                       sizeof_array = pmy_info->sizeof_array;
+  unsi                       idx_void_list = pmy_info->idx_void_list;
 
+  if(plist_casted->n_elem == 0){
+    return 0;
+   }
+
+  /* se la lista ha 1 solo elemento non devo liberare lo spazio (ogni lista
+   * ha almeno uno spazio), ma basta decrementare il n_elem,
+   * perche' quando aggiungero' l'elemento successivo il valore contenuto
+   * sara' sovrascritti essendo n_elem==0 */
+  pelem_moving = GET_NEXT_ELEM(ptable, plist_casted->idx_start);
+  if(plist_casted->n_elem == 1){
+    if((*ppvalue_input = malloc(sizeof_array)) == NULL) return 0;
+    memcpy(*ppvalue_input, pelem_moving, sizeof_array);
+    (plist_casted->n_elem)--;
+    return 1;
+   }
+
+  /* raggiungo l'ultimo elemento con pelem_moving e conservo in idx_current l'indice del penultimo */
+  idx_current = plist_casted->idx_start;
+  while(GET_IDX_NEXT(pelem_moving) != idx_end){
+    pelem_moving = GET_NEXT_ELEM(ptable, (idx_current = GET_IDX_NEXT(pelem_moving)));
+   }
+  pelem_moving = GET_NEXT_ELEM(ptable, GET_IDX_NEXT(pelem_moving));
+
+  /* scrivo IDX_FINE_LISTA nell'idx_next del penultimo elemento */
+  GET_IDX_NEXT(GET_NEXT_ELEM(ptable, idx_current)) = IDX_FINE_LISTA;
+
+  /* restituisco il valore estratto */
+  if((*ppvalue_input = malloc(sizeof_array)) == NULL) return 0;
+  memcpy(*ppvalue_input, pelem_moving, sizeof_array);
+
+  /* metto l'ultimo elemento in cima alla lista dei vuoti */
+  GET_IDX_NEXT(pelem_moving) = idx_void_list;
+  pmy_info->idx_void_list = plist_casted->idx_end;
+
+  /* aggiorno le informazioni della lista */
+  plist_casted->idx_end = idx_current;
+  (plist_casted->n_elem)--;
+
+  return 1;
+ }
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo
  *                 elemento della lista uguale a quello fornito in input

@@ -89,9 +89,8 @@ void test_float(){
   print_list(plist, print_float);
   printf("Estratto %f\n", f);
   for(;;){
-    plist = malloc_list(type_list_dynamic, "FLOAT", 1);
     insert_first(plist, (all_type)((float)2.4), 0);
-    free_list(plist);
+    extract_first(plist, (all_type)((pvoid)&f), NULL);
    }
  }
 
@@ -150,49 +149,53 @@ void test_table_generic(){
   if((plist = malloc_list_specify_table("GENERIC", 3, type_resize_default, 100)) == NULL) printf("Non creata.\n");
   print_list(plist, print_generic);
   insert_last(plist, (all_type)((pvoid)&f), sizeof(float));
-  extract_first(plist, (all_type)((pvoid)&pf), &size);
+  extract_last(plist, (all_type)((pvoid)&pf), &size);
+  extract_last(plist, (all_type)((pvoid)&pf), &size);
+  extract_last(plist, (all_type)((pvoid)&pf), &size);
   printf("Estratto %f con size %u\n", *pf, size);
   f=5;
   insert_last(plist, (all_type)((pvoid)&f), sizeof(float));
   f=10;
   insert_first(plist, (all_type)((pvoid)&f), sizeof(float));
   print_list(plist, print_generic);
-  extract_first(plist, (all_type)((pvoid)&pf), &size);
+  extract_last(plist, (all_type)((pvoid)&pf), &size);
   printf("Estratto %f con size %u\n", *pf, size);
   print_list(plist, print_generic);
   for(;;){
-    plist = malloc_list_specify_table("GENERIC", 3, type_resize_default, 3);
-    insert_first(plist, (all_type)((pvoid)&f), sizeof(float));
-
-    free_list(plist);
+    insert_last(plist, (all_type)((pvoid)&f), sizeof(float));
+    extract_last(plist, (all_type)((pvoid)&pf), &size);
+    free(pf);
    }
  }
 
 void test_table_char(){
   pvoid plist;
   char  c='a', ex;
+  int i=0;
 
   /* if((plist = malloc_list(type_list_table, "GENERIC", 3)) == NULL) printf("Non creata.\n"); */
   if((plist = malloc_list_specify_table("CHAR", 1, type_resize_default, 100)) == NULL) printf("Non creata.\n");
-  print_list(plist, print_char);
   insert_first(plist, (all_type)c, sizeof(float));
+  print_list(plist, print_char);
+  extract_last(plist, (all_type)((pvoid)&ex), NULL);
+  extract_last(plist, (all_type)((pvoid)&ex), NULL);
+  printf("Estratto %c\n", ex);
+  print_list(plist, print_char);
   c='b';
   insert_first(plist, (all_type)c, sizeof(float));
   c='c';
-  insert_last(plist, (all_type)c, sizeof(float));
-  c='d';
-  insert_last(plist, (all_type)c, sizeof(float));
+  insert_first(plist, (all_type)c, sizeof(float));
   print_list(plist, print_char);
-  extract_first(plist, (all_type)((pvoid)&ex), NULL);
+  extract_last(plist, (all_type)((pvoid)&ex), NULL);
   printf("Estratto %c\n", ex);
   print_list(plist, print_char);
   /* free_list(plist); */
   for(;;){
-    if((plist = malloc_list_specify_table("CHAR", 1, type_resize_default, 3)) == NULL) return;
-    /* insert_first(plist, (all_type) c, sizeof(float)); */
-
-    free_list(plist);
+    i++;
+    if((insert_last(plist, (all_type)c, sizeof(float))) == 0) break;
+    extract_last(plist, (all_type)((pvoid)&ex), NULL);
    }
+  printf("iter %d\n", i);
  }
 
 void test_table_array_float(){
@@ -207,13 +210,14 @@ void test_table_array_float(){
   if((plist = malloc_list(type_list_table, "FLOAT", 5)) == NULL) printf("Non creata.\n");
   if((plist = malloc_list(type_list_table, "FLOAT", 3)) == NULL) printf("Non creata.\n");
   insert_last(plist, (all_type)(pvoid)array, 0);
-  extract_first(plist, (all_type)(pvoid)&pextracted, 0);
+  extract_last(plist, (all_type)(pvoid)&pextracted, 0);
   printf("Estratto: ");
   print_array_float((all_type)(pvoid)pextracted, 5);
   printf("\n");
 
   array[0] = 100;
   insert_last(plist, (all_type)(pvoid)array, 0);
+  extract_last(plist, (all_type)(pvoid)&pextracted, 0);
   array[0] = 1000;
   insert_first(plist, (all_type)(pvoid)array, 0);
   array[0] = 100000;
@@ -225,12 +229,11 @@ void test_table_array_float(){
   /* extract_first(plist, (all_type)((pvoid)&ex), NULL); */
   /* printf("Estratto %c\n", ex); */
   /* print_list(plist, print_char); */
-  /* for(;;){ */
-  /*   plist = malloc_list(type_list_table, "FLOAT", 5); */
-  /*   insert_first(plist, (all_type)(pvoid)array, 0); */
-
-  /*   free_list(plist); */
-  /*  } */
+  for(;;){
+    insert_last(plist, (all_type)(pvoid)array, 0);
+    extract_last(plist, (all_type)(pvoid)&pextracted, 0);
+    free(pextracted);
+   }
  }
 
 void compare_generic(){
@@ -284,7 +287,7 @@ void compare_array_float(){
  }
 
 int main(int argc, char *argv[]){
-  test_table_array_float();
+  test_float();
 
   return 0;
  }
