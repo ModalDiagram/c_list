@@ -110,6 +110,47 @@ int extract_first_dynamic_generic(pvoid plist, all_type pvalue, punsi psize){
   return 1;
  }
 
+/* insert_last: inserisce un elemento in coda alla lista.
+ * plist:        lista al cui termine inserire l'elemento
+ * value:        elemento da inserire
+ * size:         deve essere rispettivamente:
+ *               - type_data_generic: dimensione del dato da inserire
+ *               - altri:             non ha importanza
+ *
+ * Torna 1 se tutto va bene, 0 altrimenti.
+ *
+ * NB: per evitare errori, value deve essere del tipo appropriato e castato a (all_type), ad esempio
+ * - insert_last(mia_lista_double, (all_type)(2.4), 0)
+ * - insert_last(mia_lista_generic, (all_type)((pvoid)&var_da_inserire), sizeof(var_da_inserire))
+ * */
+int insert_last_dynamic_generic(pvoid plista, all_type value, unsi size){
+  return 0;
+ }
+
+/* extract_last: estrae l'elemento in coda alla lista
+ * plist:         lista dal cui termine estrarre l'elemento
+ * pvalue:        indirizzo in cui verra' scritto rispettivamente:
+ *                - type_data_generic: indirizzo dell'elemento estratto
+ *                - type_data_array_*: indirizzo dell'array estratto
+ *                - altri:             valore dell'elemento estratto
+ * psize:         indirizzo in cui verra' scritto rispettivamente:
+ *                - type_data_generic: size dell'elemento estratto
+ *                - type_data_array_*: numero di elementi dell'array estratto
+ *                - altri:             niente
+ *
+ * Torna 1 se tutto va bene, 0 altrimenti
+ *
+ * NB: per evitare errori, value deve essere del tipo appropriato e castato a (all_type), ad esempio
+ * - extract_last(mia_lista_double, (all_type)((pvoid) &d), 0)
+ * dove d e' la variabile in cui salvare il valore estratto. psize non e' importante
+ * in questo caso dato che si tratta di una lista di double e non generic.
+ *
+ * */
+int extract_last_dynamic_generic(pvoid plista, all_type pvalue, punsi psize){
+  return 0;
+ }
+
+
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo
  *                 elemento della lista uguale a quello fornito in input
  *                 secondo pinput_compare)

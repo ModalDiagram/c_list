@@ -105,6 +105,8 @@ typedef int (*type_get_info_table)(pvoid plist, punsi pn_entries, punsi pn_occup
 typedef void (*type_free_list)(pvoid plist);
 typedef int (*type_insert_first)(pvoid plist, all_type value, unsi size);
 typedef int (*type_extract_first)(pvoid plist, all_type pvalue, punsi psize);
+typedef int (*type_insert_last)(pvoid plist, all_type value, unsi size);
+typedef int (*type_extract_last)(pvoid plist, all_type pvalue, punsi psize);
 typedef int (*type_search_first)(pvoid plist,
                                  all_type value_searched, unsi  size_searched,
                                  all_type pvalue_found,   punsi psize_found,
