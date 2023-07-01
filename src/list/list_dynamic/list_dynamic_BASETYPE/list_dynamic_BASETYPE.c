@@ -115,8 +115,27 @@ int extract_first_dynamic_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
  * - insert_last(mia_lista_double, (all_type)(2.4), 0)
  * - insert_last(mia_lista_generic, (all_type)((pvoid)&var_da_inserire), sizeof(var_da_inserire))
  * */
-int insert_last_dynamic_BASETYPE(pvoid plista, all_type value, unsi size){
-  return 0;
+int insert_last_dynamic_BASETYPE(pvoid plist, all_type value, unsi size){
+  plist_dynamic_BASETYPE plist_casted;
+  pelem_BASETYPE pnew_elem;
+  plist_casted = (plist_dynamic_BASETYPE) plist;
+
+  /* Alloco nuovo elemento */
+  if((pnew_elem = malloc(sizeof(elem_BASETYPE))) == NULL) return 0;
+  /* Scrivo valore */
+  pnew_elem->val = value.MEMBERTYPE;
+
+  /* Scrivo pnext */
+  pnew_elem->pnext = NULL;
+  /* Aggiorno informazioni */
+  if(plist_casted->pend != NULL){
+    plist_casted->pend->pnext = pnew_elem;
+   }
+  plist_casted->pend = pnew_elem;
+
+  if(!((plist_casted->n_elem)++)) plist_casted->pstart = pnew_elem;
+
+  return 1;
  }
 
 /* extract_last: estrae l'elemento in coda alla lista

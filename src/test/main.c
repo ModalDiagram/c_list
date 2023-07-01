@@ -47,6 +47,9 @@ void test_generic(){
 
   if((plist = malloc_list(type_list_dynamic, "GENERIC", 1)) == NULL) printf("Non creata.\n");
   insert_first(plist, (all_type)((pvoid)&f), sizeof(float));
+  f=5;
+  insert_last(plist, (all_type)((pvoid)&f), sizeof(float));
+  insert_last(plist, (all_type)((pvoid)&f), sizeof(float));
   printf("yes");
   print_list(plist, print_generic);
   extract_first(plist, (all_type)((pvoid)&pextract), &size_extract);
@@ -64,7 +67,9 @@ void test_float(){
   float f = 3.0;
 
   if((plist = malloc_list(type_list_dynamic, "FLOAT", 1)) == NULL) printf("Non creata.\n");
+  insert_last(plist, (all_type)((float)8.4), 29);
   insert_first(plist, (all_type)((float)2.4), 29);
+  insert_last(plist, (all_type)((float)6.4), 29);
   insert_first(plist, (all_type)((float)4.4), 29);
   print_list(plist, print_float);
   extract_first(plist, (all_type)((pvoid)&f), NULL);
@@ -98,6 +103,10 @@ void test_array_float(){
 
   if((plist = malloc_list(type_list_dynamic, "FLOAT", 3)) == NULL) printf("Non creata.\n");
   insert_first(plist, (all_type)((pvoid)parray), 0);
+  parray[0] = 10;
+  insert_last(plist, (all_type)((pvoid)parray), 0);
+  parray[0] = 100;
+  insert_last(plist, (all_type)((pvoid)parray), 0);
   /* printf("Float %f\n", GET_FLOAT(parray)); */
   print_list(plist, print_array_float);
   extract_first(plist, (all_type)((pvoid)&poutput), NULL);
@@ -242,7 +251,7 @@ void compare_array_float(){
  }
 
 int main(int argc, char *argv[]){
-  compare_generic();
+  test_array_float();
 
   return 0;
  }

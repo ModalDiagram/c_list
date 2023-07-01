@@ -273,7 +273,7 @@ int insert_last(pvoid plista, all_type value, unsi size);
  * in questo caso dato che si tratta di una lista di double e non generic.
  *
  * */
-int extract_last(pvoid plista, all_type pvalue, punsi psize);
+int extract_last(pvoid plist, all_type pvalue, punsi psize);
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo
  *                 elemento della lista uguale a quello fornito in input

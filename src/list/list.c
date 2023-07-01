@@ -237,8 +237,10 @@ int extract_first(pvoid plist, all_type pvalue, punsi psize){
  * - insert_last(mia_lista_double, (all_type)(2.4), 0)
  * - insert_last(mia_lista_generic, (all_type)((pvoid)&var_da_inserire), sizeof(var_da_inserire))
  * */
-int insert_last(pvoid plista, all_type value, unsi size){
-  return 0;
+int insert_last(pvoid plist, all_type value, unsi size){
+  pmy_list plist_casted = (pmy_list) plist;
+
+  return insert_last_arr[plist_casted->tlist](plist_casted->plist, value, size);
  }
 
 /* extract_last: estrae l'elemento in coda alla lista
@@ -260,8 +262,10 @@ int insert_last(pvoid plista, all_type value, unsi size){
  * in questo caso dato che si tratta di una lista di double e non generic.
  *
  * */
-int extract_last(pvoid plista, all_type pvalue, punsi psize){
-  return 0;
+int extract_last(pvoid plist, all_type pvalue, punsi psize){
+  pmy_list plist_casted = (pmy_list) plist;
+
+  return extract_last_arr[plist_casted->tlist](plist_casted->plist, pvalue, psize);
  }
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo

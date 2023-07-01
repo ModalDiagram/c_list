@@ -141,8 +141,26 @@ int extract_first_dynamic_array_BASETYPE(pvoid plist, all_type pvalue, punsi psi
  * - insert_last(mia_lista_double, (all_type)(2.4), 0)
  * - insert_last(mia_lista_generic, (all_type)((pvoid)&var_da_inserire), sizeof(var_da_inserire))
  * */
-int insert_last_dynamic_array_BASETYPE(pvoid plista, all_type value, unsi size){
-  return 0;
+int insert_last_dynamic_array_BASETYPE(pvoid plist, all_type value, unsi size){
+  plist_dynamic_array_BASETYPE plist_casted;
+  pvoid pnew_elem;
+  unsi  size_array;
+
+  plist_casted = (plist_dynamic_array_BASETYPE) plist;
+  size_array = plist_casted->size_array;
+  if((pnew_elem = malloc(size_array * size_type + sizeof(pvoid))) == NULL) return 0;
+
+  memcpy(pnew_elem, value.pv, size_array*size_type);
+
+  GET_PNEXT(pnew_elem) = NULL;
+  if(plist_casted->pend != NULL){
+    GET_PNEXT(plist_casted->pend) = pnew_elem;
+   }
+  plist_casted->pend = pnew_elem;
+
+  if(!((plist_casted->n_elem)++)) plist_casted->pstart = pnew_elem;
+
+  return 1;
  }
 
 /* extract_last: estrae l'elemento in coda alla lista
@@ -164,7 +182,7 @@ int insert_last_dynamic_array_BASETYPE(pvoid plista, all_type value, unsi size){
  * in questo caso dato che si tratta di una lista di double e non generic.
  *
  * */
-int extract_last_dynamic_array_BASETYPE(pvoid plista, all_type pvalue, punsi psize){
+int extract_last_dynamic_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
   return 0;
  }
 
