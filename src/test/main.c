@@ -147,9 +147,13 @@ void test_table_generic(){
   unsi size;
 
   /* if((plist = malloc_list(type_list_table, "GENERIC", 3)) == NULL) printf("Non creata.\n"); */
-  if((plist = malloc_list_specify_table("GENERIC", 3, type_resize_default, 3)) == NULL) printf("Non creata.\n");
+  if((plist = malloc_list_specify_table("GENERIC", 3, type_resize_default, 100)) == NULL) printf("Non creata.\n");
   print_list(plist, print_generic);
-  insert_first(plist, (all_type)((pvoid)&f), sizeof(float));
+  insert_last(plist, (all_type)((pvoid)&f), sizeof(float));
+  extract_first(plist, (all_type)((pvoid)&pf), &size);
+  printf("Estratto %f con size %u\n", *pf, size);
+  f=5;
+  insert_last(plist, (all_type)((pvoid)&f), sizeof(float));
   f=10;
   insert_first(plist, (all_type)((pvoid)&f), sizeof(float));
   print_list(plist, print_generic);
@@ -174,6 +178,10 @@ void test_table_char(){
   insert_first(plist, (all_type)c, sizeof(float));
   c='b';
   insert_first(plist, (all_type)c, sizeof(float));
+  c='c';
+  insert_last(plist, (all_type)c, sizeof(float));
+  c='d';
+  insert_last(plist, (all_type)c, sizeof(float));
   print_list(plist, print_char);
   extract_first(plist, (all_type)((pvoid)&ex), NULL);
   printf("Estratto %c\n", ex);
@@ -198,13 +206,18 @@ void test_table_array_float(){
   if((plist = malloc_list(type_list_table, "FLOAT", 3)) == NULL) printf("Non creata.\n");
   if((plist = malloc_list(type_list_table, "FLOAT", 5)) == NULL) printf("Non creata.\n");
   if((plist = malloc_list(type_list_table, "FLOAT", 3)) == NULL) printf("Non creata.\n");
-  insert_first(plist, (all_type)(pvoid)array, 0);
-  array[0] = 10;
-  insert_first(plist, (all_type)(pvoid)array, 0);
+  insert_last(plist, (all_type)(pvoid)array, 0);
   extract_first(plist, (all_type)(pvoid)&pextracted, 0);
   printf("Estratto: ");
   print_array_float((all_type)(pvoid)pextracted, 5);
   printf("\n");
+
+  array[0] = 100;
+  insert_last(plist, (all_type)(pvoid)array, 0);
+  array[0] = 1000;
+  insert_first(plist, (all_type)(pvoid)array, 0);
+  array[0] = 100000;
+  insert_last(plist, (all_type)(pvoid)array, 0);
   print_list(plist, print_array_float);
   /* c='b'; */
   /* insert_first(plist, (all_type)c, sizeof(float)); */
@@ -271,7 +284,7 @@ void compare_array_float(){
  }
 
 int main(int argc, char *argv[]){
-  test_array_float();
+  test_table_array_float();
 
   return 0;
  }

@@ -341,8 +341,45 @@ int extract_first_table_generic(pvoid plist, all_type pvalue, punsi psize){
  * - insert_last(mia_lista_double, (all_type)(2.4), 0)
  * - insert_last(mia_lista_generic, (all_type)((pvoid)&var_da_inserire), sizeof(var_da_inserire))
  * */
-int insert_last_table_generic(pvoid plista, all_type value, unsi size){
-  return 0;
+int insert_last_table_generic(pvoid plist, all_type value, unsi size){
+  pelem_table_generic pfirst_free_elem;
+  plist_table_generic plist_casted = (plist_table_generic) plist;
+  int                 int_tmp;
+
+  /* se la lista ha 0 elementi ha gia' uno spazio nella tabella
+   * ma con paddr e size vuoti, quindi e' sufficiente che scriva li' */
+  if(plist_casted->n_elem == 0){
+    pfirst_free_elem = ((pelem_table_generic) ptable) + plist_casted->idx_start;
+    if((pfirst_free_elem->paddr = malloc(size)) == NULL) return 0;
+    memcpy(pfirst_free_elem->paddr,value.pv,(pfirst_free_elem->size)=size);
+    (plist_casted->n_elem)++;
+    return 1;
+   }
+
+  if(idx_void_list == IDX_FINE_LISTA){
+    printf("Memoria preallocata piena\n");
+    return 0;
+   }
+  /* salvo l'indirizzo del primo elemento libero */
+  pfirst_free_elem = ((pelem_table_generic) ptable) + idx_void_list;
+
+  /* salvo le informazioni prese in input nell'elemento */
+  if((pfirst_free_elem->paddr = malloc(size)) == NULL) return 0;
+  memcpy(pfirst_free_elem->paddr,value.pv,(pfirst_free_elem->size)=size);
+  int_tmp = pfirst_free_elem->idx_next;
+  pfirst_free_elem->idx_next = IDX_FINE_LISTA;
+
+  /* aggiorno l'idx_next del penultimo elemento nell'indice del nuovo elemento */
+  (((pelem_table_generic) ptable) + (plist_casted->idx_end))->idx_next = idx_void_list;
+
+  /* aggiorno le informazioni sulla lista */
+  plist_casted->idx_end = idx_void_list;
+  (plist_casted->n_elem)++;
+
+  /* aggiorno l'indice della lista dei vuoti */
+  idx_void_list = int_tmp;
+
+  return 1;
  }
 
 /* extract_last: estrae l'elemento in coda alla lista
@@ -364,7 +401,7 @@ int insert_last_table_generic(pvoid plista, all_type value, unsi size){
  * in questo caso dato che si tratta di una lista di double e non generic.
  *
  * */
-int extract_last_table_generic(pvoid plista, all_type pvalue, punsi psize){
+int extract_last_table_generic(pvoid plist, all_type pvalue, punsi psize){
   return 0;
  }
 
