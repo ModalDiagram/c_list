@@ -2,7 +2,6 @@
 #define _LIST
 
 #include "../util/defines_typedef.h"
-#include "../all_type/define_all_type.h"
 
 /* Questa libreria fornisce all'utente l'oggetto "list".
  * La complessita' delle funzioni non dipende dalla lunghezza della lista:
@@ -33,26 +32,23 @@
  *   l'elemento contenuto nella lista
  */
 
-/* Di seguito sono riportati due define che permettono di passare da una variabile di
- * tipo puntatore alla variabile ALL_TYPE (che puo' assumere tutti i tipi di dato
- * contenibili in queste liste) e viceversa.
- *
- * TO_ALLTYPE(value) serve per passare un puntatore a una funzione che accetta
- * argomenti di tipo all_type, basta fornire alla funzione TO_ALLTYPE(value), ad
- * esempio per inserire un array in una lista usiamo:
- * - insert_first(pmia_lista_array, TO_ALLTYPE(array), ...)
- *
- * TO_PVOID(value) serve per castare a pvoid una variabile presa in input come ALL_TYPE,
- * ad esempio in pinput_print(ALL_TYPE value, unsi size), per trattare value
- * come pfloat uso
- * - (pfloat) TO_PVOID(value)
+/* Di seguito e' riportato un enum con tutti i tipi contenibili dall'oggetto.
+ * Siccome C non permette l'overload delle funzioni, tutte prendono in input una variabile
+ * di tipo all_type, in modo da poter passare diversi tipi. La variabile data in input
+ * allora va castata al tipo appropriato e poi ad all_type.
+ * Questo da' un warning se si compila con --pedantic, ma e' inevitabile.
+ * Esempi di funzioni che prendono variabili all_type in input:
+ * insert_first(plist_float, (all_type)((float)2.5), ...)
+ * extract_first(plist_float, (all_type)((pvoid)&f), ...)
  * */
-#define TO_ALLTYPE(value) \
- ((ALL_TYPE)((long)( value )))
-#define TO_PVOID(value) \
- ((pvoid)((long)( value )))
-#define TO_BASETYPE(value) \
- ((long)( value ))
+typedef union _all_type
+         {int      i;
+          long     l;
+          float    f;
+          double   d;
+          char     c;
+          void*    pv;
+         } all_type;
 
 /* Dimensione della zona di memoria da allocare all'istanziamento della prima
  * lista_veloce e in cui saranno contenute anche le successive lista_veloce */
@@ -92,11 +88,10 @@ typedef enum{
  * E' presa in input da print_list.
  * Deve tornare 1 se stampa bene o altrimenti.
  *
- * NB: per evitare errori di casting, bisogna usare TO_PVOID(value) per castare
- * value a pvoid invece di (pvoid) value, ad esempio nel caso in cui vogliamo stampare
- * un elemento di una lista contenente array.
+ * NB: all_type e' la union definita prima. Per usare value come int, float, pvoid etc.
+ * si usa value.i, value.f, value.pv, ...
  * */
-typedef int (*pcustom_print)(ALL_TYPE value, unsi size);
+typedef int (*pcustom_print)(all_type value, unsi size);
 
 /* pcustom_compare: funzione con cui comparare due elementi della lista
  * value1:          rappresenta rispettivamente:
@@ -108,21 +103,18 @@ typedef int (*pcustom_print)(ALL_TYPE value, unsi size);
  *                  - dato array:    dimensione del primo array da comparare
  * value2:          come value1 ma del secondo elemento da comparare
  * size2:           come size1 ma del secondo elemento da comparare
- * presult:         indirizzo in cui salvare il risultato del compare, che deve essere:
- *                  0  se sono uguali
+ * return:          0  se sono uguali
  *                  >0 se il primo è maggiore
  *                  <0 se il secondo è maggiore
  *
  * E' presa in input ad esempio da sort_list e get_max.
  * Deve tornare 1 se stampa bene o altrimenti.
  *
- * NB: per evitare errori di casting, bisogna usare TO_PVOID(value) per castare
- * value a pvoid invece di (pvoid) value, ad esempio nel caso in cui vogliamo comparare
- * due elementi di una lista che contiene array.
+ * NB: all_type e' la union definita prima. Per usare value come int, float, pvoid etc.
+ * si usa value.i, value.f, value.pv, ...
  * */
-typedef int (*pcustom_compare)(ALL_TYPE value1, unsi size1,
-                               ALL_TYPE value2, unsi size2,
-                               pint  presult);
+typedef int (*pcustom_compare)(all_type value1, unsi size1,
+                               all_type value2, unsi size2);
 
 /* Sono fornite le seguenti funzioni membro: */
 
@@ -145,7 +137,7 @@ typedef int (*pcustom_compare)(ALL_TYPE value1, unsi size1,
  * */
 pvoid malloc_list(type_list type_list, pchar type_string, unsi dim_array);
 
-/* malloc_list_specify_table: crea una nuova lista come sopra, e specifica il tipo di
+/* malloc_list_specify_table: crea una nuova lista di tipo type_list_table, e specifica il tipo di
  *                            resize della tabella che contiene la lista.
  * type_resize:               tipo di resize della tabella. Di default è type_resize_default,
  *                            ma puo' essere selezionato tra:
@@ -162,7 +154,7 @@ pvoid malloc_list(type_list type_list, pchar type_string, unsi dim_array);
  * return:      puntatore alla nuova lista, NULL se l'istanziamento non
  *              va a buon fine
  * */
-pvoid malloc_list_specify_table(type_list type_list, pchar type_string, unsi dim_array, type_resize type_resize, unsi dim_table);
+pvoid malloc_list_specify_table(pchar type_string, unsi dim_array, type_resize type_resize, unsi dim_table);
 
 /* change_resize_table: cambia il tipo di resize della tabella che contiene plist.
  * type_resize:         tipo di resize da impostare per la tabella. Puo' essere:
@@ -175,6 +167,24 @@ pvoid malloc_list_specify_table(type_list type_list, pchar type_string, unsi dim
  *
  * */
 int change_resize_table(pvoid plist, type_resize type_resize);
+
+/* resize_table: cambia il numero di elementi complessivi della tabella che contiene plist
+ * n_entries:    numero di elementi complessivi della tabella, dopo che è stata ridimensionata;
+ *
+ * return:       1 se ridimensionata correttamente, 0 altrimenti, ad esempio se
+ * n_entries è minore del numero di elementi delle liste contenute.
+ */
+int resize_table(pvoid plist, unsi n_entries);
+
+/* get_info_table: fornisce informazioni sulla tabella che contiene plist
+ * pn_entries: indirizzo in cui scrivere il numero di elementi complessivi della tabella;
+ * pn_occupied: indirizzo in cui scrivere il numero di elementi occupati della tabella;
+ *
+ * return: 1 se tutto va bene, 0 altrimenti
+ * */
+int get_info_table(pvoid plist,
+                   punsi pn_entries,
+                   punsi pn_occupied);
 
 /* free_list: libera la memoria occupata dalla lista
  * plista:    lista da liberare
@@ -202,11 +212,11 @@ pchar get_type_list(pvoid plist);
  *
  * Torna 1 se tutto va bene, 0 altrimenti.
  *
- * NB: per evitare errori di casting, value va inserito come TO_ALLTYPE(value), ad esempio
- * - insert_first(mia_lista_double, TO_ALLTYPE(2.4), 0)
- * - insert_first(mia_lista_generic, TO_ALLTYPE(&var_da_inserire), sizeof(var_da_inserire))
+ * NB: per evitare errori, value deve essere del tipo appropriato e castato a (all_type), ad esempio
+ * - insert_first(mia_lista_double, (all_type)(2.4), 0)
+ * - insert_first(mia_lista_generic, (all_type)((pvoid)&var_da_inserire), sizeof(var_da_inserire))
  * */
-int insert_first(pvoid plist, ALL_TYPE value, unsi size);
+int insert_first(pvoid plist, all_type value, unsi size);
 
 /* extract_first: estrae l'elemento in cima alla lista
  * plist:         lista dal cui inizio estrarre l'elemento
@@ -221,13 +231,13 @@ int insert_first(pvoid plist, ALL_TYPE value, unsi size);
  *
  * Torna 1 se tutto va bene, 0 altrimenti
  *
- * NB: per evitare errori di casting, pvalue va inserito come TO_ALLTYPE(pvalue), ad esempio
- * - extract_first(mia_lista_double, TO_ALLTYPE(&d), NULL)
+ * NB: per evitare errori, value deve essere del tipo appropriato e castato a (all_type), ad esempio
+ * - extract_first(mia_lista_double, (all_type)((pvoid) &d), 0)
  * dove d e' la variabile in cui salvare il valore estratto. psize non e' importante
  * in questo caso dato che si tratta di una lista di double e non generic.
  *
  * */
-int extract_first(pvoid plist, ALL_TYPE pvalue, punsi psize);
+int extract_first(pvoid plist, all_type pvalue, punsi psize);
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo
  *                 elemento della lista uguale a quello fornito in input
@@ -241,17 +251,16 @@ int extract_first(pvoid plist, ALL_TYPE pvalue, punsi psize);
  *                 (size intesa nello stesso modo di size_searched)
  * pinput_compare: funzione con cui comparare due elementi della lista.
  *                 E' una funzione del tipo:
- *                 int (*pcustom_compare)(pvoid pvalue1, unsi size1, pvoid pvalue2, unsi size2, pint presult);
- *                 Deve scrivere in presult 0 se sono uguali
+ *                 int (*pcustom_compare)(all_type value1, unsi size1, all_type value2, unsi size2, pint presult);
+ *                 Deve scrivere in presult 0 se sono uguali.
+ *                 La funzione compara value_searched come value1 e ciascun elemento
+ *                 della lista come value2 e si ferma quando i due sono uguali secondo pinput_compare
  *
  * Torna 1 se lo ha trovato, 0 altrimenti
- *
- * NB: pinput_compare puo' essere NULL, e in quel caso sara' utilizzata la plist_compare
- * fornita con la funzione add_functions se presente
  * */
 int search_first(pvoid plist,
-                 pvoid  paddr_searched, unsi  size_searched,
-                 ppvoid ppaddr_found,   punsi psize_found,
+                 all_type value_searched, unsi size_searched,
+                 all_type pvalue_found,   punsi psize_found,
                  pcustom_compare pinput_compare);
 
 /* get_max:        trova il massimo della lista (cioe' l'elemento che e' piu' grande di
@@ -262,16 +271,13 @@ int search_first(pvoid plist,
  *                 - type_data_array_*: numero di elem. dell'array massimo
  * pinput_compare: funzione con cui comparare due elementi della lista.
  *                 E' una funzione del tipo:
- *                 int (*pcustom_compare)(pvoid pvalue1, unsi size1, pvoid pvalue2, unsi size2, pint presult);
+ *                 int (*pcustom_compare)(all_type value1, unsi size1, all_type value2, unsi size2, pint presult);
  *                 Deve scrivere in presult:
  *                 - 0  se sono uguali
  *                 - >0 se il primo è maggiore
  *                 - <0 se il secondo è maggiore
  *
  * Torna 1 se tutto va bene, 0 altrimenti
- *
- * NB: pinput_compare puo' essere NULL, e in quel caso sara' utilizzata la plist_compare
- * fornita con la funzione add_functions se presente
  * */
 int get_max(pvoid plist, ppvoid ppaddr_max, punsi psize_max, pcustom_compare pinput_compare);
 
@@ -279,16 +285,13 @@ int get_max(pvoid plist, ppvoid ppaddr_max, punsi psize_max, pcustom_compare pin
  * plist:          lista da ordinare
  * pinput_compare: funzione con cui comparare due elementi della lista.
  *                 E' una funzione del tipo:
- *                 int (*pcustom_compare)(pvoid pvalue1, unsi size1, pvoid pvalue2, unsi size2, pint presult);
+ *                 int (*pcustom_compare)(all_type value1, unsi size1, all_type value2, unsi size2, pint presult);
  *                 Deve scrivere in presult:
  *                 - 0  se sono uguali
  *                 - >0 se il primo è maggiore
  *                 - <0 se il secondo è maggiore
  *
  * Torna 1 se tutto va bene, 0 altrimenti
- *
- * NB: pinput_compare puo' essere NULL, e in quel caso sara' utilizzata la plist_compare
- * fornita con la funzione add_functions se presente
  * */
 int sort_list(pvoid plist, pcustom_compare pinput_compare);
 

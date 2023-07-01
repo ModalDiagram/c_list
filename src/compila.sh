@@ -8,7 +8,7 @@ rm list_copied/list.o
 ./copy_types.sh
 
 echo "Compilo"
-my_gcc="gcc -Wall --pedantic" || exit
+my_gcc="gcc -Wall" || exit
 
 cd list_copied
 $my_gcc -c list.c -o list_tmp.o || exit

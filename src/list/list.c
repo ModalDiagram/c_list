@@ -4,18 +4,19 @@
 #include "list.h"
 #include "list.hidden"
 #include "../util/defines_typedef.h"
-#include "../all_type/define_all_type.h"
 #include "./list_table/list_table_generic/list_table_generic.h"
 #include "./list_table/list_table_array_char/list_table_array_char.h"
 #include "./list_table/list_table_array_int/list_table_array_int.h"
 #include "./list_table/list_table_array_float/list_table_array_float.h"
 #include "./list_table/list_table_array_double/list_table_array_double.h"
 #include "./list_table/list_table_array_long/list_table_array_long.h"
+#include "./list_table/list_table_array_pvoid/list_table_array_pvoid.h"
 #include "./list_table/list_table_char/list_table_char.h"
 #include "./list_table/list_table_int/list_table_int.h"
 #include "./list_table/list_table_float/list_table_float.h"
 #include "./list_table/list_table_double/list_table_double.h"
 #include "./list_table/list_table_long/list_table_long.h"
+#include "./list_table/list_table_pvoid/list_table_pvoid.h"
 
 #include "./list_dynamic/list_dynamic_generic/list_dynamic_generic.h"
 #include "./list_dynamic/list_dynamic_array_char/list_dynamic_array_char.h"
@@ -23,15 +24,19 @@
 #include "./list_dynamic/list_dynamic_array_float/list_dynamic_array_float.h"
 #include "./list_dynamic/list_dynamic_array_double/list_dynamic_array_double.h"
 #include "./list_dynamic/list_dynamic_array_long/list_dynamic_array_long.h"
+#include "./list_dynamic/list_dynamic_array_pvoid/list_dynamic_array_pvoid.h"
 #include "./list_dynamic/list_dynamic_char/list_dynamic_char.h"
 #include "./list_dynamic/list_dynamic_int/list_dynamic_int.h"
 #include "./list_dynamic/list_dynamic_float/list_dynamic_float.h"
 #include "./list_dynamic/list_dynamic_double/list_dynamic_double.h"
 #include "./list_dynamic/list_dynamic_long/list_dynamic_long.h"
+#include "./list_dynamic/list_dynamic_pvoid/list_dynamic_pvoid.h"
 
 CREA_ARRAY(malloc_list)
-CREA_ARRAY(malloc_list_specify_table)
-CREA_ARRAY(change_resize_table)
+CREA_ARRAY_TABLE(malloc_list_specify_table)
+CREA_ARRAY_TABLE(change_resize_table)
+CREA_ARRAY_TABLE(resize_table)
+CREA_ARRAY_TABLE(get_info_table)
 CREA_ARRAY(free_list)
 CREA_ARRAY(insert_first)
 CREA_ARRAY(extract_first)
@@ -93,14 +98,14 @@ pvoid malloc_list(type_list type_list, pchar type_string, unsi dim_array){
  * return:      puntatore alla nuova lista, NULL se l'istanziamento non
  *              va a buon fine
  * */
-pvoid malloc_list_specify_table(type_list type_list, pchar type_string, unsi dim_array, type_resize type_resize, unsi dim_table){
+pvoid malloc_list_specify_table(pchar type_string, unsi dim_array, type_resize type_resize, unsi dim_table){
   pmy_list pnew_list = (pmy_list) malloc(sizeof(my_list));
   int      type_input;
 
-  type_input = find_type(type_list, type_string, dim_array);
+  type_input = find_type(type_list_table, type_string, dim_array);
   if (type_input == -1) return NULL;
 
-  if((pnew_list->plist = malloc_list_specify_table_arr[type_input](dim_array, type_resize, dim_table)) == NULL){
+  if((pnew_list->plist = malloc_list_specify_table_arr[type_input - type_dynamic_generic - 1](dim_array, type_resize, dim_table)) == NULL){
     free(pnew_list);
     return NULL;
    }
@@ -123,7 +128,30 @@ pvoid malloc_list_specify_table(type_list type_list, pchar type_string, unsi dim
 int change_resize_table(pvoid plist, type_resize type_resize){
   pmy_list plist_casted = (pmy_list) plist;
 
-  return change_resize_table_arr[plist_casted->tlist](plist_casted->plist, type_resize);
+  if((plist_casted->tlist) <= (unsi)type_dynamic_generic) return 0;
+  return change_resize_table_arr[plist_casted->tlist - type_dynamic_generic - 1](plist_casted->plist, type_resize);
+ }
+
+/* resize_table: cambia il numero di elementi complessivi della tabella che contiene plist
+ * n_entries:    numero di elementi complessivi della tabella, dopo che è stata ridimensionata;
+ *
+ * return:       1 se ridimensionata correttamente, 0 altrimenti, ad esempio se
+ * n_entries è minore del numero di elementi delle liste contenute.
+ */
+int resize_table(pvoid plist, unsi n_entries){
+  return 0;
+ }
+
+/* get_info_table: fornisce informazioni sulla tabella che contiene plist
+ * pn_entries: indirizzo in cui scrivere il numero di elementi complessivi della tabella;
+ * pn_occupied: indirizzo in cui scrivere il numero di elementi occupati della tabella;
+ *
+ * return: 1 se tutto va bene, 0 altrimenti
+ * */
+int get_info_table(pvoid plist,
+                   punsi pn_entries,
+                   punsi pn_occupied){
+  return 0;
  }
 
 /* free_list: libera la memoria occupata dalla lista
@@ -160,11 +188,11 @@ pchar get_type_list(pvoid plist){
  *
  * Torna 1 se tutto va bene, 0 altrimenti.
  *
- * NB: per evitare errori di casting, value va inserito come TO_ALLTYPE(value), ad esempio
- * - insert_first(mia_lista_double, TO_ALLTYPE(2.4), 0)
- *
+ * NB: per evitare errori, value deve essere del tipo appropriato e castato a (all_type), ad esempio
+ * - insert_first(mia_lista_double, (all_type)(2.4), 0)
+ * - insert_first(mia_lista_generic, (all_type)((pvoid)&var_da_inserire), sizeof(var_da_inserire))
  * */
-int insert_first(pvoid plist, ALL_TYPE value, unsi size){
+int insert_first(pvoid plist, all_type value, unsi size){
   pmy_list plist_casted = (pmy_list) plist;
 
   return insert_first_arr[plist_casted->tlist](plist_casted->plist, value, size);
@@ -183,13 +211,12 @@ int insert_first(pvoid plist, ALL_TYPE value, unsi size){
  *
  * Torna 1 se tutto va bene, 0 altrimenti
  *
- * NB: per evitare errori di casting, pvalue va inserito come TO_ALLTYPE(pvalue), ad esempio
- * - extract_first(mia_lista_double, TO_ALLTYPE(&d), NULL)
+ * NB: per evitare errori, value deve essere del tipo appropriato e castato a (all_type), ad esempio
+ * - extract_first(mia_lista_double, (all_type)((pvoid) &d), 0)
  * dove d e' la variabile in cui salvare il valore estratto. psize non e' importante
  * in questo caso dato che si tratta di una lista di double e non generic.
- *
  * */
-int extract_first(pvoid plist, ALL_TYPE pvalue, punsi psize){
+int extract_first(pvoid plist, all_type pvalue, punsi psize){
   pmy_list plist_casted = (pmy_list) plist;
 
   return extract_first_arr[plist_casted->tlist](plist_casted->plist, pvalue, psize);
@@ -211,15 +238,16 @@ int extract_first(pvoid plist, ALL_TYPE pvalue, punsi psize){
  *                 Deve scrivere in presult 0 se sono uguali
  *
  * Torna 1 se lo ha trovato, 0 altrimenti
- *
- * NB: pinput_compare puo' essere NULL, e in quel caso sara' utilizzata la plist_compare
- * fornita con la funzione add_functions se presente
  * */
 int search_first(pvoid plist,
-                 pvoid  paddr_searched, unsi  size_searched,
-                 ppvoid ppaddr_found,   punsi psize_found,
+                 all_type value_searched, unsi  size_searched,
+                 all_type pvalue_found,   punsi psize_found,
                  pcustom_compare pinput_compare){
-  return 0;
+  pmy_list plist_casted = (pmy_list) plist;
+  return search_first_arr[plist_casted->tlist](plist_casted->plist,
+                                               value_searched, size_searched,
+                                               pvalue_found,   psize_found,
+                                               pinput_compare);
  }
 
 /* get_max:        trova il massimo della lista (cioe' l'elemento che e' piu' grande di
@@ -237,9 +265,6 @@ int search_first(pvoid plist,
  *                 - <0 se il secondo è maggiore
  *
  * Torna 1 se tutto va bene, 0 altrimenti
- *
- * NB: pinput_compare puo' essere NULL, e in quel caso sara' utilizzata la plist_compare
- * fornita con la funzione add_functions se presente
  * */
 int get_max(pvoid plist, ppvoid ppaddr_max, punsi psize_max, pcustom_compare pinput_compare){
   return 0;
@@ -256,9 +281,6 @@ int get_max(pvoid plist, ppvoid ppaddr_max, punsi psize_max, pcustom_compare pin
  *                 - <0 se il secondo è maggiore
  *
  * Torna 1 se tutto va bene, 0 altrimenti
- *
- * NB: pinput_compare puo' essere NULL, e in quel caso sara' utilizzata la plist_compare
- * fornita con la funzione add_functions se presente
  * */
 int sort_list(pvoid plist, pcustom_compare pinput_compare){
   return 0;
@@ -337,9 +359,13 @@ type_list_data find_type(type_list type_list, pchar type_string, unsi dim_array)
       if(dim_array == 1){return type_table_double;}
       else {return type_table_array_double;}
      }
-    else if(!(strcmp(type_string, "PVOID"))){
+    else if(!(strcmp(type_string, "LONG"))){
       if(dim_array == 1){return type_table_long;}
       else {return type_table_array_long;}
+     }
+    else if(!(strcmp(type_string, "PVOID"))){
+      if(dim_array == 1){return type_table_pvoid;}
+      else {return type_table_array_pvoid;}
      }
     else if(!(strcmp(type_string, "GENERIC"))){
       return type_table_generic;

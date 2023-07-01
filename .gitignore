@@ -1,5 +1,7 @@
 src/compile_commands.json
 schema.*
+*.xopp
 src/.cache/
 prod/*
 src/lista_veloce.c
+src/all_type/

@@ -1,8 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "./../../../util/defines_typedef.h"
-#include "./../../../all_type/define_all_type.h"
 #include "./../../list.h"
+#include "list_table_array_BASETYPE.hidden"
+#include "list_table_array_BASETYPE.h"
+
+#define DEBUG_LIST_TABLE_ARRAY_BASETYPE
+
+#define GET_IDX_NEXT(pvalue) (*((punsi)(((pchar) pvalue )+sizeof_array)))
+#define GET_NEXT_ELEM(pvalue, i) (((pchar) pvalue ) + (sizeof_array + sizeof(unsi))* i)
+
+static ppvoid pptables = NULL;
 
 /* Sono fornite le seguenti funzioni membro: */
 
@@ -24,7 +33,7 @@
  *              va a buon fine
  * */
 pvoid malloc_list_table_array_BASETYPE(unsi dim_array){
-  return NULL;
+  return malloc_list_specify_table_table_array_BASETYPE(dim_array, type_resize_default, TABLE_DEFAULT_DIM);
  }
 
 /* malloc_list_specify_table: crea una nuova lista come sopra, e specifica il tipo di
@@ -41,13 +50,163 @@ pvoid malloc_list_table_array_BASETYPE(unsi dim_array){
  *                            Se la tabella e' stata gia' creata, ad esempio semplicemente
  *                            con malloc_list(), essa ha la dimensione di default TABLE_DEFAULT_DIM
  *
- * return:      puntatore alla nuova lista, NULL se l'istanziamento non
- *              va a buon fine
+ * return:                    puntatore alla nuova lista, NULL se l'istanziamento non
+ *                            va a buon fine
  * */
-pvoid malloc_list_specify_table_table_array_BASETYPE(unsi dim_array, type_resize type_resize, unsi dim_table){
-  return NULL;
+pvoid malloc_list_specify_table_table_array_BASETYPE(unsi size_array, type_resize type_resize, unsi dim_table){
+  plist_table_array_BASETYPE pnew_list;
+  pvoid                      pfirst_elem_of_new_list, ptable;
+  pinfo_table                pmy_info;
+  unsi                       idx_void_list;
+  unsi                       sizeof_array = size_array * sizeof(BASETYPE);
+
+  /* se non esiste la lista di tabelle, la creo */
+  if(pptables == NULL){
+    #ifdef DEBUG_LIST_TABLE_ARRAY_BASETYPE
+    printf("---- DEBUG MALLOC ----\n");
+    printf("Lista di tabelle non esiste\n");
+    printf("---- FINE DEBUG ----\n\n");
+    #endif
+    if((pptables = malloc_list(type_list_dynamic, "PVOID", 1)) == NULL) return NULL;
+    ptable = create_table_array_BASETYPE(sizeof_array, type_resize, dim_table);
+   }
+  /* se esiste cerco la tabella che contiene array con dimensione uguale a quello
+   * da istanziare (size_array) */
+  else{
+    /* se la tabella corrispondente esiste, search_first la scrive in ptable;
+     * se non esiste la creo e la inserisco nella lista (in create_table) */
+    if(!search_first(pptables, (all_type)(int)size_array, 0, (all_type)(pvoid)&ptable, 0, pfind_table_array_BASETYPE)){
+      #ifdef DEBUG_LIST_TABLE_ARRAY_BASETYPE
+      printf("---- DEBUG MALLOC ----\n");
+      printf("Tabella con dim %u non esiste\n", size_array);
+      printf("---- FINE DEBUG ----\n\n");
+      #endif
+      ptable = create_table_array_BASETYPE(sizeof_array, type_resize, dim_table);
+     }
+    #ifdef DEBUG_LIST_TABLE_ARRAY_BASETYPE
+    else{
+      printf("---- DEBUG MALLOC ----\n");
+      printf("Tabella esiste, indirizzo %lu\n", (long)ptable);
+      printf("---- FINE DEBUG ----\n\n");
+     }
+    #endif
+   }
+  pmy_info = (pinfo_table) ptable;
+  ptable = pmy_info + 1;
+  idx_void_list = pmy_info->idx_void_list;
+
+  if(idx_void_list == IDX_FINE_LISTA)
+   {
+    printf("Memoria preallocata esaurita\n");
+    return NULL;
+   }
+
+  /* STEP 1 */
+  if((pnew_list = (plist_table_array_BASETYPE) malloc(sizeof(plist_table_array_BASETYPE))) == NULL) return NULL;
+  pnew_list->n_elem = 0;
+  pnew_list->idx_start = idx_void_list;
+  pnew_list->idx_end = idx_void_list;
+  pnew_list->ptable = pmy_info;
+
+  /* STEP 2 */
+  pfirst_elem_of_new_list = GET_NEXT_ELEM(ptable, idx_void_list);
+  idx_void_list = GET_IDX_NEXT(pfirst_elem_of_new_list);
+
+  /* STEP 3 */
+  GET_IDX_NEXT(pfirst_elem_of_new_list) = IDX_FINE_LISTA;
+
+  pmy_info->idx_void_list = idx_void_list;
+  #ifdef DEBUG_LIST_TABLE_ARRAY_BASETYPE
+  printf("---- DEBUG MALLOC ----\n");
+  printf("Nuova lista creata, indice: %d\n", pnew_list->idx_start);
+  printf("idx_void_list: %u\n", idx_void_list);
+  printf("---- FINE DEBUG ----\n\n");
+  #endif
+  return (pvoid) pnew_list;
  }
 
+/* pfind_table: funzione con cui trovare la tabella con dimensione corretta
+ * value1:      intero corrispondente alla size degli array da cercare
+ * size1:       non importa
+ * value2:      indirizzo della tabella da cercare, posso prendere la dimensione degli
+ *              array contenuti con ((pinfo_table) ptable)->size_array
+ * size2:       non importa
+ * presult:     vi scrive 0 quando l'intero in value1 e' uguale alla dimensione degli
+ *              array in value2
+ * */
+int pfind_table_array_BASETYPE(all_type value1, unsi size1,
+                all_type value2, unsi size2){
+  if(*((pint)(value2.pv)) == value1.i){
+    return 0;
+   }
+  return 1;
+ }
+
+/* create_table: alloca la memoria della tabella
+ * dim:          numero massimo di elementi contenuti nella tabella
+ *
+ * return:       torna l'indirizzo della tabella
+ *
+ * FUNZIONAMENTO:
+ * 1) Alloco lo spazio della tabella, che corrisponde al sizeof(info_table), il quale
+ *    contiene size degli array contenuti e idx_void_list, piu' dim volte il size di un
+ *    elemento della tabella, che e' size_array*sizeof(tipo).
+ *    La aggiungo alla lista di tabelle.
+ * 2) Imposto le informazioni sulla tabella:
+ *    - size_array in pinfo_table prima della tabella
+ *    - idx_void_list in pinfo_table prima della tabella
+ *    - type_resize nell'idx_next del primo elemento della tabella
+ *    Poi sposto table di pinfo_table in modo che coincida con l'inizio della tabella
+ *    vera e propria.
+ * 3) Inizializzo la tabella: e' fatta solo dalla lista dai vuoti. Questa inizia
+ *    all'indice 1 e ha per elementi successivi gli indici 2->3->... fino
+ *    all'ultimo che ha per elemento successivo 0 (IDX_FINE_LISTA)
+ * */
+pvoid create_table_array_BASETYPE(unsi sizeof_array, type_resize type_resize, unsi dim){
+  int         i;
+  pvoid       pelem_tmp, ptable;
+  pinfo_table pinfo_new_table;
+
+  /* STEP 1 */
+  if((ptable = malloc(sizeof(info_table) + (sizeof_array+sizeof(unsi))*dim)) == NULL) return NULL;
+  #ifdef DEBUG_LIST_TABLE_ARRAY_BASETYPE
+  printf("---- DEBUG CREATE_TABLE ----\n");
+  printf("Nuova tabella creata, indirizzo: %lu\n", (long)ptable);
+  printf("---- FINE DEBUG ----\n\n");
+  #endif
+  insert_first(pptables, (all_type)ptable, 0);
+  /* print_list(pptables, NULL); */
+
+  /* STEP 2 */
+  pinfo_new_table = ptable;
+  pinfo_new_table->sizeof_array = sizeof_array;
+  pinfo_new_table->idx_void_list = 1;
+  ptable = pinfo_new_table + 1;
+  pelem_tmp = ptable;
+  GET_IDX_NEXT(pelem_tmp) = type_resize;
+  pelem_tmp = GET_NEXT_ELEM(ptable, 1);
+
+  /* STEP 3 */
+  for (i = 2; i < dim; i++, pelem_tmp = GET_NEXT_ELEM(pelem_tmp, 1)){
+    GET_IDX_NEXT(pelem_tmp) = i;
+   }
+  GET_IDX_NEXT(pelem_tmp) = IDX_FINE_LISTA;
+
+  #ifdef DEBUG_LIST_TABLE_ARRAY_BASETYPE
+  printf("---- DEBUG CREATE_TABLE ----\n");
+  printf("Creo tabella\n");
+  printf("Ecco la tabella:\n");
+  printf("idx,  val,  idx_next\n");
+  for (i = 0, pelem_tmp = ptable; i < dim; i++) {
+    printf("%d,    val%d,   %u\n", i, i, GET_IDX_NEXT(pelem_tmp));
+    pelem_tmp = GET_NEXT_ELEM(pelem_tmp, 1);
+    if(i>5) break;
+   }
+  printf("---- FINE DEBUG ----\n\n");
+  #endif
+
+  return pinfo_new_table;
+ }
 /* change_resize_table: cambia il tipo di resize della tabella che contiene plist.
  * type_resize:         tipo di resize da impostare per la tabella. Puo' essere:
  *                      - type_resize_default: la table viene ampliata automaticamente
@@ -59,6 +218,34 @@ pvoid malloc_list_specify_table_table_array_BASETYPE(unsi dim_array, type_resize
  *
  * */
 int change_resize_table_table_array_BASETYPE(pvoid plist, type_resize type_resize){
+  plist_table_array_BASETYPE plist_casted = (plist_table_array_BASETYPE) plist;
+  pinfo_table                pmy_info = (pinfo_table) (plist_casted->ptable);
+  unsi  sizeof_array = pmy_info->sizeof_array;
+  pvoid ptable = pmy_info + 1;
+
+  GET_IDX_NEXT(ptable) = type_resize;
+  return 1;
+ }
+
+/* resize_table: cambia il numero di elementi complessivi della tabella che contiene plist
+ * n_entries:    numero di elementi complessivi della tabella, dopo che è stata ridimensionata;
+ *
+ * return:       1 se ridimensionata correttamente, 0 altrimenti, ad esempio se
+ * n_entries è minore del numero di elementi delle liste contenute.
+ */
+int resize_table_table_array_BASETYPE(pvoid plist, unsi n_entries){
+  return 0;
+ }
+
+/* get_info_table: fornisce informazioni sulla tabella che contiene plist
+ * pn_entries: indirizzo in cui scrivere il numero di elementi complessivi della tabella;
+ * pn_occupied: indirizzo in cui scrivere il numero di elementi occupati della tabella;
+ *
+ * return: 1 se tutto va bene, 0 altrimenti
+ * */
+int get_info_table_table_array_BASETYPE(pvoid plist,
+                   punsi pn_entries,
+                   punsi pn_occupied){
   return 0;
  }
 
@@ -67,7 +254,39 @@ int change_resize_table_table_array_BASETYPE(pvoid plist, type_resize type_resiz
  *
  * return:    non ritorna niente */
 void free_list_table_array_BASETYPE(pvoid plist){
-  return;
+  plist_table_array_BASETYPE plist_casted = (plist_table_array_BASETYPE) plist;
+  pinfo_table                pmy_info = (pinfo_table) (plist_casted->ptable);
+  unsi                       sizeof_array = pmy_info->sizeof_array;
+  unsi                       idx_void_list = pmy_info->idx_void_list;
+  pvoid                      ptable = pmy_info + 1;
+
+  if(plist_casted->n_elem == 0)
+   {
+    idx_void_list = plist_casted->idx_start;
+    free(plist);
+    #ifdef DEBUG_LIST_TABLE_BASETYPE
+    printf("---- DEBUG ----\n");
+    printf("Lista liberata. Indirizzo lista dei vuoti: %d\n", idx_void_list);
+    printf("---- FINE DEBUG ----\n");
+    #endif
+    return;
+   }
+
+  /* STEP 1 */
+  GET_IDX_NEXT(GET_NEXT_ELEM(ptable, plist_casted->idx_end)) = idx_void_list;
+
+  /* STEP 2 */
+  idx_void_list = plist_casted->idx_start;
+  pmy_info->idx_void_list = idx_void_list;
+
+  /* STEP 3 */
+  free(plist);
+
+  #ifdef DEBUG_LIST_TABLE_BASETYPE
+  printf("---- DEBUG ----\n");
+  printf("Lista liberata. Indirizzo lista dei vuoti: %d\n", idx_void_list);
+  printf("---- FINE DEBUG ----\n");
+  #endif
  }
 
 /* insert_first: inserisce un elemento in cima alla lista.
@@ -79,8 +298,51 @@ void free_list_table_array_BASETYPE(pvoid plist){
  *
  * Torna 1 se tutto va bene, 0 altrimenti.
  * */
-int insert_first_table_array_BASETYPE(pvoid plist, ALL_TYPE value, unsi size){
-  return 0;
+int insert_first_table_array_BASETYPE(pvoid plist, all_type value, unsi size){
+  plist_table_array_BASETYPE plist_casted = (plist_table_array_BASETYPE) plist;
+  pinfo_table                pmy_info = (pinfo_table) (plist_casted->ptable);
+  pvoid               pfirst_free_elem, ptable = pmy_info + 1;
+  int                 int_tmp;
+  unsi                sizeof_array = pmy_info->sizeof_array;
+  unsi                idx_void_list = pmy_info->idx_void_list;
+
+  /* se la lista ha 0 elementi ha gia' uno spazio nella tabella
+   * ma con paddr e size vuoti, quindi e' sufficiente che scriva li' */
+  if(plist_casted->n_elem == 0)
+   {
+    pfirst_free_elem = GET_NEXT_ELEM(ptable, plist_casted->idx_start);
+    memcpy(pfirst_free_elem, value.pv, sizeof_array);
+    (plist_casted->n_elem)++;
+    return 1;
+   }
+
+  if(idx_void_list == IDX_FINE_LISTA)
+   {
+    printf("Memoria preallocata piena\n");
+    return 0;
+   }
+  /* STEP 1 */
+  pfirst_free_elem = GET_NEXT_ELEM(ptable, idx_void_list);
+
+  /* STEP 2 */
+  memcpy(pfirst_free_elem,value.pv, sizeof_array);
+  int_tmp = GET_IDX_NEXT(pfirst_free_elem);
+  GET_IDX_NEXT(pfirst_free_elem) = plist_casted->idx_start;
+
+  /* STEP 3 */
+  plist_casted->idx_start = idx_void_list;
+  (plist_casted->n_elem)++;
+
+  /* STEP 4 */
+  idx_void_list = int_tmp;
+  pmy_info->idx_void_list = idx_void_list;
+  #ifdef DEBUG_LIST_TABLE_GENERIC
+  printf("---- DEBUG INSERT_FIRST ----\n");
+  printf("Nuovo idx_void_list: %d\n", idx_void_list);
+  printf("---- FINE DEBUG ----\n\n");
+  #endif
+
+  return 1;
  }
 
 /* extract_first: estrae l'elemento in cima alla lista
@@ -96,8 +358,48 @@ int insert_first_table_array_BASETYPE(pvoid plist, ALL_TYPE value, unsi size){
  *                - altri:             niente
  *
  * Torna 1 se tutto va bene, 0 altrimenti */
-int extract_first_table_array_BASETYPE(pvoid plist, ALL_TYPE pvalue, punsi psize){
-  return 0;
+int extract_first_table_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
+  plist_table_array_BASETYPE plist_casted = (plist_table_array_BASETYPE) plist;
+  pinfo_table                pmy_info = (pinfo_table) (plist_casted->ptable);
+  pvoid               pelem_to_extract, ptable = pmy_info + 1;
+  ppvoid              ppvalue_input = pvalue.pv;
+  int                 tmp_int;
+  unsi                sizeof_array = pmy_info->sizeof_array;
+  unsi                idx_void_list = pmy_info->idx_void_list;
+
+  if(plist_casted->n_elem == 0){
+    return 0;
+   }
+
+  /* STEP 1 */
+  pelem_to_extract = GET_NEXT_ELEM(ptable, plist_casted->idx_start);
+
+  /* STEP 2 */
+  if((*ppvalue_input = malloc(sizeof_array)) == NULL) return 0;
+  memcpy(*ppvalue_input, pelem_to_extract, sizeof_array);
+
+  /* se la lista ha 1 solo elemento non devo liberare lo spazio (ogni lista
+   * ha almeno uno spazio), ma basta decrementare il n_elem,
+   * perche' quando aggiungero' l'elemento successivo paddr e size
+   * saranno sovrascritti essendo n_elem==0 */
+  if(plist_casted->n_elem == 1)
+   {
+    (plist_casted->n_elem)--;
+    return 1;
+   }
+
+  /* STEP 3 */
+  tmp_int = GET_IDX_NEXT(pelem_to_extract);
+  GET_IDX_NEXT(pelem_to_extract) = idx_void_list;
+
+  /* STEP 4 */
+  pmy_info->idx_void_list = plist_casted->idx_start;
+
+  /* STEP 5 */
+  plist_casted->idx_start = tmp_int;
+  (plist_casted->n_elem)--;
+
+  return 1;
  }
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo
@@ -121,8 +423,8 @@ int extract_first_table_array_BASETYPE(pvoid plist, ALL_TYPE pvalue, punsi psize
  * fornita con la funzione add_functions se presente
  * */
 int search_first_table_array_BASETYPE(pvoid plist,
-                         pvoid  paddr_searched, unsi  size_searched,
-                         ppvoid ppaddr_found,   punsi psize_found,
+                         all_type value_searched, unsi size_searched,
+                         all_type pvalue_found,   punsi psize_found,
                          pcustom_compare pinput_compare){
   return 0;
  }
@@ -192,5 +494,35 @@ int sort_list_table_array_BASETYPE(pvoid plist, pcustom_compare pinput_compare){
  * Torna 1 se tutto va bene, 0 altrimenti
  * */
 int print_list_table_array_BASETYPE(pvoid plist, pcustom_print pinput_print){
-  return 0;
+  plist_table_array_BASETYPE plist_casted = (plist_table_array_BASETYPE) plist;
+  pinfo_table                pmy_info = (pinfo_table) (plist_casted->ptable);
+  pvoid pelem_tmp, ptable = pmy_info + 1;
+  unsi  sizeof_array = pmy_info->sizeof_array;
+  int   i=0;
+
+  printf("type_list: type_list_table\n");
+  printf("type_data: array BASETYPE\n");
+  printf("Numero di elementi degli array contenuti: %lu\n", sizeof_array / sizeof(BASETYPE));
+  printf("Numero di elementi della lista: %u\n", plist_casted->n_elem);
+  #ifdef DEBUG_LIST_TABLE_GENERIC
+  printf("---- DEBUG PRINT_LIST ----\n");
+  printf("Idx_start: %d, idx_end: %d, n_elem: %d, idx_void_list: %d\n", plist_casted->idx_start, plist_casted->idx_end, plist_casted->n_elem, idx_void_list);
+  printf("Tipo di resize: %d\n", GET_IDX_NEXT(ptable));
+  printf("---- FINE DEBUG ----\n\n");
+  #endif
+  if((plist_casted->n_elem == 0) || (pinput_print == NULL)) return 1;
+
+  pelem_tmp = GET_NEXT_ELEM(ptable, plist_casted->idx_start);
+  while(GET_IDX_NEXT(pelem_tmp) != IDX_FINE_LISTA)
+   {
+    i++;
+    if(i == 5) break;
+    if(!(pinput_print((all_type)(pelem_tmp), sizeof_array / sizeof(BASETYPE)))) return 0;
+    printf("->");
+    pelem_tmp = GET_NEXT_ELEM(ptable, GET_IDX_NEXT(pelem_tmp));
+   }
+  if(!(pinput_print((all_type)(pelem_tmp), sizeof_array / sizeof(BASETYPE)))) return 0;
+  printf("\n");
+
+  return 1;
  }

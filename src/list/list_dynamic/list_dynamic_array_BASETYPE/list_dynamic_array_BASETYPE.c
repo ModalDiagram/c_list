@@ -2,11 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include "./../../../util/defines_typedef.h"
-#include "./../../../all_type/define_all_type.h"
 #include "./../../list.h"
 #include "list_dynamic_array_BASETYPE.hidden"
 
+#ifndef GET_PNEXT
 #define GET_PNEXT(pvalue) (*((ppvoid)(((pBASETYPE) pvalue )+size_array)))
+#endif
 
 static unsi size_type = sizeof(BASETYPE);
 
@@ -37,41 +38,6 @@ pvoid malloc_list_dynamic_array_BASETYPE(unsi dim_array){
   pnew_list->n_elem = 0;
   pnew_list->size_array = dim_array;
   return pnew_list;
- }
-
-/* malloc_list_specify_table: crea una nuova lista come sopra, e specifica il tipo di
- *                            resize della tabella che contiene la lista.
- * type_resize:               tipo di resize della tabella. Di default è type_resize_default,
- *                            ma puo' essere selezionato tra:
- *                            - type_resize_default: la tabella si espande automaticamente
- *                            quando piena
- *                            - type_resize_manual: le funzioni di inserimento tornano
- *                            errore quando la tabella e' piena. Essa va espansa manualmente
- *                            con la funzione expand_table
- * dim_table:                 numero di elementi che puo' contenere la tabella creata,
- *                            nel caso in cui questa non esistesse e dovesse essere creata.
- *                            Se la tabella e' stata gia' creata, ad esempio semplicemente
- *                            con malloc_list(), essa ha la dimensione di default TABLE_DEFAULT_DIM
- *
- * return:      puntatore alla nuova lista, NULL se l'istanziamento non
- *              va a buon fine
- * */
-pvoid malloc_list_specify_table_dynamic_array_BASETYPE(unsi dim_array, type_resize type_resize, unsi dim_table){
-  return NULL;
- }
-
-/* change_resize_table: cambia il tipo di resize della tabella che contiene plist.
- * type_resize:         tipo di resize da impostare per la tabella. Puo' essere:
- *                      - type_resize_default: la table viene ampliata automaticamente
- *                                             una volta riempita
- *                      - type_resize_manual:  la table torna errore quando si cerca di
- *                                             inserire elementi oltre la sua capienza.
- *                                             Deve essere ampliata manualmente
- *                                             attraverso shrink_table
- *
- * */
-int change_resize_table_dynamic_array_BASETYPE(pvoid plist, type_resize type_resize){
-  return 0;
  }
 
 /* free_list: libera la memoria occupata dalla lista
@@ -107,7 +73,7 @@ void free_list_dynamic_array_BASETYPE(pvoid plist){
  *
  * Torna 1 se tutto va bene, 0 altrimenti.
  * */
-int insert_first_dynamic_array_BASETYPE(pvoid plist, ALL_TYPE value, unsi size){
+int insert_first_dynamic_array_BASETYPE(pvoid plist, all_type value, unsi size){
   plist_dynamic_array_BASETYPE plist_casted;
   pvoid pnew_elem;
   unsi  size_array;
@@ -116,7 +82,7 @@ int insert_first_dynamic_array_BASETYPE(pvoid plist, ALL_TYPE value, unsi size){
   size_array = plist_casted->size_array;
   if((pnew_elem = malloc(size_array * size_type + sizeof(pvoid))) == NULL) return 0;
 
-  memcpy(pnew_elem, TO_PVOID(value), size_array*size_type);
+  memcpy(pnew_elem, value.pv, size_array*size_type);
 
   GET_PNEXT(pnew_elem) = plist_casted->pstart;
   plist_casted->pstart = pnew_elem;
@@ -139,11 +105,15 @@ int insert_first_dynamic_array_BASETYPE(pvoid plist, ALL_TYPE value, unsi size){
  *                - altri:             niente
  *
  * Torna 1 se tutto va bene, 0 altrimenti */
-int extract_first_dynamic_array_BASETYPE(pvoid plist, ALL_TYPE pvalue, punsi psize){
+int extract_first_dynamic_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
   plist_dynamic_array_BASETYPE plist_casted = (plist_dynamic_array_BASETYPE) plist;
   pvoid pelem_to_remove;
-  ppvoid ppvalue_input = TO_PVOID(pvalue);
+  ppvoid ppvalue_input = pvalue.pv;
   unsi size_array = plist_casted->size_array;
+
+  if(plist_casted->n_elem == 0){
+    return 0;
+   }
 
   pelem_to_remove = plist_casted->pstart;
   plist_casted->pstart = GET_PNEXT(pelem_to_remove);
@@ -178,8 +148,8 @@ int extract_first_dynamic_array_BASETYPE(pvoid plist, ALL_TYPE pvalue, punsi psi
  * fornita con la funzione add_functions se presente
  * */
 int search_first_dynamic_array_BASETYPE(pvoid plist,
-                         pvoid  paddr_searched, unsi  size_searched,
-                         ppvoid ppaddr_found,   punsi psize_found,
+                         all_type value_searched, unsi size_searched,
+                         all_type pvalue_found,   punsi psize_found,
                          pcustom_compare pinput_compare){
   return 0;
  }
@@ -252,17 +222,22 @@ int print_list_dynamic_array_BASETYPE(pvoid plist, pcustom_print pinput_print){
   plist_dynamic_array_BASETYPE plist_casted = (plist_dynamic_array_BASETYPE) plist;
   pvoid pelem_moving = plist_casted->pstart;
   unsi size_array = plist_casted->size_array;
+  int i = 0;
 
-  printf("Number of elements: %u\n", plist_casted->n_elem);
-  printf("Number of elements of array contained: %u\n", plist_casted->size_array);
+  printf("type_list: type_list_dynamic\n");
+  printf("type_data: array BASETYPE\n");
+  printf("Numero di elementi degli array contenuti: %u\n", plist_casted->size_array);
+  printf("Numero di elementi della lista: %u\n", plist_casted->n_elem);
   if (pelem_moving == NULL) return 1;
 
   if(pinput_print != NULL){
-    pinput_print(TO_ALLTYPE(pelem_moving), size_array);
+    pinput_print((all_type) pelem_moving, size_array);
     pelem_moving = GET_PNEXT(pelem_moving);
     while(pelem_moving != NULL){
+      i++;
+      if(i == 5) break;
       printf("->");
-      pinput_print(TO_ALLTYPE(pelem_moving), size_array);
+      pinput_print((all_type)pelem_moving, size_array);
       pelem_moving = GET_PNEXT(pelem_moving);
      }
     printf("\n");

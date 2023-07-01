@@ -2,7 +2,6 @@
 #define _LIST_TABLE_ARRAY_BASETYPE
 
 #include "./../../../util/defines_typedef.h"
-#include "./../../../all_type/define_all_type.h"
 #include "./../../list.h"
 
 /* Sono fornite le seguenti funzioni membro: */
@@ -57,6 +56,24 @@ pvoid malloc_list_specify_table_table_array_BASETYPE(unsi dim_array, type_resize
  * */
 int change_resize_table_table_array_BASETYPE(pvoid plist, type_resize type_resize);
 
+/* resize_table: cambia il numero di elementi complessivi della tabella che contiene plist
+ * n_entries:    numero di elementi complessivi della tabella, dopo che è stata ridimensionata;
+ *
+ * return:       1 se ridimensionata correttamente, 0 altrimenti, ad esempio se
+ * n_entries è minore del numero di elementi delle liste contenute.
+ */
+int resize_table_table_array_BASETYPE(pvoid plist, unsi n_entries);
+
+/* get_info_table: fornisce informazioni sulla tabella che contiene plist
+ * pn_entries: indirizzo in cui scrivere il numero di elementi complessivi della tabella;
+ * pn_occupied: indirizzo in cui scrivere il numero di elementi occupati della tabella;
+ *
+ * return: 1 se tutto va bene, 0 altrimenti
+ * */
+int get_info_table_table_array_BASETYPE(pvoid plist,
+                   punsi pn_entries,
+                   punsi pn_occupied);
+
 /* free_list: libera la memoria occupata dalla lista
  * plista:    lista da liberare
  *
@@ -72,7 +89,7 @@ void free_list_table_array_BASETYPE(pvoid plist);
  *
  * Torna 1 se tutto va bene, 0 altrimenti.
  * */
-int insert_first_table_array_BASETYPE(pvoid plist, ALL_TYPE value, unsi size);
+int insert_first_table_array_BASETYPE(pvoid plist, all_type value, unsi size);
 
 /* extract_first: estrae l'elemento in cima alla lista
  * plist:         lista dal cui inizio estrarre l'elemento
@@ -87,7 +104,7 @@ int insert_first_table_array_BASETYPE(pvoid plist, ALL_TYPE value, unsi size);
  *                - altri:             niente
  *
  * Torna 1 se tutto va bene, 0 altrimenti */
-int extract_first_table_array_BASETYPE(pvoid plist, ALL_TYPE pvalue, punsi psize);
+int extract_first_table_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize);
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo
  *                 elemento della lista uguale a quello fornito in input
@@ -110,8 +127,8 @@ int extract_first_table_array_BASETYPE(pvoid plist, ALL_TYPE pvalue, punsi psize
  * fornita con la funzione add_functions se presente
  * */
 int search_first_table_array_BASETYPE(pvoid plist,
-                         pvoid  paddr_searched, unsi  size_searched,
-                         ppvoid ppaddr_found,   punsi psize_found,
+                         all_type value_searched, unsi size_searched,
+                         all_type pvalue_found,   punsi psize_found,
                          pcustom_compare pinput_compare);
 
 /* get_max:        trova il massimo della lista (cioe' l'elemento che e' piu' grande di

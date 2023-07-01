@@ -2,7 +2,6 @@
 #define _LIST_DYNAMIC_BASETYPE
 
 #include "./../../../util/defines_typedef.h"
-#include "./../../../all_type/define_all_type.h"
 #include "./../../list.h"
 
 /* Sono fornite le seguenti funzioni membro: */
@@ -16,37 +15,6 @@
  *              va a buon fine
  * */
 pvoid malloc_list_dynamic_BASETYPE(unsi dim_array);
-
-/* malloc_list_specify_table: crea una nuova lista come sopra, e specifica il tipo di
- *                            resize della tabella che contiene la lista.
- * type_resize:               tipo di resize della tabella. Di default è type_resize_default,
- *                            ma puo' essere selezionato tra:
- *                            - type_resize_default: la tabella si espande automaticamente
- *                            quando piena
- *                            - type_resize_manual: le funzioni di inserimento tornano
- *                            errore quando la tabella e' piena. Essa va espansa manualmente
- *                            con la funzione expand_table
- * dim_table:                 numero di elementi che puo' contenere la tabella creata,
- *                            nel caso in cui questa non esistesse e dovesse essere creata.
- *                            Se la tabella e' stata gia' creata, ad esempio semplicemente
- *                            con malloc_list(), essa ha la dimensione di default TABLE_DEFAULT_DIM
- *
- * return:      puntatore alla nuova lista, NULL se l'istanziamento non
- *              va a buon fine
- * */
-pvoid malloc_list_specify_table_dynamic_BASETYPE(unsi dim_array, type_resize type_resize, unsi dim_table);
-
-/* change_resize_table: cambia il tipo di resize della tabella che contiene plist.
- * type_resize:         tipo di resize da impostare per la tabella. Puo' essere:
- *                      - type_resize_default: la table viene ampliata automaticamente
- *                                             una volta riempita
- *                      - type_resize_manual:  la table torna errore quando si cerca di
- *                                             inserire elementi oltre la sua capienza.
- *                                             Deve essere ampliata manualmente
- *                                             attraverso shrink_table
- *
- * */
-int change_resize_table_dynamic_BASETYPE(pvoid plist, type_resize type_resize);
 
 /* free_list: libera la memoria occupata dalla lista
  * plista:    lista da liberare
@@ -63,7 +31,7 @@ void free_list_dynamic_BASETYPE(pvoid plist);
  *
  * Torna 1 se tutto va bene, 0 altrimenti.
  * */
-int insert_first_dynamic_BASETYPE(pvoid plist, ALL_TYPE value, unsi size);
+int insert_first_dynamic_BASETYPE(pvoid plist, all_type value, unsi size);
 
 /* extract_first: estrae l'elemento in cima alla lista
  * plist:         lista dal cui inizio estrarre l'elemento
@@ -78,7 +46,7 @@ int insert_first_dynamic_BASETYPE(pvoid plist, ALL_TYPE value, unsi size);
  *                - altri:             niente
  *
  * Torna 1 se tutto va bene, 0 altrimenti */
-int extract_first_dynamic_BASETYPE(pvoid plist, ALL_TYPE pvalue, punsi psize);
+int extract_first_dynamic_BASETYPE(pvoid plist, all_type pvalue, punsi psize);
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo
  *                 elemento della lista uguale a quello fornito in input
@@ -101,8 +69,8 @@ int extract_first_dynamic_BASETYPE(pvoid plist, ALL_TYPE pvalue, punsi psize);
  * fornita con la funzione add_functions se presente
  * */
 int search_first_dynamic_BASETYPE(pvoid plist,
-                         pvoid  paddr_searched, unsi  size_searched,
-                         ppvoid ppaddr_found,   punsi psize_found,
+                         all_type value_searched, unsi size_searched,
+                         all_type pvalue_found,   punsi psize_found,
                          pcustom_compare pinput_compare);
 
 /* get_max:        trova il massimo della lista (cioe' l'elemento che e' piu' grande di

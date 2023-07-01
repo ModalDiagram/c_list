@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "./../../../util/defines_typedef.h"
-#include "./../../../all_type/define_all_type.h"
 #include "./../../list.h"
 #include "list_dynamic_BASETYPE.hidden"
 
@@ -22,41 +21,6 @@ pvoid malloc_list_dynamic_BASETYPE(unsi dim_array){
   pnew_list->pstart = pnew_list->pend = NULL;
   pnew_list->n_elem = 0;
   return pnew_list;
- }
-
-/* malloc_list_specify_table: crea una nuova lista come sopra, e specifica il tipo di
- *                            resize della tabella che contiene la lista.
- * type_resize:               tipo di resize della tabella. Di default è type_resize_default,
- *                            ma puo' essere selezionato tra:
- *                            - type_resize_default: la tabella si espande automaticamente
- *                            quando piena
- *                            - type_resize_manual: le funzioni di inserimento tornano
- *                            errore quando la tabella e' piena. Essa va espansa manualmente
- *                            con la funzione expand_table
- * dim_table:                 numero di elementi che puo' contenere la tabella creata,
- *                            nel caso in cui questa non esistesse e dovesse essere creata.
- *                            Se la tabella e' stata gia' creata, ad esempio semplicemente
- *                            con malloc_list(), essa ha la dimensione di default TABLE_DEFAULT_DIM
- *
- * return:      puntatore alla nuova lista, NULL se l'istanziamento non
- *              va a buon fine
- * */
-pvoid malloc_list_specify_table_dynamic_BASETYPE(unsi dim_array, type_resize type_resize, unsi dim_table){
-  return NULL;
- }
-
-/* change_resize_table: cambia il tipo di resize della tabella che contiene plist.
- * type_resize:         tipo di resize da impostare per la tabella. Puo' essere:
- *                      - type_resize_default: la table viene ampliata automaticamente
- *                                             una volta riempita
- *                      - type_resize_manual:  la table torna errore quando si cerca di
- *                                             inserire elementi oltre la sua capienza.
- *                                             Deve essere ampliata manualmente
- *                                             attraverso shrink_table
- *
- * */
-int change_resize_table_dynamic_BASETYPE(pvoid plist, type_resize type_resize){
-  return 0;
  }
 
 /* free_list: libera la memoria occupata dalla lista
@@ -91,7 +55,7 @@ void free_list_dynamic_BASETYPE(pvoid plist){
  *
  * Torna 1 se tutto va bene, 0 altrimenti.
  * */
-int insert_first_dynamic_BASETYPE(pvoid plist, ALL_TYPE value, unsi size){
+int insert_first_dynamic_BASETYPE(pvoid plist, all_type value, unsi size){
   plist_dynamic_BASETYPE plist_casted;
   pelem_BASETYPE pnew_elem;
 
@@ -101,7 +65,7 @@ int insert_first_dynamic_BASETYPE(pvoid plist, ALL_TYPE value, unsi size){
   pnew_elem->pnext = plist_casted->pstart;
   plist_casted->pstart = pnew_elem;
 
-  pnew_elem->val = (BASETYPE) value;
+  pnew_elem->val = value.MEMBERTYPE;
 
   if(!((plist_casted->n_elem)++)) plist_casted->pend = pnew_elem;
 
@@ -121,10 +85,10 @@ int insert_first_dynamic_BASETYPE(pvoid plist, ALL_TYPE value, unsi size){
  *                - altri:             niente
  *
  * Torna 1 se tutto va bene, 0 altrimenti */
-int extract_first_dynamic_BASETYPE(pvoid plist, ALL_TYPE pvalue, punsi psize){
+int extract_first_dynamic_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
   plist_dynamic_BASETYPE plist_casted = (plist_dynamic_BASETYPE) plist;
   pelem_BASETYPE pelem_to_remove;
-  pBASETYPE pvalue_input = (pBASETYPE)TO_PVOID(pvalue);
+  pBASETYPE pvalue_input = (pBASETYPE) pvalue.pv;
 
   pelem_to_remove = plist_casted->pstart;
   plist_casted->pstart = pelem_to_remove->pnext;
@@ -150,7 +114,7 @@ int extract_first_dynamic_BASETYPE(pvoid plist, ALL_TYPE pvalue, punsi psize){
  * pinput_compare: funzione con cui comparare due elementi della lista.
  *                 E' una funzione del tipo:
  *                 int (*pcustom_compare)(pvoid pvalue1, unsi size1, pvoid pvalue2, unsi size2, pint presult);
- *                 Deve scrivere in presult 0 se sono uguali
+ *                 Deve tornare 0 se sono uguali
  *
  * Torna 1 se lo ha trovato, 0 altrimenti
  *
@@ -158,9 +122,21 @@ int extract_first_dynamic_BASETYPE(pvoid plist, ALL_TYPE pvalue, punsi psize){
  * fornita con la funzione add_functions se presente
  * */
 int search_first_dynamic_BASETYPE(pvoid plist,
-                         pvoid  paddr_searched, unsi  size_searched,
-                         ppvoid ppaddr_found,   punsi psize_found,
+                         all_type value_searched, unsi size_searched,
+                         all_type pvalue_found,   punsi psize_found,
                          pcustom_compare pinput_compare){
+  plist_dynamic_BASETYPE plist_casted = (plist_dynamic_BASETYPE) plist;
+  pelem_BASETYPE         pelem_moving;
+
+  if (pinput_compare == NULL) return 0;
+  pelem_moving = plist_casted->pstart;
+  while(pelem_moving != NULL){
+    if(!pinput_compare(value_searched, 0,(all_type)pelem_moving->val, 0)){
+      *((pBASETYPE) pvalue_found.pv) = pelem_moving->val;
+      return 1;
+     }
+    pelem_moving = pelem_moving->pnext;
+   }
   return 0;
  }
 
@@ -231,15 +207,20 @@ int sort_list_dynamic_BASETYPE(pvoid plist, pcustom_compare pinput_compare){
 int print_list_dynamic_BASETYPE(pvoid plist, pcustom_print pinput_print){
   plist_dynamic_BASETYPE plist_casted = (plist_dynamic_BASETYPE) plist;
   pelem_BASETYPE pelem_moving = plist_casted->pstart;
+  int i=0;
 
-  printf("Number of elements: %u\n", plist_casted->n_elem);
+  printf("type_list: type_list_dynamic\n");
+  printf("type_data: BASETYPE\n");
+  printf("Numero di elementi della lista: %u\n", plist_casted->n_elem);
   if (plist_casted->pstart == NULL) return 1;
   if(pinput_print != NULL){
-    pinput_print(pelem_moving->val, 0);
+    pinput_print((all_type)(pelem_moving->val), 0);
     pelem_moving = pelem_moving->pnext;
     while(pelem_moving != NULL){
+      i++;
+      if(i == 5) break;
       printf("->");
-      pinput_print(pelem_moving->val, 0);
+      pinput_print((all_type)(pelem_moving->val), 0);
       pelem_moving = pelem_moving->pnext;
      }
     printf("\n");

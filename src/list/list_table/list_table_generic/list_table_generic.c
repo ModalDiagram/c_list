@@ -2,13 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include "./../../../util/defines_typedef.h"
-#include "./../../../all_type/define_all_type.h"
 #include "./../../list.h"
 #include "list_table_generic.hidden"
 #include "list_table_generic.h"
 
-#define DEBUG_LIST_TABLE_GENERIC
-#define IDX_FINE_LISTA 0
+/* #define DEBUG_LIST_TABLE_GENERIC */
 
 static pvoid ptable = NULL;
 static unsi  idx_void_list = 1;
@@ -63,7 +61,7 @@ pvoid malloc_list_specify_table_table_generic(unsi dim_array, type_resize type_r
     printf("Tabella non esiste\n");
     printf("---- FINE DEBUG ----\n\n");
     #endif
-    if((create_table(type_resize, dim_table)) == NULL) return NULL;
+    if((create_table_generic(type_resize, dim_table)) == NULL) return NULL;
    }
 
   if(idx_void_list == IDX_FINE_LISTA)
@@ -106,7 +104,7 @@ pvoid malloc_list_specify_table_table_generic(unsi dim_array, type_resize type_r
  *    all'indice 0 e ha per elementi successivi gli indici 1->2->3->... fino
  *    all'ultimo che ha per elemento successivo -1
  * */
-pvoid create_table(type_resize type_resize, unsi dim)
+pvoid create_table_generic(type_resize type_resize, unsi dim)
  {
   pelem_table_generic pelem_tmp;
   int                 i;
@@ -133,7 +131,7 @@ pvoid create_table(type_resize type_resize, unsi dim)
   for (i = 0, pelem_tmp = (pelem_table_generic) ptable; i < dim; i++) {
     printf("%d,    val%d,   %u\n", i, i, pelem_tmp->idx_next);
     pelem_tmp++;
-    if(i>10) break;
+    if(i>5) break;
    }
   printf("---- FINE DEBUG ----\n\n");
   #endif
@@ -153,6 +151,28 @@ pvoid create_table(type_resize type_resize, unsi dim)
  * */
 int change_resize_table_table_generic(pvoid plist, type_resize type_resize){
   ((pelem_table_generic) ptable)->idx_next = type_resize;
+  return 1;
+ }
+
+/* resize_table: cambia il numero di elementi complessivi della tabella che contiene plist
+ * n_entries:    numero di elementi complessivi della tabella, dopo che è stata ridimensionata;
+ *
+ * return:       1 se ridimensionata correttamente, 0 altrimenti, ad esempio se
+ * n_entries è minore del numero di elementi delle liste contenute.
+ */
+int resize_table_table_generic(pvoid plist, unsi n_entries){
+  return 0;
+ }
+
+/* get_info_table: fornisce informazioni sulla tabella che contiene plist
+ * pn_entries: indirizzo in cui scrivere il numero di elementi complessivi della tabella;
+ * pn_occupied: indirizzo in cui scrivere il numero di elementi occupati della tabella;
+ *
+ * return: 1 se tutto va bene, 0 altrimenti
+ * */
+int get_info_table_table_generic(pvoid plist,
+                   punsi pn_entries,
+                   punsi pn_occupied){
   return 0;
  }
 
@@ -161,7 +181,42 @@ int change_resize_table_table_generic(pvoid plist, type_resize type_resize){
  *
  * return:    non ritorna niente */
 void free_list_table_generic(pvoid plist){
-  return;
+  pelem_table_generic pelem_start = (pelem_table_generic) ptable, pelem_tmp;
+  plist_table_generic plist_to_free = (plist_table_generic) plist;
+
+  if(plist_to_free->n_elem == 0)
+   {
+    idx_void_list = plist_to_free->idx_start;
+    free(plist);
+    #ifdef DEBUG_LISTA_VELOCE
+    printf("---- DEBUG ----\n");
+    printf("Lista liberata. Indirizzo lista dei vuoti: %d\n", idx_void_list);
+    printf("---- FINE DEBUG ----\n");
+    #endif
+    return;
+   }
+
+  /* STEP 1 */
+  pelem_tmp = pelem_start + plist_to_free->idx_start;
+  while((pelem_tmp->idx_next) != -1)
+   {
+    free(pelem_tmp->paddr);
+    pelem_tmp = pelem_start + (pelem_tmp->idx_next);
+   }
+  free(pelem_tmp->paddr);
+
+  /* STEP 2 */
+  pelem_tmp->idx_next = idx_void_list;
+  idx_void_list = plist_to_free->idx_start;
+
+  /* STEP 3 */
+  free(plist);
+
+  #ifdef DEBUG_LISTA_VELOCE
+  printf("---- DEBUG ----\n");
+  printf("Lista liberata. Indirizzo lista dei vuoti: %d\n", idx_void_list);
+  printf("---- FINE DEBUG ----\n");
+  #endif
  }
 
 /* insert_first: inserisce un elemento in cima alla lista.
@@ -173,7 +228,7 @@ void free_list_table_generic(pvoid plist){
  *
  * Torna 1 se tutto va bene, 0 altrimenti.
  * */
-int insert_first_table_generic(pvoid plist, ALL_TYPE value, unsi size){
+int insert_first_table_generic(pvoid plist, all_type value, unsi size){
   pelem_table_generic pfirst_free_elem;
   plist_table_generic plist_casted = (plist_table_generic) plist;
   int                 int_tmp;
@@ -184,7 +239,7 @@ int insert_first_table_generic(pvoid plist, ALL_TYPE value, unsi size){
    {
     pfirst_free_elem = ((pelem_table_generic) ptable) + plist_casted->idx_start;
     if((pfirst_free_elem->paddr = malloc(size)) == NULL) return 0;
-    memcpy(pfirst_free_elem->paddr,TO_PVOID(value),(pfirst_free_elem->size)=size);
+    memcpy(pfirst_free_elem->paddr,value.pv,(pfirst_free_elem->size)=size);
     (plist_casted->n_elem)++;
     return 1;
    }
@@ -199,7 +254,7 @@ int insert_first_table_generic(pvoid plist, ALL_TYPE value, unsi size){
 
   /* STEP 2 */
   if((pfirst_free_elem->paddr = malloc(size)) == NULL) return 0;
-  memcpy(pfirst_free_elem->paddr,TO_PVOID(value),(pfirst_free_elem->size)=size);
+  memcpy(pfirst_free_elem->paddr,value.pv,(pfirst_free_elem->size)=size);
   int_tmp = pfirst_free_elem->idx_next;
   pfirst_free_elem->idx_next = plist_casted->idx_start;
 
@@ -231,8 +286,46 @@ int insert_first_table_generic(pvoid plist, ALL_TYPE value, unsi size){
  *                - altri:             niente
  *
  * Torna 1 se tutto va bene, 0 altrimenti */
-int extract_first_table_generic(pvoid plist, ALL_TYPE pvalue, punsi psize){
-  return 0;
+int extract_first_table_generic(pvoid plist, all_type pvalue, punsi psize){
+  pelem_table_generic pelem_to_extract;
+  plist_table_generic plist_casted = (plist_table_generic) plist;
+  ppvoid              ppvalue_input = pvalue.pv;
+  int                 tmp_int;
+
+  if(plist_casted->n_elem == 0)
+   {
+    return 0;
+   }
+
+  /* STEP 1 */
+  pelem_to_extract = ((pelem_table_generic) ptable) + plist_casted->idx_start;
+
+  /* STEP 2 */
+  *ppvalue_input = pelem_to_extract->paddr;
+  *psize = pelem_to_extract->size;
+
+  /* se la lista ha 1 solo elemento non devo liberare lo spazio (ogni lista
+   * ha almeno uno spazio), ma basta decrementare il n_elem,
+   * perche' quando aggiungero' l'elemento successivo paddr e size
+   * saranno sovrascritti essendo n_elem==0 */
+  if(plist_casted->n_elem == 1)
+   {
+    (plist_casted->n_elem)--;
+    return 1;
+   }
+
+  /* STEP 3 */
+  tmp_int = pelem_to_extract->idx_next;
+  pelem_to_extract->idx_next = idx_void_list;
+
+  /* STEP 4 */
+  idx_void_list = plist_casted->idx_start;
+
+  /* STEP 5 */
+  plist_casted->idx_start = tmp_int;
+  (plist_casted->n_elem)--;
+
+  return 1;
  }
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo
@@ -256,8 +349,8 @@ int extract_first_table_generic(pvoid plist, ALL_TYPE pvalue, punsi psize){
  * fornita con la funzione add_functions se presente
  * */
 int search_first_table_generic(pvoid plist,
-                         pvoid  paddr_searched, unsi  size_searched,
-                         ppvoid ppaddr_found,   punsi psize_found,
+                         all_type value_searched, unsi size_searched,
+                         all_type pvalue_found,   punsi psize_found,
                          pcustom_compare pinput_compare){
   return 0;
  }
@@ -329,9 +422,11 @@ int sort_list_table_generic(pvoid plist, pcustom_compare pinput_compare){
 int print_list_table_generic(pvoid plist, pcustom_print pinput_print){
   plist_table_generic plist_casted = (plist_table_generic) plist;
   pelem_table_generic pelem_start = (pelem_table_generic) ptable, pelem_tmp;
+  int i=0;
 
-  printf("Tipo lista: VELOCE.\n");
-  printf("Numero di elementi: %d.\n", plist_casted->n_elem);
+  printf("type_list: type_list_table\n");
+  printf("type_data: generic\n");
+  printf("Numero di elementi della lista: %u\n", plist_casted->n_elem);
   #ifdef DEBUG_LIST_TABLE_GENERIC
   printf("---- DEBUG PRINT_LIST ----\n");
   printf("Idx_start: %d, idx_end: %d, n_elem: %d, idx_void_list: %d\n", plist_casted->idx_start, plist_casted->idx_end, plist_casted->n_elem, idx_void_list);
@@ -341,13 +436,15 @@ int print_list_table_generic(pvoid plist, pcustom_print pinput_print){
   if((plist_casted->n_elem == 0) || (pinput_print == NULL)) return 1;
 
   pelem_tmp = pelem_start + plist_casted->idx_start;
-  while(pelem_tmp->idx_next != -1)
+  while(pelem_tmp->idx_next != IDX_FINE_LISTA)
    {
-    if(!(pinput_print(TO_ALLTYPE(pelem_tmp->paddr), pelem_tmp->size))) return 0;
+    i++;
+    if(i == 5) break;
+    if(!(pinput_print((all_type)(pelem_tmp->paddr), pelem_tmp->size))) return 0;
     printf("->");
     pelem_tmp = pelem_start + pelem_tmp->idx_next;
    }
-  if(!(pinput_print(TO_ALLTYPE(pelem_tmp->paddr), pelem_tmp->size))) return 0;
+  if(!(pinput_print((all_type)(pelem_tmp->paddr), pelem_tmp->size))) return 0;
   printf("\n");
 
   return 1;

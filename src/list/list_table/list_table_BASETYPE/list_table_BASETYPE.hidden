@@ -1,5 +1,5 @@
-#ifndef _LIST_TABLE_GENERIC_HIDDEN
-#define _LIST_TABLE_GENERIC_HIDDEN
+#ifndef _LIST_TABLE_BASETYPE_HIDDEN
+#define _LIST_TABLE_BASETYPE_HIDDEN
 
 #include "./../../../util/defines_typedef.h"
 
@@ -81,12 +81,12 @@
  * di aiuto come print_lista ed eventuali controlli in funzioni come
  * insert_nth e extract_nth
  * */
-typedef struct _list_table_generic {
+typedef struct _list_table_BASETYPE {
   unsi idx_start;
   unsi idx_end;
   unsi n_elem;
- } list_table_generic;
-typedef list_table_generic* plist_table_generic;
+ } list_table_BASETYPE;
+typedef list_table_BASETYPE* plist_table_BASETYPE;
 
 /* STRUTTURA ELEMENTO:
  * la tabella e' essenzialmente un array di elementi fatti da:
@@ -94,12 +94,11 @@ typedef list_table_generic* plist_table_generic;
  * - size:     size dell'elemento da conservare
  * - idx_next: indirizzo dell'elemento successivo della lista
  * */
-typedef struct _elem_table_generic{
-  pvoid paddr;
-  unsi size;
-  unsi idx_next;
- } elem_table_generic;
-typedef elem_table_generic* pelem_table_generic;
+typedef struct _elem_table_BASETYPE{
+  BASETYPE val;
+  unsi     idx_next;
+ } elem_table_BASETYPE;
+typedef elem_table_BASETYPE* pelem_table_BASETYPE;
 
 /* Di seguito le funzioni usate internamente: */
 
@@ -109,6 +108,6 @@ typedef elem_table_generic* pelem_table_generic;
  *
  * return:       torna l'indirizzo della tabella
  * */
-pvoid create_table_generic(type_resize type_resize, unsi dim);
+pvoid create_table_BASETYPE(type_resize type_resize, unsi dim);
 
 #endif
