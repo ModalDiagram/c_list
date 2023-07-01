@@ -98,6 +98,8 @@ int extract_first_dynamic_generic(pvoid plist, all_type pvalue, punsi psize){
   pelem_generic         pelem_to_remove;
   ppvoid                ppvalue_input = pvalue.pv;
 
+  if(plist_casted->n_elem == 0) return 0;
+
   pelem_to_remove = plist_casted->pstart;
   plist_casted->pstart = pelem_to_remove->pnext;
 
@@ -172,7 +174,34 @@ int insert_last_dynamic_generic(pvoid plist, all_type value, unsi size){
  *
  * */
 int extract_last_dynamic_generic(pvoid plist, all_type pvalue, punsi psize){
-  return 0;
+  plist_dynamic_generic plist_casted = (plist_dynamic_generic) plist;
+  pelem_generic         pelem_moving, pelem_tmp=NULL;
+  ppvoid                ppvalue_input = pvalue.pv;
+
+  if(plist_casted->n_elem == 0) return 0;
+
+  /* raggiungo l'ultimo elemento con pelem_moving e conservo in pelem_tmp il penultimo */
+  pelem_moving = plist_casted->pstart;
+  while(pelem_moving->pnext != NULL){
+    pelem_tmp = pelem_moving;
+    pelem_moving = pelem_moving->pnext;
+   }
+
+  /* restituisco il valore estratto e libero l'elemento */
+  *ppvalue_input = pelem_moving->paddr;
+  *psize = pelem_moving->size;
+  free(pelem_moving);
+  /* cambio il pnext del penultimo solo se questo e' diverso da NULL (che e'
+   * il caso in cui la lista ha un solo elemento) */
+  if(pelem_tmp != NULL){
+    pelem_tmp->pnext = NULL;
+   }
+
+  /* aggiorno le informazioni della lista */
+  plist_casted->pend = pelem_tmp;
+  if(!(--(plist_casted->n_elem))) plist_casted->pstart = NULL;
+
+  return 1;
  }
 
 

@@ -183,7 +183,36 @@ int insert_last_dynamic_array_BASETYPE(pvoid plist, all_type value, unsi size){
  *
  * */
 int extract_last_dynamic_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
-  return 0;
+  plist_dynamic_array_BASETYPE plist_casted = (plist_dynamic_array_BASETYPE) plist;
+  pvoid         pelem_moving, pelem_tmp=NULL;
+  ppvoid        ppvalue_input = pvalue.pv;
+  unsi          size_array = plist_casted->size_array;
+
+  if(plist_casted->n_elem == 0) return 0;
+
+  /* raggiungo l'ultimo elemento con pelem_moving e conservo in pelem_tmp il penultimo */
+  pelem_moving = plist_casted->pstart;
+  while(GET_PNEXT(pelem_moving) != NULL){
+    pelem_tmp = pelem_moving;
+    pelem_moving = GET_PNEXT(pelem_moving);
+   }
+
+  /* restituisco il valore estratto e libero l'elemento */
+  if((*ppvalue_input = malloc(size_array*size_type)) == NULL) return 0;
+  memcpy(*ppvalue_input, pelem_moving, size_array*size_type);
+
+  free(pelem_moving);
+  /* cambio il pnext del penultimo solo se questo e' diverso da NULL (che e'
+   * il caso in cui la lista ha un solo elemento) */
+  if(pelem_tmp != NULL){
+    GET_PNEXT(pelem_tmp) = NULL;
+   }
+
+  /* aggiorno le informazioni della lista */
+  plist_casted->pend = pelem_tmp;
+  if(!(--(plist_casted->n_elem))) plist_casted->pstart = NULL;
+
+  return 1;
  }
 
 

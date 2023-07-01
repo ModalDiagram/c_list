@@ -49,8 +49,15 @@ void test_generic(){
   insert_first(plist, (all_type)((pvoid)&f), sizeof(float));
   f=5;
   insert_last(plist, (all_type)((pvoid)&f), sizeof(float));
-  insert_last(plist, (all_type)((pvoid)&f), sizeof(float));
-  printf("yes");
+  extract_last(plist, (all_type)((pvoid)&pextract), &size_extract);
+  printf("Estratto %f con size %u\n", *pextract, size_extract);
+  f=18;
+  insert_first(plist, (all_type)((pvoid)&f), sizeof(float));
+  extract_last(plist, (all_type)((pvoid)&pextract), &size_extract);
+  printf("Estratto %f con size %u\n", *pextract, size_extract);
+  print_list(plist, print_generic);
+  extract_last(plist, (all_type)((pvoid)&pextract), &size_extract);
+  extract_last(plist, (all_type)((pvoid)&pextract), &size_extract);
   print_list(plist, print_generic);
   extract_first(plist, (all_type)((pvoid)&pextract), &size_extract);
   printf("Estratto %f con size %u\n", *pextract, size_extract);
@@ -69,8 +76,12 @@ void test_float(){
   if((plist = malloc_list(type_list_dynamic, "FLOAT", 1)) == NULL) printf("Non creata.\n");
   insert_last(plist, (all_type)((float)8.4), 29);
   insert_first(plist, (all_type)((float)2.4), 29);
-  insert_last(plist, (all_type)((float)6.4), 29);
-  insert_first(plist, (all_type)((float)4.4), 29);
+  extract_last(plist, (all_type)((pvoid)&f), NULL);
+  printf("Estratto %f\n", f);
+  extract_last(plist, (all_type)((pvoid)&f), NULL);
+  print_list(plist, print_float);
+  extract_last(plist, (all_type)((pvoid)&f), NULL);
+  printf("Estratto %f\n", f);
   print_list(plist, print_float);
   extract_first(plist, (all_type)((pvoid)&f), NULL);
   print_list(plist, print_float);
@@ -107,6 +118,15 @@ void test_array_float(){
   insert_last(plist, (all_type)((pvoid)parray), 0);
   parray[0] = 100;
   insert_last(plist, (all_type)((pvoid)parray), 0);
+  extract_last(plist, (all_type)((pvoid)&poutput), NULL);
+  printf("Estratto {%f, %f, %f}\n", poutput[0], poutput[1], poutput[2]);
+  parray[0] = 1000;
+  insert_last(plist, (all_type)((pvoid)parray), 0);
+  extract_last(plist, (all_type)((pvoid)&poutput), NULL);
+  printf("Estratto {%f, %f, %f}\n", poutput[0], poutput[1], poutput[2]);
+  extract_last(plist, (all_type)((pvoid)&poutput), NULL);
+  extract_last(plist, (all_type)((pvoid)&poutput), NULL);
+  extract_last(plist, (all_type)((pvoid)&poutput), NULL);
   /* printf("Float %f\n", GET_FLOAT(parray)); */
   print_list(plist, print_array_float);
   extract_first(plist, (all_type)((pvoid)&poutput), NULL);

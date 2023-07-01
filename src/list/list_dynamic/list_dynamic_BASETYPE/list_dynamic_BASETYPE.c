@@ -91,6 +91,8 @@ int extract_first_dynamic_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
   pelem_BASETYPE pelem_to_remove;
   pBASETYPE pvalue_input = (pBASETYPE) pvalue.pv;
 
+  if(plist_casted->n_elem == 0) return 0;
+
   pelem_to_remove = plist_casted->pstart;
   plist_casted->pstart = pelem_to_remove->pnext;
 
@@ -157,8 +159,35 @@ int insert_last_dynamic_BASETYPE(pvoid plist, all_type value, unsi size){
  * in questo caso dato che si tratta di una lista di double e non generic.
  *
  * */
-int extract_last_dynamic_BASETYPE(pvoid plista, all_type pvalue, punsi psize){
-  return 0;
+int extract_last_dynamic_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
+  plist_dynamic_BASETYPE plist_casted = (plist_dynamic_BASETYPE) plist;
+  pelem_BASETYPE         pelem_moving, pelem_tmp=NULL;
+  pBASETYPE pvalue_input = (pBASETYPE) pvalue.pv;
+
+  if(plist_casted->n_elem == 0) return 0;
+
+  /* raggiungo l'ultimo elemento con pelem_moving e conservo in pelem_tmp il penultimo */
+  pelem_moving = plist_casted->pstart;
+  while(pelem_moving->pnext != NULL){
+    pelem_tmp = pelem_moving;
+    pelem_moving = pelem_moving->pnext;
+   }
+
+  /* restituisco il valore estratto e libero l'elemento */
+  (*pvalue_input) = pelem_moving->val;
+
+  free(pelem_moving);
+  /* cambio il pnext del penultimo solo se questo e' diverso da NULL (che e'
+   * il caso in cui la lista ha un solo elemento) */
+  if(pelem_tmp != NULL){
+    pelem_tmp->pnext = NULL;
+   }
+
+  /* aggiorno le informazioni della lista */
+  plist_casted->pend = pelem_tmp;
+  if(!(--(plist_casted->n_elem))) plist_casted->pstart = NULL;
+
+  return 1;
  }
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo
