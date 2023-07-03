@@ -101,6 +101,17 @@ typedef struct _elem_table_generic{
  } elem_table_generic;
 typedef elem_table_generic* pelem_table_generic;
 
+/* table_info: contiene le informazioni della tabella
+ * n_entries:  numero di spazi totali della tabella
+ * n_occupied: numero di spazi della tabella occupati attualmente
+ * La metto in memoria subito prima della tabella per non metterla static e dato
+ * che mi serve al piu' una volta per funzione
+ * */
+typedef struct _table_info_generic{
+  unsi n_entries;
+  unsi n_occupied;
+ } table_info_generic;
+typedef table_info_generic* ptable_info_generic;
 /* Di seguito le funzioni usate internamente: */
 
 /* create_table: alloca la memoria della tabella

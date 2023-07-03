@@ -153,7 +153,10 @@ int resize_table(pvoid plist, unsi n_entries){
 int get_info_table(pvoid plist,
                    punsi pn_entries,
                    punsi pn_occupied){
-  return 0;
+  pmy_list plist_casted = (pmy_list) plist;
+
+  if((plist_casted->tlist) <= (unsi)type_dynamic_generic) return 0;
+  return get_info_table_arr[plist_casted->tlist - type_dynamic_generic - 1](plist_casted->plist, pn_entries, pn_occupied);
  }
 
 /* free_list: libera la memoria occupata dalla lista

@@ -8,6 +8,9 @@
 
 /* #define DEBUG_LIST_TABLE_GENERIC */
 
+/* questi due li metto static perche' li uso sempre e non li voglio calcolare.
+ * il n_entries e n_occupied lo metto subito prima della table perche' non mi servono sempre e per non
+ * mettere troppi static (li alloco solo quando mi serve la table) */
 static pvoid ptable = NULL;
 static unsi  idx_void_list = 1;
 
@@ -83,6 +86,8 @@ pvoid malloc_list_specify_table_table_generic(unsi dim_array, type_resize type_r
   /* STEP 3 */
   pfirst_elem_of_new_list->idx_next = IDX_FINE_LISTA;
 
+  (*(((punsi)ptable)-1))++;
+
   #ifdef DEBUG_LIST_TABLE_GENERIC
   printf("---- DEBUG MALLOC ----\n");
   printf("Nuova lista creata, indice: %d\n", pnew_list->idx_start);
@@ -108,11 +113,16 @@ pvoid create_table_generic(type_resize type_resize, unsi dim)
  {
   pelem_table_generic pelem_tmp;
   int                 i;
+  ptable_info_generic ptable_and_elem;
 
 
   /* STEP 1 */
-  if((ptable = malloc(sizeof(elem_table_generic)*dim)) == NULL) return NULL;
+  if((ptable_and_elem = malloc(sizeof(table_info_generic) + sizeof(elem_table_generic)*dim)) == NULL) return NULL;
 
+  ptable_and_elem->n_entries = dim;
+  ptable_and_elem->n_occupied = 0;
+
+  ptable = ((pchar) ptable_and_elem) + sizeof(table_info_generic);
   pelem_tmp = (pelem_table_generic) ptable;
   pelem_tmp->idx_next = type_resize;
   pelem_tmp++;
@@ -173,7 +183,13 @@ int resize_table_table_generic(pvoid plist, unsi n_entries){
 int get_info_table_table_generic(pvoid plist,
                    punsi pn_entries,
                    punsi pn_occupied){
-  return 0;
+  ptable_info_generic pmy_info;
+
+  pmy_info = ptable - sizeof(table_info_generic);
+  *pn_entries = pmy_info->n_entries;
+  *pn_occupied = pmy_info->n_occupied;
+
+  return 1;
  }
 
 /* free_list: libera la memoria occupata dalla lista
@@ -186,8 +202,10 @@ void free_list_table_generic(pvoid plist){
 
   if(plist_to_free->n_elem == 0)
    {
+    (pelem_start + plist_to_free->idx_start)->idx_next = idx_void_list;
     idx_void_list = plist_to_free->idx_start;
     free(plist);
+    (*(((punsi)ptable)-1))--;
     #ifdef DEBUG_LISTA_VELOCE
     printf("---- DEBUG ----\n");
     printf("Lista liberata. Indirizzo lista dei vuoti: %d\n", idx_void_list);
@@ -198,12 +216,14 @@ void free_list_table_generic(pvoid plist){
 
   /* STEP 1 */
   pelem_tmp = pelem_start + plist_to_free->idx_start;
-  while((pelem_tmp->idx_next) != -1)
+  while((pelem_tmp->idx_next) != IDX_FINE_LISTA)
    {
     free(pelem_tmp->paddr);
     pelem_tmp = pelem_start + (pelem_tmp->idx_next);
+    (*(((punsi)ptable)-1))--;
    }
   free(pelem_tmp->paddr);
+  (*(((punsi)ptable)-1))--;
 
   /* STEP 2 */
   pelem_tmp->idx_next = idx_void_list;
@@ -264,6 +284,9 @@ int insert_first_table_generic(pvoid plist, all_type value, unsi size){
 
   /* STEP 4 */
   idx_void_list = int_tmp;
+
+  (*(((punsi)ptable)-1))++;
+
   #ifdef DEBUG_LIST_TABLE_GENERIC
   printf("---- DEBUG INSERT_FIRST ----\n");
   printf("Nuovo idx_void_list: %d\n", idx_void_list);
@@ -325,6 +348,8 @@ int extract_first_table_generic(pvoid plist, all_type pvalue, punsi psize){
   plist_casted->idx_start = tmp_int;
   (plist_casted->n_elem)--;
 
+  (*(((punsi)ptable)-1))--;
+
   return 1;
  }
 
@@ -378,6 +403,8 @@ int insert_last_table_generic(pvoid plist, all_type value, unsi size){
 
   /* aggiorno l'indice della lista dei vuoti */
   idx_void_list = int_tmp;
+
+  (*(((punsi)ptable)-1))++;
 
   return 1;
  }
@@ -444,6 +471,8 @@ int extract_last_table_generic(pvoid plist, all_type pvalue, punsi psize){
   /* aggiorno le informazioni della lista */
   plist_casted->idx_end = idx_current;
   (plist_casted->n_elem)--;
+
+  (*(((punsi)ptable)-1))--;
 
   return 1;
  }

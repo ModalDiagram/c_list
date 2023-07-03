@@ -112,13 +112,19 @@ typedef list_table_array_BASETYPE* plist_table_array_BASETYPE;
  * sizeof_array:  size degli array contenuti (data da n_elem*sizeof(tipo))
  * idx_void_list: indice di inizio della lista dei vuoti della tabella (ne serve
  *                uno per ogni tabella)
+ * n_entries:  numero di spazi totali della tabella
+ * n_occupied: numero di spazi della tabella occupati attualmente
  *
+ * A differenza delle altre classi non la metto prima della tabella perche' dovrei
+ * calcolare comunque ogni volta idx_void_list, che qui non posso mettere static
  * */
-typedef struct _info_table {
+typedef struct _table_info_array_BASETYPE {
   unsi sizeof_array;
   unsi idx_void_list;
- } info_table;
-typedef info_table* pinfo_table;
+  unsi n_entries;
+  unsi n_occupied;
+ } table_info_array_BASETYPE;
+typedef table_info_array_BASETYPE* ptable_info_array_BASETYPE;
 
 /* Di seguito le funzioni usate internamente: */
 

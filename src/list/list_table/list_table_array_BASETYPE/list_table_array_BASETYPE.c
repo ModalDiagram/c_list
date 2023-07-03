@@ -56,7 +56,7 @@ pvoid malloc_list_table_array_BASETYPE(unsi dim_array){
 pvoid malloc_list_specify_table_table_array_BASETYPE(unsi size_array, type_resize type_resize, unsi dim_table){
   plist_table_array_BASETYPE pnew_list;
   pvoid                      pfirst_elem_of_new_list, ptable;
-  pinfo_table                pmy_info;
+  ptable_info_array_BASETYPE                pmy_info;
   unsi                       idx_void_list;
   unsi                       sizeof_array = size_array * sizeof(BASETYPE);
 
@@ -91,7 +91,7 @@ pvoid malloc_list_specify_table_table_array_BASETYPE(unsi size_array, type_resiz
      }
     #endif
    }
-  pmy_info = (pinfo_table) ptable;
+  pmy_info = (ptable_info_array_BASETYPE) ptable;
   ptable = pmy_info + 1;
   idx_void_list = pmy_info->idx_void_list;
 
@@ -116,6 +116,9 @@ pvoid malloc_list_specify_table_table_array_BASETYPE(unsi size_array, type_resiz
   GET_IDX_NEXT(pfirst_elem_of_new_list) = IDX_FINE_LISTA;
 
   pmy_info->idx_void_list = idx_void_list;
+
+  (pmy_info->n_occupied)++;
+
   #ifdef DEBUG_LIST_TABLE_ARRAY_BASETYPE
   printf("---- DEBUG MALLOC ----\n");
   printf("Nuova lista creata, indice: %d\n", pnew_list->idx_start);
@@ -128,8 +131,8 @@ pvoid malloc_list_specify_table_table_array_BASETYPE(unsi size_array, type_resiz
 /* pfind_table: funzione con cui trovare la tabella con dimensione corretta
  * value1:      intero corrispondente alla size degli array da cercare
  * size1:       non importa
- * value2:      indirizzo della tabella da cercare, posso prendere la dimensione degli
- *              array contenuti con ((pinfo_table) ptable)->size_array
+ * value2:      indirizzo delintegrate e^(-2ix) dcosx++integrate e^(-2ix) dcosx++la tabella da cercare, posso prendere la dimensione degli
+ *              array contenuti con ((ptable_info_array_BASETYPE) ptable)->size_array
  * size2:       non importa
  * presult:     vi scrive 0 quando l'intero in value1 e' uguale alla dimensione degli
  *              array in value2
@@ -148,15 +151,15 @@ int pfind_table_array_BASETYPE(all_type value1, unsi size1,
  * return:       torna l'indirizzo della tabella
  *
  * FUNZIONAMENTO:
- * 1) Alloco lo spazio della tabella, che corrisponde al sizeof(info_table), il quale
+ * 1) Alloco lo spazio della tabella, che corrisponde al sizeof(table_info_array_BASETYPE), il quale
  *    contiene size degli array contenuti e idx_void_list, piu' dim volte il size di un
  *    elemento della tabella, che e' size_array*sizeof(tipo).
  *    La aggiungo alla lista di tabelle.
  * 2) Imposto le informazioni sulla tabella:
- *    - size_array in pinfo_table prima della tabella
- *    - idx_void_list in pinfo_table prima della tabella
+ *    - size_array in ptable_info_array_BASETYPE prima della tabella
+ *    - idx_void_list in ptable_info_array_BASETYPE prima della tabella
  *    - type_resize nell'idx_next del primo elemento della tabella
- *    Poi sposto table di pinfo_table in modo che coincida con l'inizio della tabella
+ *    Poi sposto table di ptable_info_array_BASETYPE in modo che coincida con l'inizio della tabella
  *    vera e propria.
  * 3) Inizializzo la tabella: e' fatta solo dalla lista dai vuoti. Questa inizia
  *    all'indice 1 e ha per elementi successivi gli indici 2->3->... fino
@@ -165,10 +168,10 @@ int pfind_table_array_BASETYPE(all_type value1, unsi size1,
 pvoid create_table_array_BASETYPE(unsi sizeof_array, type_resize type_resize, unsi dim){
   int         i;
   pvoid       pelem_tmp, ptable;
-  pinfo_table pinfo_new_table;
+  ptable_info_array_BASETYPE pinfo_new_table;
 
   /* STEP 1 */
-  if((ptable = malloc(sizeof(info_table) + (sizeof_array+sizeof(unsi))*dim)) == NULL) return NULL;
+  if((ptable = malloc(sizeof(table_info_array_BASETYPE) + (sizeof_array+sizeof(unsi))*dim)) == NULL) return NULL;
   #ifdef DEBUG_LIST_TABLE_ARRAY_BASETYPE
   printf("---- DEBUG CREATE_TABLE ----\n");
   printf("Nuova tabella creata, indirizzo: %lu\n", (long)ptable);
@@ -181,6 +184,8 @@ pvoid create_table_array_BASETYPE(unsi sizeof_array, type_resize type_resize, un
   pinfo_new_table = ptable;
   pinfo_new_table->sizeof_array = sizeof_array;
   pinfo_new_table->idx_void_list = 1;
+  pinfo_new_table->n_occupied = 0;
+  pinfo_new_table->n_entries = dim;
   ptable = pinfo_new_table + 1;
   pelem_tmp = ptable;
   GET_IDX_NEXT(pelem_tmp) = type_resize;
@@ -219,7 +224,7 @@ pvoid create_table_array_BASETYPE(unsi sizeof_array, type_resize type_resize, un
  * */
 int change_resize_table_table_array_BASETYPE(pvoid plist, type_resize type_resize){
   plist_table_array_BASETYPE plist_casted = (plist_table_array_BASETYPE) plist;
-  pinfo_table                pmy_info = (pinfo_table) (plist_casted->ptable);
+  ptable_info_array_BASETYPE                pmy_info = (ptable_info_array_BASETYPE) (plist_casted->ptable);
   unsi  sizeof_array = pmy_info->sizeof_array;
   pvoid ptable = pmy_info + 1;
 
@@ -237,7 +242,7 @@ int resize_table_table_array_BASETYPE(pvoid plist, unsi n_entries){
   return 0;
  }
 
-/* get_info_table: fornisce informazioni sulla tabella che contiene plist
+/* get_table_info_array_BASETYPE: fornisce informazioni sulla tabella che contiene plist
  * pn_entries: indirizzo in cui scrivere il numero di elementi complessivi della tabella;
  * pn_occupied: indirizzo in cui scrivere il numero di elementi occupati della tabella;
  *
@@ -246,7 +251,12 @@ int resize_table_table_array_BASETYPE(pvoid plist, unsi n_entries){
 int get_info_table_table_array_BASETYPE(pvoid plist,
                    punsi pn_entries,
                    punsi pn_occupied){
-  return 0;
+  ptable_info_array_BASETYPE pmy_info = (ptable_info_array_BASETYPE) (((plist_table_array_BASETYPE) plist)->ptable);
+
+  *pn_entries = pmy_info->n_entries;
+  *pn_occupied = pmy_info->n_occupied;
+
+  return 1;
  }
 
 /* free_list: libera la memoria occupata dalla lista
@@ -255,15 +265,18 @@ int get_info_table_table_array_BASETYPE(pvoid plist,
  * return:    non ritorna niente */
 void free_list_table_array_BASETYPE(pvoid plist){
   plist_table_array_BASETYPE plist_casted = (plist_table_array_BASETYPE) plist;
-  pinfo_table                pmy_info = (pinfo_table) (plist_casted->ptable);
+  ptable_info_array_BASETYPE pmy_info = (ptable_info_array_BASETYPE) (plist_casted->ptable);
   unsi                       sizeof_array = pmy_info->sizeof_array;
   unsi                       idx_void_list = pmy_info->idx_void_list;
   pvoid                      ptable = pmy_info + 1;
 
   if(plist_casted->n_elem == 0)
    {
+    GET_IDX_NEXT(GET_NEXT_ELEM(ptable, plist_casted->idx_start)) = idx_void_list;
     idx_void_list = plist_casted->idx_start;
     free(plist);
+    (pmy_info->n_occupied)--;
+
     #ifdef DEBUG_LIST_TABLE_BASETYPE
     printf("---- DEBUG ----\n");
     printf("Lista liberata. Indirizzo lista dei vuoti: %d\n", idx_void_list);
@@ -280,6 +293,7 @@ void free_list_table_array_BASETYPE(pvoid plist){
   pmy_info->idx_void_list = idx_void_list;
 
   /* STEP 3 */
+  ((pmy_info)->n_occupied) -= plist_casted->n_elem;
   free(plist);
 
   #ifdef DEBUG_LIST_TABLE_BASETYPE
@@ -300,7 +314,7 @@ void free_list_table_array_BASETYPE(pvoid plist){
  * */
 int insert_first_table_array_BASETYPE(pvoid plist, all_type value, unsi size){
   plist_table_array_BASETYPE plist_casted = (plist_table_array_BASETYPE) plist;
-  pinfo_table                pmy_info = (pinfo_table) (plist_casted->ptable);
+  ptable_info_array_BASETYPE pmy_info = (ptable_info_array_BASETYPE) (plist_casted->ptable);
   pvoid               pfirst_free_elem, ptable = pmy_info + 1;
   int                 int_tmp;
   unsi                sizeof_array = pmy_info->sizeof_array;
@@ -336,6 +350,9 @@ int insert_first_table_array_BASETYPE(pvoid plist, all_type value, unsi size){
   /* STEP 4 */
   idx_void_list = int_tmp;
   pmy_info->idx_void_list = idx_void_list;
+
+  (pmy_info->n_occupied)++;
+
   #ifdef DEBUG_LIST_TABLE_GENERIC
   printf("---- DEBUG INSERT_FIRST ----\n");
   printf("Nuovo idx_void_list: %d\n", idx_void_list);
@@ -360,7 +377,7 @@ int insert_first_table_array_BASETYPE(pvoid plist, all_type value, unsi size){
  * Torna 1 se tutto va bene, 0 altrimenti */
 int extract_first_table_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
   plist_table_array_BASETYPE plist_casted = (plist_table_array_BASETYPE) plist;
-  pinfo_table                pmy_info = (pinfo_table) (plist_casted->ptable);
+  ptable_info_array_BASETYPE pmy_info = (ptable_info_array_BASETYPE) (plist_casted->ptable);
   pvoid               pelem_to_extract, ptable = pmy_info + 1;
   ppvoid              ppvalue_input = pvalue.pv;
   int                 tmp_int;
@@ -398,6 +415,7 @@ int extract_first_table_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize
   /* STEP 5 */
   plist_casted->idx_start = tmp_int;
   (plist_casted->n_elem)--;
+  (pmy_info->n_occupied)--;
 
   return 1;
  }
@@ -418,7 +436,7 @@ int extract_first_table_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize
 int insert_last_table_array_BASETYPE(pvoid plist, all_type value, unsi size){
   plist_table_array_BASETYPE plist_casted = (plist_table_array_BASETYPE) plist;
   int                        int_tmp;
-  pinfo_table                pmy_info = (pinfo_table) (plist_casted->ptable);
+  ptable_info_array_BASETYPE pmy_info = (ptable_info_array_BASETYPE) (plist_casted->ptable);
   pvoid                      pfirst_free_elem, ptable = pmy_info + 1;
   unsi                       sizeof_array = pmy_info->sizeof_array;
   unsi                       idx_void_list = pmy_info->idx_void_list;
@@ -452,7 +470,9 @@ int insert_last_table_array_BASETYPE(pvoid plist, all_type value, unsi size){
   (plist_casted->n_elem)++;
 
   /* aggiorno l'indice della lista dei vuoti */
-  idx_void_list = int_tmp;
+  pmy_info->idx_void_list = int_tmp;
+
+  (pmy_info->n_occupied)++;
 
   return 1;
  }
@@ -478,7 +498,7 @@ int insert_last_table_array_BASETYPE(pvoid plist, all_type value, unsi size){
  * */
 int extract_last_table_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
   plist_table_array_BASETYPE plist_casted = (plist_table_array_BASETYPE) plist;
-  pinfo_table                pmy_info = (pinfo_table) (plist_casted->ptable);
+  ptable_info_array_BASETYPE                pmy_info = (ptable_info_array_BASETYPE) (plist_casted->ptable);
   pvoid                      pelem_moving, ptable = pmy_info + 1;
   ppvoid                     ppvalue_input = pvalue.pv;
   unsi                       idx_current, idx_end = plist_casted->idx_end;
@@ -522,6 +542,7 @@ int extract_last_table_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize)
   /* aggiorno le informazioni della lista */
   plist_casted->idx_end = idx_current;
   (plist_casted->n_elem)--;
+  (pmy_info->n_occupied)--;
 
   return 1;
  }
@@ -622,7 +643,7 @@ int search_first_table_array_BASETYPE(pvoid plist,
  * */
 int print_list_table_array_BASETYPE(pvoid plist, pcustom_print pinput_print){
   plist_table_array_BASETYPE plist_casted = (plist_table_array_BASETYPE) plist;
-  pinfo_table                pmy_info = (pinfo_table) (plist_casted->ptable);
+  ptable_info_array_BASETYPE                pmy_info = (ptable_info_array_BASETYPE) (plist_casted->ptable);
   pvoid pelem_tmp, ptable = pmy_info + 1;
   unsi  sizeof_array = pmy_info->sizeof_array;
   int   i=0;

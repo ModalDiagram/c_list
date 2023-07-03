@@ -46,10 +46,8 @@ void test_generic(){
   unsi size_extract;
 
   if((plist = malloc_list(type_list_dynamic, "GENERIC", 1)) == NULL) printf("Non creata.\n");
-  insert_first(plist, (all_type)((pvoid)&f), sizeof(float));
   f=5;
   insert_last(plist, (all_type)((pvoid)&f), sizeof(float));
-  extract_last(plist, (all_type)((pvoid)&pextract), &size_extract);
   printf("Estratto %f con size %u\n", *pextract, size_extract);
   f=18;
   insert_first(plist, (all_type)((pvoid)&f), sizeof(float));
@@ -140,76 +138,111 @@ void test_array_float(){
  }
 
 void test_table_generic(){
-  pvoid plist;
+  pvoid plist, plistdue;
   float f=4;
   pfloat pf;
-  unsi size;
+  unsi size, tot, occupied;
 
   /* if((plist = malloc_list(type_list_table, "GENERIC", 3)) == NULL) printf("Non creata.\n"); */
   if((plist = malloc_list_specify_table("GENERIC", 3, type_resize_default, 100)) == NULL) printf("Non creata.\n");
-  print_list(plist, print_generic);
-  insert_last(plist, (all_type)((pvoid)&f), sizeof(float));
-  extract_last(plist, (all_type)((pvoid)&pf), &size);
-  extract_last(plist, (all_type)((pvoid)&pf), &size);
-  extract_last(plist, (all_type)((pvoid)&pf), &size);
-  printf("Estratto %f con size %u\n", *pf, size);
-  f=5;
-  insert_last(plist, (all_type)((pvoid)&f), sizeof(float));
-  f=10;
+  if((plistdue = malloc_list_specify_table("GENERIC", 3, type_resize_default, 100)) == NULL) printf("Non creata.\n");
+  free_list(plistdue);
+  get_info_table(plist, &tot, &occupied);
+  printf("Totali: %u, occupati: %u\n", tot, occupied);
   insert_first(plist, (all_type)((pvoid)&f), sizeof(float));
-  print_list(plist, print_generic);
+  insert_first(plist, (all_type)((pvoid)&f), sizeof(float));
+  insert_first(plist, (all_type)((pvoid)&f), sizeof(float));
+  get_info_table(plist, &tot, &occupied);
+  printf("Totali: %u, occupati: %u\n", tot, occupied);
+  f=5;
+  /* insert_last(plist, (all_type)((pvoid)&f), sizeof(float)); */
   extract_last(plist, (all_type)((pvoid)&pf), &size);
-  printf("Estratto %f con size %u\n", *pf, size);
-  print_list(plist, print_generic);
-  for(;;){
-    insert_last(plist, (all_type)((pvoid)&f), sizeof(float));
-    extract_last(plist, (all_type)((pvoid)&pf), &size);
-    free(pf);
-   }
+  get_info_table(plist, &tot, &occupied);
+  printf("Totali: %u, occupati: %u\n", tot, occupied);
+  /* print_list(plist, print_generic); */
+  /* insert_last(plist, (all_type)((pvoid)&f), sizeof(float)); */
+  /* extract_last(plist, (all_type)((pvoid)&pf), &size); */
+  /* extract_last(plist, (all_type)((pvoid)&pf), &size); */
+  /* extract_last(plist, (all_type)((pvoid)&pf), &size); */
+  /* printf("Estratto %f con size %u\n", *pf, size); */
+  /* f=5; */
+  /* insert_last(plist, (all_type)((pvoid)&f), sizeof(float)); */
+  /* f=10; */
+  /* insert_first(plist, (all_type)((pvoid)&f), sizeof(float)); */
+  /* print_list(plist, print_generic); */
+  /* extract_last(plist, (all_type)((pvoid)&pf), &size); */
+  /* printf("Estratto %f con size %u\n", *pf, size); */
+  /* print_list(plist, print_generic); */
+  /* for(;;){ */
+  /*   insert_last(plist, (all_type)((pvoid)&f), sizeof(float)); */
+  /*   extract_last(plist, (all_type)((pvoid)&pf), &size); */
+  /*   free(pf); */
+  /*  } */
  }
 
 void test_table_char(){
   pvoid plist;
   char  c='a', ex;
-  int i=0;
+  unsi tot, occupied;
 
   /* if((plist = malloc_list(type_list_table, "GENERIC", 3)) == NULL) printf("Non creata.\n"); */
   if((plist = malloc_list_specify_table("CHAR", 1, type_resize_default, 100)) == NULL) printf("Non creata.\n");
+  get_info_table(plist, &tot, &occupied);
+  printf("Totali: %u, occupati: %u\n", tot, occupied);
+  free_list(plist);
+  if((plist = malloc_list_specify_table("CHAR", 1, type_resize_default, 100)) == NULL) printf("Non creata.\n");
+  get_info_table(plist, &tot, &occupied);
+  printf("Totali: %u, occupati: %u\n", tot, occupied);
+  if((plist = malloc_list_specify_table("CHAR", 1, type_resize_default, 100)) == NULL) printf("Non creata.\n");
   insert_first(plist, (all_type)c, sizeof(float));
-  print_list(plist, print_char);
+  get_info_table(plist, &tot, &occupied);
+  printf("Totali: %u, occupati: %u\n", tot, occupied);
+  /* print_list(plist, print_char); */
   extract_last(plist, (all_type)((pvoid)&ex), NULL);
-  extract_last(plist, (all_type)((pvoid)&ex), NULL);
-  printf("Estratto %c\n", ex);
-  print_list(plist, print_char);
-  c='b';
-  insert_first(plist, (all_type)c, sizeof(float));
-  c='c';
-  insert_first(plist, (all_type)c, sizeof(float));
-  print_list(plist, print_char);
-  extract_last(plist, (all_type)((pvoid)&ex), NULL);
-  printf("Estratto %c\n", ex);
-  print_list(plist, print_char);
-  /* free_list(plist); */
-  for(;;){
-    i++;
-    if((insert_last(plist, (all_type)c, sizeof(float))) == 0) break;
-    extract_last(plist, (all_type)((pvoid)&ex), NULL);
-   }
-  printf("iter %d\n", i);
+  get_info_table(plist, &tot, &occupied);
+  printf("Totali: %u, occupati: %u\n", tot, occupied);
+  /* extract_last(plist, (all_type)((pvoid)&ex), NULL); */
+  /* printf("Estratto %c\n", ex); */
+  /* print_list(plist, print_char); */
+  /* c='b'; */
+  /* insert_first(plist, (all_type)c, sizeof(float)); */
+  /* c='c'; */
+  /* insert_first(plist, (all_type)c, sizeof(float)); */
+  /* print_list(plist, print_char); */
+  /* extract_last(plist, (all_type)((pvoid)&ex), NULL); */
+  /* printf("Estratto %c\n", ex); */
+  /* print_list(plist, print_char); */
+  /* /1* free_list(plist); *1/ */
+  /* for(;;){ */
+  /*   i++; */
+  /*   if((insert_last(plist, (all_type)c, sizeof(float))) == 0) break; */
+  /*   extract_last(plist, (all_type)((pvoid)&ex), NULL); */
+  /*  } */
+  /* printf("iter %d\n", i); */
  }
 
 void test_table_array_float(){
   pvoid plist;
   float array[5]={1,2,3,4,5};
+  unsi tot, occupied;
   pfloat pextracted;
 
   /* if((plist = malloc_list(type_list_table, "GENERIC", 3)) == NULL) printf("Non creata.\n"); */
   if((plist = malloc_list(type_list_table, "FLOAT", 5)) == NULL) printf("Non creata.\n");
-  if((plist = malloc_list(type_list_table, "FLOAT", 4)) == NULL) printf("Non creata.\n");
-  if((plist = malloc_list(type_list_table, "FLOAT", 3)) == NULL) printf("Non creata.\n");
+  free(plist);
   if((plist = malloc_list(type_list_table, "FLOAT", 5)) == NULL) printf("Non creata.\n");
-  if((plist = malloc_list(type_list_table, "FLOAT", 3)) == NULL) printf("Non creata.\n");
   insert_last(plist, (all_type)(pvoid)array, 0);
+  insert_last(plist, (all_type)(pvoid)array, 0);
+  insert_last(plist, (all_type)(pvoid)array, 0);
+  get_info_table(plist, &tot, &occupied);
+  printf("Totali: %u, occupati: %u\n", tot, occupied);
+  extract_first(plist, (all_type)(pvoid)&pextracted, 0);
+  extract_first(plist, (all_type)(pvoid)&pextracted, 0);
+  extract_first(plist, (all_type)(pvoid)&pextracted, 0);
+  extract_first(plist, (all_type)(pvoid)&pextracted, 0);
+  get_info_table(plist, &tot, &occupied);
+  printf("Totali: %u, occupati: %u\n", tot, occupied);
+
   extract_last(plist, (all_type)(pvoid)&pextracted, 0);
   printf("Estratto: ");
   print_array_float((all_type)(pvoid)pextracted, 5);
@@ -287,7 +320,7 @@ void compare_array_float(){
  }
 
 int main(int argc, char *argv[]){
-  test_float();
+  test_table_array_float();
 
   return 0;
  }

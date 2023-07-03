@@ -83,6 +83,8 @@ pvoid malloc_list_specify_table_table_BASETYPE(unsi dim_array, type_resize type_
   /* STEP 3 */
   pfirst_elem_of_new_list->idx_next = IDX_FINE_LISTA;
 
+  (*(((punsi)ptable)-1))++;
+
   #ifdef DEBUG_LIST_TABLE_BASETYPE
   printf("---- DEBUG MALLOC ----\n");
   printf("Nuova lista creata, indice: %d\n", pnew_list->idx_start);
@@ -107,11 +109,16 @@ pvoid malloc_list_specify_table_table_BASETYPE(unsi dim_array, type_resize type_
 pvoid create_table_BASETYPE(type_resize type_resize, unsi dim){
   pelem_table_BASETYPE pelem_tmp;
   int                  i;
+  ptable_info_BASETYPE ptable_and_elem;
 
 
   /* STEP 1 */
-  if((ptable = malloc(sizeof(elem_table_BASETYPE)*dim)) == NULL) return NULL;
+  if((ptable_and_elem = malloc(sizeof(table_info_BASETYPE) + sizeof(elem_table_BASETYPE)*dim)) == NULL) return NULL;
 
+  ptable_and_elem->n_entries = dim;
+  ptable_and_elem->n_occupied = 0;
+
+  ptable = ((pchar) ptable_and_elem) + sizeof(table_info_BASETYPE);
   pelem_tmp = (pelem_table_BASETYPE) ptable;
   pelem_tmp->idx_next = type_resize;
   pelem_tmp++;
@@ -172,7 +179,12 @@ int resize_table_table_BASETYPE(pvoid plist, unsi n_entries){
 int get_info_table_table_BASETYPE(pvoid plist,
                    punsi pn_entries,
                    punsi pn_occupied){
-  return 0;
+  ptable_info_BASETYPE pmy_info;
+
+  pmy_info = ptable - sizeof(table_info_BASETYPE);
+  *pn_entries = pmy_info->n_entries;
+  *pn_occupied = pmy_info->n_occupied;
+  return 1;
  }
 
 /* free_list: libera la memoria occupata dalla lista
@@ -185,8 +197,10 @@ void free_list_table_BASETYPE(pvoid plist){
 
   if(plist_to_free->n_elem == 0)
    {
+    (pelem_start + plist_to_free->idx_start)->idx_next = idx_void_list;
     idx_void_list = plist_to_free->idx_start;
     free(plist);
+    (*(((punsi)ptable)-1))--;
     #ifdef DEBUG_LIST_TABLE_BASETYPE
     printf("---- DEBUG ----\n");
     printf("Lista liberata. Indirizzo lista dei vuoti: %d\n", idx_void_list);
@@ -201,6 +215,7 @@ void free_list_table_BASETYPE(pvoid plist){
   /* STEP 2 */
   idx_void_list = plist_to_free->idx_start;
 
+  (*(((punsi)ptable)-1))-= plist_to_free->n_elem;
   /* STEP 3 */
   free(plist);
 
@@ -254,6 +269,9 @@ int insert_first_table_BASETYPE(pvoid plist, all_type value, unsi size){
 
   /* STEP 4 */
   idx_void_list = int_tmp;
+
+  (*(((punsi)ptable)-1))++;
+
   #ifdef DEBUG_LIST_TABLE_BASETYPE
   printf("---- DEBUG INSERT_FIRST ----\n");
   printf("Nuovo idx_void_list: %d\n", idx_void_list);
@@ -313,6 +331,7 @@ int extract_first_table_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
   /* STEP 5 */
   plist_casted->idx_start = tmp_int;
   (plist_casted->n_elem)--;
+  (*(((punsi)ptable)-1))--;
 
   return 1;
  }
@@ -365,6 +384,8 @@ int insert_last_table_BASETYPE(pvoid plist, all_type value, unsi size){
 
   /* aggiorno l'indice della lista dei vuoti */
   idx_void_list = int_tmp;
+
+  (*(((punsi)ptable)-1))++;
 
   return 1;
  }
@@ -429,6 +450,7 @@ int extract_last_table_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
   /* aggiorno le informazioni della lista */
   plist_casted->idx_end = idx_current;
   (plist_casted->n_elem)--;
+  (*(((punsi)ptable)-1))--;
 
   return 1;
  }
