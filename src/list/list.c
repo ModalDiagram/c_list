@@ -141,7 +141,10 @@ int change_resize_table(pvoid plist, type_resize type_resize){
  * n_entries è minore del numero di elementi delle liste contenute.
  */
 int resize_table(pvoid plist, unsi n_entries){
-  return 0;
+  pmy_list plist_casted = (pmy_list) plist;
+
+  if((plist_casted->tlist) <= (unsi)type_dynamic_generic) return 0;
+  return resize_table_arr[plist_casted->tlist - type_dynamic_generic - 1](plist_casted->plist, n_entries);
  }
 
 /* get_info_table: fornisce informazioni sulla tabella che contiene plist

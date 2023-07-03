@@ -108,6 +108,7 @@ typedef elem_table_generic* pelem_table_generic;
  * che mi serve al piu' una volta per funzione
  * */
 typedef struct _table_info_generic{
+  pvoid list_of_lists;
   unsi n_entries;
   unsi n_occupied;
  } table_info_generic;
@@ -121,5 +122,20 @@ typedef table_info_generic* ptable_info_generic;
  * return:       torna l'indirizzo della tabella
  * */
 pvoid create_table_generic(type_resize type_resize, unsi dim);
+
+void print_table();
+
+/* copy_list: copia una lista da una table a un'altra
+ * ptable_dest: table in cui copiare la lista
+ * idx_void_list_dest: indirizzo in cui legge e scrive l'idx_void_list della tabella
+ *                     di destinazione
+ * ptable_orig:        table da cui copiare la lista
+ * idx_void_list_orig: indirizzo in cui legge e scrive l'idx_void_list della tabella
+ *                     di partenza
+ * idx_start:          indirizzo di partenza della lista da copiare
+ * */
+int copy_list(pelem_table_generic ptable_dest, punsi pidx_void_list_dest,
+              pelem_table_generic ptable_orig, punsi pidx_void_list_orig,
+              unsi idx_start);
 
 #endif
