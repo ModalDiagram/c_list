@@ -43,8 +43,6 @@ CREA_ARRAY(extract_first)
 CREA_ARRAY(insert_last)
 CREA_ARRAY(extract_last)
 CREA_ARRAY(search_first)
-CREA_ARRAY(get_max)
-CREA_ARRAY(sort_list)
 CREA_ARRAY(print_list)
 
 /* Sono fornite le seguenti funzioni membro: */
@@ -294,42 +292,6 @@ int search_first(pvoid plist,
                                                value_searched, size_searched,
                                                pvalue_found,   psize_found,
                                                pinput_compare);
- }
-
-/* get_max:        trova il massimo della lista (cioe' l'elemento che e' piu' grande di
- *                 tutti gli altri secondo pinput_compare)
- * ppaddr_max:     indirizzo in cui scrivere l'indirizzo dell'elemento massimo
- * psize_max:      indirizzo in cui scrivere rispettivamente:
- *                 - type_data_generic: dimensione dell'elemento massimo
- *                 - type_data_array_*: numero di elem. dell'array massimo
- * pinput_compare: funzione con cui comparare due elementi della lista.
- *                 E' una funzione del tipo:
- *                 int (*pcustom_compare)(pvoid pvalue1, unsi size1, pvoid pvalue2, unsi size2, pint presult);
- *                 Deve scrivere in presult:
- *                 - 0  se sono uguali
- *                 - >0 se il primo è maggiore
- *                 - <0 se il secondo è maggiore
- *
- * Torna 1 se tutto va bene, 0 altrimenti
- * */
-int get_max(pvoid plist, ppvoid ppaddr_max, punsi psize_max, pcustom_compare pinput_compare){
-  return 0;
- }
-
-/* sort_list:      ordina la lista secondo pinput_compare
- * plist:          lista da ordinare
- * pinput_compare: funzione con cui comparare due elementi della lista.
- *                 E' una funzione del tipo:
- *                 int (*pcustom_compare)(pvoid pvalue1, unsi size1, pvoid pvalue2, unsi size2, pint presult);
- *                 Deve scrivere in presult:
- *                 - 0  se sono uguali
- *                 - >0 se il primo è maggiore
- *                 - <0 se il secondo è maggiore
- *
- * Torna 1 se tutto va bene, 0 altrimenti
- * */
-int sort_list(pvoid plist, pcustom_compare pinput_compare){
-  return 0;
  }
 
 /* print_list:    stampa la lista e le sue proprieta' nel formato

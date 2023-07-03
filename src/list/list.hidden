@@ -111,8 +111,6 @@ typedef int (*type_search_first)(pvoid plist,
                                  all_type value_searched, unsi  size_searched,
                                  all_type pvalue_found,   punsi psize_found,
                                  pcustom_compare pinput_compare);
-typedef int (*type_get_max)(pvoid plist, ppvoid ppaddr_max, punsi psize_max, pcustom_compare pinput_compare);
-typedef int (*type_sort_list)(pvoid plist, pcustom_compare pinput_compare);
 typedef int (*type_print_list)(pvoid plist, pcustom_print pinput_print);
 
 /* Altre funzioni ausiliarie: */

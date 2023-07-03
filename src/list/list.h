@@ -16,15 +16,14 @@
  * - list_dynamic: utile nel caso in cui il numero di elementi da inserire o estrarre
  *   e' molto variabile
  * - list_table:  piu' veloce della precedente, ma occupa una quantita' fissa di memoria
- *   (specificabile in malloc_list o predefinita in defines_typedef.h), chiamata table nel seguito.
+ *   (specificabile in malloc_list o definita successivamente come TABLE_DEFAULT_DIM), chiamata table nel seguito.
  *   Le liste istanziate successivamente occupano la stessa table.
- *   Quando la table si riempie si ampliera' automaticamente di default, a meno ché
- *   non sia stato specificato type_resize_manual in change_resize_table.
- *   La table puo' essere ampliata o ridotta manualmente attraverso le funzioni
- *   expand_table e shrink_table (contenute in util/friend_functions.h).
- *   Queste operazioni rallentano il programma temporaneamente quindi questo tipo di
- *   lista e' particolarmente utile quando il numero di elementi e' circa noto a priori
- *   o non troppo variabile
+ *   La table viene creata con la quantita di memoria predefinita e il type_resize_default,
+ *   altrimenti, questi possono essere specificati in malloc_list_specify_table.
+ *   I tipi di resize gestiscono cosa succede quando la table e' piena:
+ *   - type_resize_default: la tabella si amplia automaticamente
+ *   - type_resize_manual:  le funzioni di inserimento danno errore e la table va ampliata
+ *                          manualmente attraverso resize_table
  *
  * NOTA BENE:
  * - quando un elemento viene inserito nella lista viene creata una copia dell'elemento,
@@ -32,10 +31,13 @@
  *   l'elemento contenuto nella lista
  */
 
-/* Di seguito e' riportato un enum con tutti i tipi contenibili dall'oggetto.
- * Siccome C non permette l'overload delle funzioni, tutte prendono in input una variabile
+/* Dimensione della zona di memoria da allocare all'istanziamento della prima
+ * lista_veloce e in cui saranno contenute anche le successive lista_veloce */
+#define TABLE_DEFAULT_DIM 1000
+
+/* Siccome C non permette l'overload delle funzioni, tutte prendono in input una variabile
  * di tipo all_type, in modo da poter passare diversi tipi. La variabile data in input
- * allora va castata al tipo appropriato e poi ad all_type.
+ * va castata al tipo appropriato e poi ad all_type.
  * Questo da' un warning se si compila con --pedantic, ma e' inevitabile.
  * Esempi di funzioni che prendono variabili all_type in input:
  * insert_first(plist_float, (all_type)((float)2.5), ...)
@@ -50,10 +52,6 @@ typedef union _all_type
           void*    pv;
          } all_type;
 
-/* Dimensione della zona di memoria da allocare all'istanziamento della prima
- * lista_veloce e in cui saranno contenute anche le successive lista_veloce */
-#define TABLE_DEFAULT_DIM 1000
-
 /* type_list: tipo della lista da istanziare, descritti precedentemente */
 typedef enum{
   type_list_dynamic=0,
@@ -67,11 +65,11 @@ typedef enum{
  * - type_resize_default: la table viene ampliata automaticamente una volta piena
  * - type_resize_manual:  la table torna errore quando si cerca di inserire elementi
  *                        oltre la sua capienza. Deve essere ampliata manualmente
- *                        attraverso shrink_table
+ *                        attraverso resize_table
  *
  * type_resize_default e' il tipo di resize delle tabella appena create, ma puo' essere
  * cambiato attraverso la funzione change_resize_table o scelto quando si crea la lista con
- * malloc_list_with_resize
+ * malloc_list_specify_table
  * */
 typedef enum{
   type_resize_default=0,
@@ -118,7 +116,8 @@ typedef int (*pcustom_compare)(all_type value1, unsi size1,
 
 /* Sono fornite le seguenti funzioni membro: */
 
-/* malloc_list: istanzia una nuova lista che puo' contenere dati dei tipi:
+/* malloc_list: istanzia una nuova lista di tipo type_list_dynamic o type_list_table
+ *              che puo' contenere dati dei tipi:
  *              "CHAR", "INT", "FLOAT", "DOUBLE", "LONG", "GENERIC",
  *              o loro array.
  * type_list:   tipo di lista da instanziare, tra:
@@ -145,7 +144,7 @@ pvoid malloc_list(type_list type_list, pchar type_string, unsi dim_array);
  *                            quando piena
  *                            - type_resize_manual: le funzioni di inserimento tornano
  *                            errore quando la tabella e' piena. Essa va espansa manualmente
- *                            con la funzione expand_table
+ *                            con la funzione resize_table
  * dim_table:                 numero di elementi che puo' contenere la tabella creata,
  *                            nel caso in cui questa non esistesse e dovesse essere creata.
  *                            Se la tabella e' stata gia' creata, ad esempio semplicemente
@@ -153,6 +152,10 @@ pvoid malloc_list(type_list type_list, pchar type_string, unsi dim_array);
  *
  * return:      puntatore alla nuova lista, NULL se l'istanziamento non
  *              va a buon fine
+ *
+ * NB: per ragioni di compatibilita' con altre liste preesistenti, type_resize e
+ * dim_table vengono impostati solo se la tabella non esiste ancora. Se la tabella
+ * esiste gia' essi possono essere modificati rispettivamente con change_resize_table e resize_table.
  * */
 pvoid malloc_list_specify_table(pchar type_string, unsi dim_array, type_resize type_resize, unsi dim_table);
 
@@ -172,13 +175,13 @@ int change_resize_table(pvoid plist, type_resize type_resize);
  * n_entries:    numero di elementi complessivi della tabella, dopo che è stata ridimensionata;
  *
  * return:       1 se ridimensionata correttamente, 0 altrimenti, ad esempio se
- * n_entries è minore del numero di elementi delle liste contenute.
+ *               n_entries è minore del numero di elementi delle liste contenute.
  */
 int resize_table(pvoid plist, unsi n_entries);
 
 /* get_info_table: fornisce informazioni sulla tabella che contiene plist
- * pn_entries: indirizzo in cui scrivere il numero di elementi complessivi della tabella;
- * pn_occupied: indirizzo in cui scrivere il numero di elementi occupati della tabella;
+ * pn_entries:     indirizzo in cui scrivere il numero di elementi complessivi della tabella;
+ * pn_occupied:    indirizzo in cui scrivere il numero di elementi occupati della tabella;
  *
  * return: 1 se tutto va bene, 0 altrimenti
  * */
@@ -197,8 +200,8 @@ void free_list(pvoid plist);
  * plist:         lista di cui si vuole conoscere il tipo
  *
  * return:        stringa del tipo:
- *                "DINAMICA INT"
- *                "DINAMICA ARRAY INT"
+ *                "DYNAMIC INT"
+ *                "DYNAMIC ARRAY INT"
  *                "TABLE INT"
  * */
 pchar get_type_list(pvoid plist);
@@ -298,38 +301,6 @@ int search_first(pvoid plist,
                  all_type value_searched, unsi size_searched,
                  all_type pvalue_found,   punsi psize_found,
                  pcustom_compare pinput_compare);
-
-/* get_max:        trova il massimo della lista (cioe' l'elemento che e' piu' grande di
- *                 tutti gli altri secondo pinput_compare)
- * ppaddr_max:     indirizzo in cui scrivere l'indirizzo dell'elemento massimo
- * psize_max:      indirizzo in cui scrivere rispettivamente:
- *                 - type_data_generic: dimensione dell'elemento massimo
- *                 - type_data_array_*: numero di elem. dell'array massimo
- * pinput_compare: funzione con cui comparare due elementi della lista.
- *                 E' una funzione del tipo:
- *                 int (*pcustom_compare)(all_type value1, unsi size1, all_type value2, unsi size2, pint presult);
- *                 Deve scrivere in presult:
- *                 - 0  se sono uguali
- *                 - >0 se il primo è maggiore
- *                 - <0 se il secondo è maggiore
- *
- * Torna 1 se tutto va bene, 0 altrimenti
- * */
-int get_max(pvoid plist, ppvoid ppaddr_max, punsi psize_max, pcustom_compare pinput_compare);
-
-/* sort_list:      ordina la lista secondo pinput_compare
- * plist:          lista da ordinare
- * pinput_compare: funzione con cui comparare due elementi della lista.
- *                 E' una funzione del tipo:
- *                 int (*pcustom_compare)(all_type value1, unsi size1, all_type value2, unsi size2, pint presult);
- *                 Deve scrivere in presult:
- *                 - 0  se sono uguali
- *                 - >0 se il primo è maggiore
- *                 - <0 se il secondo è maggiore
- *
- * Torna 1 se tutto va bene, 0 altrimenti
- * */
-int sort_list(pvoid plist, pcustom_compare pinput_compare);
 
 /* print_list:    stampa la lista e le sue proprieta' nel formato
  *                type_list: ...

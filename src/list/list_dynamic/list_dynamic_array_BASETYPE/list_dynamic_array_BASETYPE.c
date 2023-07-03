@@ -243,48 +243,6 @@ int search_first_dynamic_array_BASETYPE(pvoid plist,
   return 0;
  }
 
-/* get_max:        trova il massimo della lista (cioe' l'elemento che e' piu' grande di
- *                 tutti gli altri secondo pinput_compare)
- * ppaddr_max:     indirizzo in cui scrivere l'indirizzo dell'elemento massimo
- * psize_max:      indirizzo in cui scrivere rispettivamente:
- *                 - type_data_generic: dimensione dell'elemento massimo
- *                 - type_data_array_*: numero di elem. dell'array massimo
- * pinput_compare: funzione con cui comparare due elementi della lista.
- *                 E' una funzione del tipo:
- *                 int (*pcustom_compare)(pvoid pvalue1, unsi size1, pvoid pvalue2, unsi size2, pint presult);
- *                 Deve scrivere in presult:
- *                 - 0  se sono uguali
- *                 - >0 se il primo è maggiore
- *                 - <0 se il secondo è maggiore
- *
- * Torna 1 se tutto va bene, 0 altrimenti
- *
- * NB: pinput_compare puo' essere NULL, e in quel caso sara' utilizzata la plist_compare
- * fornita con la funzione add_functions se presente
- * */
-int get_max_dynamic_array_BASETYPE(pvoid plist, ppvoid ppaddr_max, punsi psize_max, pcustom_compare pinput_compare){
-  return 0;
- }
-
-/* sort_list:      ordina la lista secondo pinput_compare
- * plist:          lista da ordinare
- * pinput_compare: funzione con cui comparare due elementi della lista.
- *                 E' una funzione del tipo:
- *                 int (*pcustom_compare)(pvoid pvalue1, unsi size1, pvoid pvalue2, unsi size2, pint presult);
- *                 Deve scrivere in presult:
- *                 - 0  se sono uguali
- *                 - >0 se il primo è maggiore
- *                 - <0 se il secondo è maggiore
- *
- * Torna 1 se tutto va bene, 0 altrimenti
- *
- * NB: pinput_compare puo' essere NULL, e in quel caso sara' utilizzata la plist_compare
- * fornita con la funzione add_functions se presente
- * */
-int sort_list_dynamic_array_BASETYPE(pvoid plist, pcustom_compare pinput_compare){
-  return 0;
- }
-
 /* print_list:    stampa la lista e le sue proprieta' nel formato
  *                type_list: ...
  *                type_data: ...
