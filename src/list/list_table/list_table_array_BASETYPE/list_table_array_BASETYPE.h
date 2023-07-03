@@ -142,6 +142,47 @@ int insert_last_table_array_BASETYPE(pvoid plista, all_type value, unsi size);
  * */
 int extract_last_table_array_BASETYPE(pvoid plista, all_type pvalue, punsi psize);
 
+/* insert_nth: inserisce un elemento all'n-esima posizione della lista
+ * plist:      lista in cui inserire l'elemento
+ * value:      elemento da inserire
+ * size:       deve essere rispettivamente:
+ *             - type_data_generic: dimensione del dato da inserire
+ *             - altri:             non ha importanza
+ *
+ * Torna 1 se tutto va bene, 0 altrimenti.
+ *
+ * NB: per evitare errori, value deve essere del tipo appropriato e castato a (all_type), ad esempio
+ * - insert_nth(mia_lista_double, (all_type)(2.4), 0, 3)
+ * - insert_nth(mia_lista_generic, (all_type)((pvoid)&var_da_inserire), sizeof(var_da_inserire), 3)
+ *
+ * NB2: le posizioni sono contate a partire da 1, n=1 vuol dire inserire l'elemento
+ *      in cima alla lista, n=2 dopo il primo elemento e cosi' via
+ * */
+int insert_nth_table_array_BASETYPE(pvoid plist, all_type value, unsi size, unsi n);
+
+/* extract_first: estrae l'elemento all'n-esima posizione della lista
+ * plist:         lista da cui estrarre l'elemento
+ * pvalue:        indirizzo in cui verra' scritto rispettivamente:
+ *                - type_data_generic: indirizzo dell'elemento estratto
+ *                - type_data_array_*: indirizzo dell'array estratto
+ *                - altri:             valore dell'elemento estratto
+ * psize:         indirizzo in cui verra' scritto rispettivamente:
+ *                - type_data_generic: size dell'elemento estratto
+ *                - type_data_array_*: numero di elementi dell'array estratto
+ *                - altri:             niente
+ *
+ * Torna 1 se tutto va bene, 0 altrimenti
+ *
+ * NB: per evitare errori, value deve essere del tipo appropriato e castato a (all_type), ad esempio
+ * - extract_first(mia_lista_double, (all_type)((pvoid) &d), 0)
+ * dove d e' la variabile in cui salvare il valore estratto. psize non e' importante
+ * in questo caso dato che si tratta di una lista di double e non generic.
+ *
+ * NB2: le posizioni sono contate a partire da 1, n=1 vuol dire estrarre l'elemento
+ *      in cima alla lista, n=2 dopo il primo elemento e cosi' via
+ * */
+int extract_nth_table_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize, unsi n);
+
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo
  *                 elemento della lista uguale a quello fornito in input
  *                 secondo pinput_compare)
