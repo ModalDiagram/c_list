@@ -110,10 +110,11 @@ pvoid create_table_BASETYPE(type_resize type_resize, unsi dim){
   pelem_table_BASETYPE pelem_tmp;
   int                  i;
   ptable_info_BASETYPE ptable_and_elem;
+  unsi                 actual_size = dim+1;
 
 
   /* STEP 1 */
-  if((ptable_and_elem = malloc(sizeof(table_info_BASETYPE) + sizeof(elem_table_BASETYPE)*dim)) == NULL) return NULL;
+  if((ptable_and_elem = malloc(sizeof(table_info_BASETYPE) + sizeof(elem_table_BASETYPE)*actual_size)) == NULL) return NULL;
 
   ptable_and_elem->n_entries = dim;
   ptable_and_elem->n_occupied = 0;
@@ -124,7 +125,7 @@ pvoid create_table_BASETYPE(type_resize type_resize, unsi dim){
   pelem_tmp++;
 
   /* STEP 2 */
-  for (i = 2; i < dim; i++, pelem_tmp++){
+  for (i = 2; i < actual_size; i++, pelem_tmp++){
     pelem_tmp->idx_next = i;
    }
   pelem_tmp->idx_next = IDX_FINE_LISTA;

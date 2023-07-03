@@ -169,9 +169,10 @@ pvoid create_table_array_BASETYPE(unsi sizeof_array, type_resize type_resize, un
   int         i;
   pvoid       pelem_tmp, ptable;
   ptable_info_array_BASETYPE pinfo_new_table;
+  unsi        actual_size = dim + 1;
 
   /* STEP 1 */
-  if((ptable = malloc(sizeof(table_info_array_BASETYPE) + (sizeof_array+sizeof(unsi))*dim)) == NULL) return NULL;
+  if((ptable = malloc(sizeof(table_info_array_BASETYPE) + (sizeof_array+sizeof(unsi))*actual_size)) == NULL) return NULL;
   #ifdef DEBUG_LIST_TABLE_ARRAY_BASETYPE
   printf("---- DEBUG CREATE_TABLE ----\n");
   printf("Nuova tabella creata, indirizzo: %lu\n", (long)ptable);
@@ -192,7 +193,7 @@ pvoid create_table_array_BASETYPE(unsi sizeof_array, type_resize type_resize, un
   pelem_tmp = GET_NEXT_ELEM(ptable, 1);
 
   /* STEP 3 */
-  for (i = 2; i < dim; i++, pelem_tmp = GET_NEXT_ELEM(pelem_tmp, 1)){
+  for (i = 2; i < actual_size; i++, pelem_tmp = GET_NEXT_ELEM(pelem_tmp, 1)){
     GET_IDX_NEXT(pelem_tmp) = i;
    }
   GET_IDX_NEXT(pelem_tmp) = IDX_FINE_LISTA;

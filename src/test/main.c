@@ -144,21 +144,28 @@ void test_table_generic(){
   unsi size, tot, occupied;
 
   /* if((plist = malloc_list(type_list_table, "GENERIC", 3)) == NULL) printf("Non creata.\n"); */
-  if((plist = malloc_list_specify_table("GENERIC", 3, type_resize_default, 100)) == NULL) printf("Non creata.\n");
-  if((plistdue = malloc_list_specify_table("GENERIC", 3, type_resize_default, 100)) == NULL) printf("Non creata.\n");
-  free_list(plistdue);
-  get_info_table(plist, &tot, &occupied);
-  printf("Totali: %u, occupati: %u\n", tot, occupied);
-  insert_first(plist, (all_type)((pvoid)&f), sizeof(float));
-  insert_first(plist, (all_type)((pvoid)&f), sizeof(float));
-  insert_first(plist, (all_type)((pvoid)&f), sizeof(float));
-  get_info_table(plist, &tot, &occupied);
-  printf("Totali: %u, occupati: %u\n", tot, occupied);
-  f=5;
-  /* insert_last(plist, (all_type)((pvoid)&f), sizeof(float)); */
-  extract_last(plist, (all_type)((pvoid)&pf), &size);
-  get_info_table(plist, &tot, &occupied);
-  printf("Totali: %u, occupati: %u\n", tot, occupied);
+  if((plist = malloc_list_specify_table("GENERIC", 3, type_resize_default, 5)) == NULL) printf("Non creata.\n");
+  if((insert_first(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("Non inserito\n");
+  if((insert_first(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("Non inserito\n");
+  if((insert_first(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("Non inserito\n");
+  if((insert_first(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("Non inserito\n");
+  if((insert_first(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("Non inserito\n");
+  free_list(plist);
+  if((plist = malloc_list_specify_table("GENERIC", 3, type_resize_default, 1)) == NULL) printf("Non creata.\n");
+  /* if((plistdue = malloc_list_specify_table("GENERIC", 3, type_resize_default, 100)) == NULL) printf("Non creata.\n"); */
+  /* free_list(plistdue); */
+  /* get_info_table(plist, &tot, &occupied); */
+  /* printf("Totali: %u, occupati: %u\n", tot, occupied); */
+  /* insert_first(plist, (all_type)((pvoid)&f), sizeof(float)); */
+  /* insert_first(plist, (all_type)((pvoid)&f), sizeof(float)); */
+  /* insert_first(plist, (all_type)((pvoid)&f), sizeof(float)); */
+  /* get_info_table(plist, &tot, &occupied); */
+  /* printf("Totali: %u, occupati: %u\n", tot, occupied); */
+  /* f=5; */
+  /* /1* insert_last(plist, (all_type)((pvoid)&f), sizeof(float)); *1/ */
+  /* extract_last(plist, (all_type)((pvoid)&pf), &size); */
+  /* get_info_table(plist, &tot, &occupied); */
+  /* printf("Totali: %u, occupati: %u\n", tot, occupied); */
   /* print_list(plist, print_generic); */
   /* insert_last(plist, (all_type)((pvoid)&f), sizeof(float)); */
   /* extract_last(plist, (all_type)((pvoid)&pf), &size); */
@@ -320,7 +327,7 @@ void compare_array_float(){
  }
 
 int main(int argc, char *argv[]){
-  test_table_array_float();
+  test_table_generic();
 
   return 0;
  }

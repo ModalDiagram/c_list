@@ -114,10 +114,11 @@ pvoid create_table_generic(type_resize type_resize, unsi dim)
   pelem_table_generic pelem_tmp;
   int                 i;
   ptable_info_generic ptable_and_elem;
+  unsi                actual_size = dim+1;
 
 
   /* STEP 1 */
-  if((ptable_and_elem = malloc(sizeof(table_info_generic) + sizeof(elem_table_generic)*dim)) == NULL) return NULL;
+  if((ptable_and_elem = malloc(sizeof(table_info_generic) + sizeof(elem_table_generic)*actual_size)) == NULL) return NULL;
 
   ptable_and_elem->n_entries = dim;
   ptable_and_elem->n_occupied = 0;
@@ -128,7 +129,7 @@ pvoid create_table_generic(type_resize type_resize, unsi dim)
   pelem_tmp++;
 
   /* STEP 2 */
-  for (i = 2; i < dim; i++, pelem_tmp++){
+  for (i = 2; i < actual_size; i++, pelem_tmp++){
     pelem_tmp->idx_next = i;
    }
   pelem_tmp->idx_next = IDX_FINE_LISTA;
