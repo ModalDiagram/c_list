@@ -193,7 +193,7 @@ int print_list_of_lists(all_type plist, unsi size){
 int resize_table_table_generic(pvoid plist, unsi n_entries){
   ptable_info_generic pmy_info;
   ptable_info_generic ptable_and_elem;
-  pelem_table_generic ptable_start, pnew_table_start, pelem_moving;
+  pelem_table_generic pnew_table_start, pelem_moving;
   int                 i;
   unsi                actual_size = n_entries + 1, new_idx_void;
   plist_table_generic plist_extracted;
@@ -210,15 +210,14 @@ int resize_table_table_generic(pvoid plist, unsi n_entries){
   if(n_entries > pmy_info->n_entries){
     /* alloco la nuovo table e inizializzo le info */
     if((ptable_and_elem = malloc(sizeof(table_info_generic) + sizeof(elem_table_generic) * actual_size)) == NULL) return 0;
-    ptable_and_elem->n_entries = n_entries;
-    ptable_and_elem->n_occupied = pmy_info->n_occupied;
-    ptable_start = (pelem_table_generic)(ptable_and_elem + 1);
-
     /* copio la tabella */
-    memcpy(ptable_start, ptable, sizeof(elem_table_generic) * (pmy_info->n_entries + 1));
+    memcpy(ptable_and_elem, pmy_info, sizeof(table_info_generic) + sizeof(elem_table_generic) * (pmy_info->n_entries + 1));
+
+    ptable_and_elem->n_entries = n_entries;
+    pnew_table_start = (pelem_table_generic)(ptable_and_elem + 1);
 
     /* collego tutti i nuovi elementi con una lista che termina all'inizio della lista dei vuoti */
-    for (i = pmy_info->n_entries + 1, pelem_moving = ptable_start + i; i < n_entries; i++) {
+    for (i = pmy_info->n_entries + 1, pelem_moving = pnew_table_start + i; i < n_entries; i++) {
       pelem_moving->idx_next = i + 1;
       pelem_moving = pelem_moving + 1;
      }
@@ -227,8 +226,8 @@ int resize_table_table_generic(pvoid plist, unsi n_entries){
     /* sposto l'inizio della lista dei vuoti all'inizio della nuova lista */
     idx_void_list = pmy_info->n_entries + 1;
 
-    free(ptable - sizeof(table_info_generic));
-    ptable = (pvoid)ptable_start;
+    free(pmy_info);
+    ptable = (pvoid)pnew_table_start;
     return 1;
    }
   /* CASO 3: rimpicciolimento
@@ -253,7 +252,7 @@ int resize_table_table_generic(pvoid plist, unsi n_entries){
      * Per ricopiare sfrutto il fatto che la tabella e' vuota quindi ricopio ogni lista
      * in ordine, aumentando di volta in volta di 1 il new_idx_void */
     new_idx_void = 1;
-    pnew_table_start = (pelem_table_generic)ptable_and_elem + 1;
+    pnew_table_start = (pelem_table_generic)(ptable_and_elem + 1);
     while(extract_first(pmy_info->list_of_lists, (all_type)((pvoid)&plist_extracted), NULL)){
       printf("Copio una lista\n");
       /* qui si devono aggiungere controlli appropriati */
@@ -266,7 +265,7 @@ int resize_table_table_generic(pvoid plist, unsi n_entries){
        }
       /* se ha piu' elementi li ricopio */
       else{
-        copy_list(pnew_table_start, &new_idx_void, ptable, &idx_void_list, ((plist_table_generic)plist_extracted)->idx_start);
+        copy_list_generic(pnew_table_start, &new_idx_void, ptable, &idx_void_list, ((plist_table_generic)plist_extracted)->idx_start);
         plist_extracted->idx_start = new_idx_void - plist_extracted->n_elem + 1;
         plist_extracted->idx_end = new_idx_void;
         new_idx_void++;
@@ -276,7 +275,7 @@ int resize_table_table_generic(pvoid plist, unsi n_entries){
     for (i = new_idx_void, pelem_moving = pnew_table_start + i; i < n_entries; i++) {
       pelem_moving->idx_next = i + 1;
       pelem_moving++;
-    }
+     }
     pelem_moving->idx_next = IDX_FINE_LISTA;
 
     /* STEP 4 */
@@ -299,7 +298,7 @@ int resize_table_table_generic(pvoid plist, unsi n_entries){
  *                     di partenza
  * idx_start:          indirizzo di partenza della lista da copiare
  * */
-int copy_list(pelem_table_generic ptable_dest, punsi pidx_void_list_dest,
+int copy_list_generic(pelem_table_generic ptable_dest, punsi pidx_void_list_dest,
               pelem_table_generic ptable_orig, punsi pidx_void_list_orig,
               unsi idx_start){
   pelem_table_generic pelem_moving_dest, pelem_moving_origin;
@@ -489,7 +488,9 @@ int extract_first_table_generic(pvoid plist, all_type pvalue, punsi psize){
 
   /* STEP 2 */
   *ppvalue_input = pelem_to_extract->paddr;
-  *psize = pelem_to_extract->size;
+  if(psize != NULL){
+    *psize = pelem_to_extract->size;
+   }
 
   /* se la lista ha 1 solo elemento non devo liberare lo spazio (ogni lista
    * ha almeno uno spazio), ma basta decrementare il n_elem,
@@ -626,7 +627,9 @@ int extract_last_table_generic(pvoid plist, all_type pvalue, punsi psize){
 
   /* restituisco il valore estratto */
   *ppvalue_input = pelem_moving->paddr;
-  *psize = pelem_moving->size;
+  if(psize != NULL){
+    *psize = pelem_moving->size;
+   }
 
   /* metto l'ultimo elemento in cima alla lista dei vuoti */
   (pelem_moving->idx_next) = idx_void_list;
@@ -767,7 +770,7 @@ int print_list_table_generic(pvoid plist, pcustom_print pinput_print){
   return 1;
  }
 
-void print_table(){
+void print_table_generic(){
   ptable_info_generic pmy_info;
   int                 i;
   pelem_table_generic pelem_moving;

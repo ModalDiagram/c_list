@@ -123,7 +123,7 @@ typedef table_info_generic* ptable_info_generic;
  * */
 pvoid create_table_generic(type_resize type_resize, unsi dim);
 
-void print_table();
+void print_table_generic();
 
 /* copy_list: copia una lista da una table a un'altra
  * ptable_dest: table in cui copiare la lista
@@ -134,8 +134,8 @@ void print_table();
  *                     di partenza
  * idx_start:          indirizzo di partenza della lista da copiare
  * */
-int copy_list(pelem_table_generic ptable_dest, punsi pidx_void_list_dest,
-              pelem_table_generic ptable_orig, punsi pidx_void_list_orig,
-              unsi idx_start);
+int copy_list_generic(pelem_table_generic ptable_dest, punsi pidx_void_list_dest,
+                      pelem_table_generic ptable_orig, punsi pidx_void_list_orig,
+                      unsi idx_start);
 
 #endif

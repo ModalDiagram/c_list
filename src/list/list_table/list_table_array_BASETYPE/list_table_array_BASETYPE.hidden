@@ -119,6 +119,7 @@ typedef list_table_array_BASETYPE* plist_table_array_BASETYPE;
  * calcolare comunque ogni volta idx_void_list, che qui non posso mettere static
  * */
 typedef struct _table_info_array_BASETYPE {
+  pvoid list_of_lists;
   unsi sizeof_array;
   unsi idx_void_list;
   unsi n_entries;
@@ -147,5 +148,22 @@ pvoid create_table_array_BASETYPE(unsi size_array, type_resize type_resize, unsi
  * */
 int pfind_table_array_BASETYPE(all_type value1, unsi size1,
                                all_type value2, unsi size2);
+
+/* copy_list: copia una lista da una table a un'altra
+ * ptable_dest: table in cui copiare la lista
+ * idx_void_list_dest: indirizzo in cui legge e scrive l'idx_void_list della tabella
+ *                     di destinazione
+ * ptable_orig:        table da cui copiare la lista
+ * idx_void_list_orig: indirizzo in cui legge e scrive l'idx_void_list della tabella
+ *                     di partenza
+ * idx_start:          indirizzo di partenza della lista da copiare
+ * */
+int copy_list_array_BASETYPE(pvoid ptable_dest, punsi pidx_void_list_dest,
+                             pvoid ptable_orig, punsi pidx_void_list_orig,
+                             unsi idx_start, unsi size_array);
+
+void print_table_array_BASETYPE(plist_table_array_BASETYPE plist);
+
+int print_list_of_lists_array_BASETYPE(all_type plist, unsi size);
 
 #endif

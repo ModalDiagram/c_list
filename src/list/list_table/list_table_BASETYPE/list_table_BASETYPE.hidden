@@ -107,6 +107,7 @@ typedef elem_table_BASETYPE* pelem_table_BASETYPE;
  * che mi serve al piu' una volta per funzione
  * */
 typedef struct _table_info_BASETYPE{
+  pvoid list_of_lists;
   unsi n_entries;
   unsi n_occupied;
  } table_info_BASETYPE;
@@ -122,5 +123,20 @@ typedef table_info_BASETYPE* ptable_info_BASETYPE;
  * return:       torna l'indirizzo della tabella
  * */
 pvoid create_table_BASETYPE(type_resize type_resize, unsi dim);
+
+void print_table_BASETYPE();
+
+/* copy_list: copia una lista da una table a un'altra
+ * ptable_dest: table in cui copiare la lista
+ * idx_void_list_dest: indirizzo in cui legge e scrive l'idx_void_list della tabella
+ *                     di destinazione
+ * ptable_orig:        table da cui copiare la lista
+ * idx_void_list_orig: indirizzo in cui legge e scrive l'idx_void_list della tabella
+ *                     di partenza
+ * idx_start:          indirizzo di partenza della lista da copiare
+ * */
+int copy_list_BASETYPE(pelem_table_BASETYPE ptable_dest, punsi pidx_void_list_dest,
+                       pelem_table_BASETYPE ptable_orig, punsi pidx_void_list_orig,
+                       unsi idx_start);
 
 #endif
