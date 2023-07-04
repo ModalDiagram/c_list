@@ -151,7 +151,7 @@ void test_table_generic(){
   f=3;
   if((insert_first(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("Non inserito\n");
   f=2;
-  free(plist);
+  free_list(plist);
   if((plist = malloc_list_specify_table("GENERIC", 3, type_resize_default, 10)) == NULL) printf("Non creata.\n");
   f= 33;
   if((insert_first(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("Non inserito\n");

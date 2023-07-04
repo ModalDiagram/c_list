@@ -344,11 +344,22 @@ int get_info_table_table_generic(pvoid plist,
 void free_list_table_generic(pvoid plist){
   pelem_table_generic pelem_start = (pelem_table_generic) ptable, pelem_tmp;
   plist_table_generic plist_to_free = (plist_table_generic) plist;
+  ptable_info_generic pmy_info = ((ptable_info_generic) ptable) - 1;
+  pvoid               pextracted;
 
   if(plist_to_free->n_elem == 0)
    {
     (pelem_start + plist_to_free->idx_start)->idx_next = idx_void_list;
     idx_void_list = plist_to_free->idx_start;
+
+    /* tolgo la lista liberata dalla list_of_lists */
+    while (extract_first(pmy_info->list_of_lists, (all_type)((pvoid) &pextracted), NULL)) {
+      if(pextracted == plist_to_free){
+        break;
+       }
+      insert_last(pmy_info->list_of_lists, (all_type)pextracted, 0);
+     }
+
     free(plist);
     (*(((punsi)ptable)-1))--;
     #ifdef DEBUG_LISTA_VELOCE
@@ -373,6 +384,14 @@ void free_list_table_generic(pvoid plist){
   /* STEP 2 */
   pelem_tmp->idx_next = idx_void_list;
   idx_void_list = plist_to_free->idx_start;
+
+  /* tolgo la lista liberata dalla list_of_lists */
+  while (extract_first(pmy_info->list_of_lists, (all_type)((pvoid) &pextracted), NULL)) {
+    if(pextracted == plist_to_free){
+      break;
+     }
+    insert_last(pmy_info->list_of_lists, (all_type)pextracted, 0);
+   }
 
   /* STEP 3 */
   free(plist);
@@ -745,7 +764,6 @@ int print_list_table_generic(pvoid plist, pcustom_print pinput_print){
   if(!(pinput_print((all_type)(pelem_tmp->paddr), pelem_tmp->size))) return 0;
   printf("\n");
 
-  print_table();
   return 1;
  }
 
