@@ -346,6 +346,21 @@ int search_first_dynamic_array_BASETYPE(pvoid plist,
                          all_type value_searched, unsi size_searched,
                          all_type pvalue_found,   punsi psize_found,
                          pcustom_compare pinput_compare){
+  plist_dynamic_array_BASETYPE plist_casted = (plist_dynamic_array_BASETYPE) plist;
+  pvoid  pelem_moving;
+  ppvoid ppvalue_input = (ppvoid)(pvalue_found.pv);
+  unsi size_array = plist_casted->size_array;
+
+  if (pinput_compare == NULL) return 0;
+  pelem_moving = plist_casted->pstart;
+  while(pelem_moving != NULL){
+    if(!pinput_compare(value_searched, 0,(all_type)pelem_moving, 0)){
+      if((*ppvalue_input = malloc(size_array*size_type)) == NULL) return 0;
+      memcpy(*ppvalue_input, pelem_moving, size_array*size_type);
+      return 1;
+     }
+    pelem_moving = GET_PNEXT(pelem_moving);
+   }
   return 0;
  }
 
