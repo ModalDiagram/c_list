@@ -232,7 +232,36 @@ int extract_last_dynamic_array_BASETYPE(pvoid plist, all_type pvalue, punsi psiz
  *      in cima alla lista, n=2 dopo il primo elemento e cosi' via
  * */
 int insert_nth_dynamic_array_BASETYPE(pvoid plist, all_type value, unsi size, unsi n){
-  return 0;
+  plist_dynamic_array_BASETYPE plist_casted = (plist_dynamic_array_BASETYPE) plist;
+  pvoid pnew_elem, pelem_moving;
+  int   i;
+  unsi  size_array;
+
+  /* gestisco casi particolari */
+  if(n > (plist_casted->n_elem + 1)) return 0;
+  if(n == (plist_casted->n_elem + 1)){
+    return insert_last(plist, value, size);
+   }
+  if(n == 1){
+    return insert_first(plist, value, size);
+   }
+
+  size_array = plist_casted->size_array;
+  /* alloco nuovo elemento e salvo informazioni in input nell'elemento */
+  if((pnew_elem = malloc(size_array * size_type + sizeof(pvoid))) == NULL) return 0;
+  memcpy(pnew_elem, value.pv, size_array*size_type);
+
+  /* raggiungo l'(n-1)esimo elemento */
+  for (i = 2, pelem_moving = plist_casted->pstart; i < n; i++) {
+    pelem_moving = GET_PNEXT(pelem_moving);
+   }
+
+  /* metto il nuovo elemento tra l'(n-1)-esimo e l'n-esimo */
+  GET_PNEXT(pnew_elem) = GET_PNEXT(pelem_moving);
+  GET_PNEXT(pelem_moving) = pnew_elem;
+
+  (plist_casted->n_elem)++;
+  return 1;
  }
 
 /* extract_nth: estrae l'elemento all'n-esima posizione della lista
@@ -257,7 +286,40 @@ int insert_nth_dynamic_array_BASETYPE(pvoid plist, all_type value, unsi size, un
  *      in cima alla lista, n=2 dopo il primo elemento e cosi' via
  * */
 int extract_nth_dynamic_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize, unsi n){
-  return 0;
+  plist_dynamic_array_BASETYPE plist_casted = (plist_dynamic_array_BASETYPE) plist;
+  pvoid  pelem_to_extract, pelem_moving;
+  int    i;
+  ppvoid ppvalue_input = pvalue.pv;
+  unsi   size_array = plist_casted->size_array;
+
+  /* gestisco casi particolari */
+  if(n > (plist_casted->n_elem)) return 0;
+  if(n == (plist_casted->n_elem)){
+    return extract_last(plist, pvalue, psize);
+   }
+  if(n == 1){
+    return extract_first(plist, pvalue, psize);
+   }
+
+  /* raggiungo l'(n-1)esimo elemento con pelem_moving */
+  for (i = 2, pelem_moving = plist_casted->pstart; i < n; i++) {
+    pelem_moving = GET_PNEXT(pelem_moving);
+  }
+
+  /* pelem_to_extract e' l'n-esimo elemento, cioe' quello da estrarre */
+  pelem_to_extract = GET_PNEXT(pelem_moving);
+
+  /* restituisco il valore contenuto in pelem_to_extract */
+  if((*ppvalue_input = malloc(size_array*size_type)) == NULL) return 0;
+  memcpy(*ppvalue_input, pelem_to_extract, size_array*size_type);
+
+  /* sposto il puntatore dell'(n-1)-esimo elemento e libero l'n-esimo */
+  GET_PNEXT(pelem_moving) = GET_PNEXT(pelem_to_extract);
+  free(pelem_to_extract);
+
+  (plist_casted->n_elem)--;
+
+  return 1;
  }
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo

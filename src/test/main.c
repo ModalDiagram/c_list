@@ -72,12 +72,21 @@ void test_float(){
   float f = 3.0;
 
   if((plist = malloc_list(type_list_dynamic, "FLOAT", 1)) == NULL) printf("Non creata.\n");
-  insert_last(plist, (all_type)((float)8.4), 29);
-  insert_first(plist, (all_type)((float)2.4), 29);
-  extract_last(plist, (all_type)((pvoid)&f), NULL);
-  printf("Estratto %f\n", f);
-  extract_last(plist, (all_type)((pvoid)&f), NULL);
+  insert_first(plist, (all_type)((float)1), 29);
+  insert_first(plist, (all_type)((float)2), 29);
+  insert_nth(plist, (all_type)((float) 6.6), 0, 2);
+  insert_first(plist, (all_type)((float)3), 29);
   print_list(plist, print_float);
+  extract_nth(plist, (all_type)((pvoid)&f), NULL, 3);
+  printf("Estratto %f\n", f);
+  insert_first(plist, (all_type)((float)3), 29);
+  insert_last(plist, (all_type)((float)4), 29);
+  insert_nth(plist, (all_type)((float) 6.6), 0, 4);
+  print_list(plist, print_float);
+  insert_last(plist, (all_type)((float)5), 29);
+  insert_last(plist, (all_type)((float)6), 29);
+  print_list(plist, print_float);
+  extract_last(plist, (all_type)((pvoid)&f), NULL);
   extract_last(plist, (all_type)((pvoid)&f), NULL);
   printf("Estratto %f\n", f);
   print_list(plist, print_float);
@@ -113,9 +122,12 @@ void test_array_float(){
   insert_first(plist, (all_type)((pvoid)parray), 0);
   parray[0] = 10;
   insert_last(plist, (all_type)((pvoid)parray), 0);
+  parray[0] = 5;
+  insert_nth(plist, (all_type)((pvoid)parray), 0, 2);
   parray[0] = 100;
   insert_last(plist, (all_type)((pvoid)parray), 0);
-  extract_last(plist, (all_type)((pvoid)&poutput), NULL);
+  print_list(plist, print_array_float);
+  extract_nth(plist, (all_type)((pvoid)&poutput), NULL, 2);
   printf("Estratto {%f, %f, %f}\n", poutput[0], poutput[1], poutput[2]);
   parray[0] = 1000;
   insert_last(plist, (all_type)((pvoid)parray), 0);
@@ -470,7 +482,7 @@ void test_table_resize(){
  }
 
 int main(int argc, char *argv[]){
-  test_table_char();
+  test_float();
 
   return 0;
  }

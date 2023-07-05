@@ -291,7 +291,9 @@ int extract_last(pvoid plist, all_type pvalue, punsi psize){
  *      in cima alla lista, n=2 dopo il primo elemento e cosi' via
  * */
 int insert_nth(pvoid plist, all_type value, unsi size, unsi n){
-  return 0;
+  pmy_list plist_casted = (pmy_list) plist;
+
+  return insert_nth_arr[plist_casted->tlist](plist_casted->plist, value, size, n);
  }
 
 /* extract_nth: estrae l'elemento all'n-esima posizione della lista
@@ -316,7 +318,9 @@ int insert_nth(pvoid plist, all_type value, unsi size, unsi n){
  *      in cima alla lista, n=2 dopo il primo elemento e cosi' via
  * */
 int extract_nth(pvoid plist, all_type pvalue, punsi psize, unsi n){
-  return 0;
+  pmy_list plist_casted = (pmy_list) plist;
+
+  return extract_nth_arr[plist_casted->tlist](plist_casted->plist, pvalue, psize, n);
  }
 
 
