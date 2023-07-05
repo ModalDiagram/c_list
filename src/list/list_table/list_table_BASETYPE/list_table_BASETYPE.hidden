@@ -95,8 +95,8 @@ typedef list_table_BASETYPE* plist_table_BASETYPE;
  * - idx_next: indirizzo dell'elemento successivo della lista
  * */
 typedef struct _elem_table_BASETYPE{
-  BASETYPE val;
-  unsi     idx_next;
+  BASETYPE_SPACE val;
+  unsi           idx_next;
  } elem_table_BASETYPE;
 typedef elem_table_BASETYPE* pelem_table_BASETYPE;
 

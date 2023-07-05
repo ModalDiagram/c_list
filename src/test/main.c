@@ -443,14 +443,14 @@ void test_table_resize(){
   plist = malloc_list_specify_table("FLOAT", 3, type_resize_manual, 30);
   for (i = 0;; i++) {
     if((insert_first(plist, (all_type)((pvoid)array), sizeof(array))) == 0) break;
-  }
+   }
   printf("Inserimenti: %d\n", i);
   free_list(plist);
   if(((plist = malloc_list_specify_table("FLOAT", 3, type_resize_manual, 30)) == NULL)) return;
   resize_table(plist, 10);
   for (i = 0;; i++) {
     if((insert_first(plist, (all_type)((pvoid)array), sizeof(array))) == 0) break;
-  }
+   }
   printf("Inserimenti: %d\n", i);
   free_list(plist);
   if((plist = malloc_list_specify_table("FLOAT", 3, type_resize_manual, 30)) == NULL){
@@ -464,21 +464,21 @@ void test_table_resize(){
     extract_first(plist, (all_type)((pvoid)&pf), &size);
     printf("%f\n", *pf);
     if((insert_first(plist, (all_type)((pvoid)array), sizeof(array))) == 0) break;
-  }
+   }
   printf("Inserimenti: %d\n", i);
   free_list(plist);
 
   plist = malloc_list_specify_table("FLOAT", 5, type_resize_manual, 10);
   for (i = 0;; i++) {
     if((insert_first(plist, (all_type)((pvoid)array), sizeof(array))) == 0) break;
-  }
+   }
   printf("Inserimenti: %d\n", i);
   free_list(plist);
   if(((plist = malloc_list_specify_table("FLOAT", 3, type_resize_manual, 30)) == NULL)) return;
   resize_table(plist, 100);
   for (i = 0;; i++) {
     if((insert_first(plist, (all_type)((pvoid)array), sizeof(array))) == 0) break;
-  }
+   }
   printf("Inserimenti: %d\n", i);
   free_list(plist);
   if((plist = malloc_list_specify_table("FLOAT", 3, type_resize_manual, 30)) == NULL){
@@ -492,9 +492,23 @@ void test_table_resize(){
     extract_first(plist, (all_type)((pvoid)&pf), &size);
     printf("%f\n", *pf);
     if((insert_first(plist, (all_type)((pvoid)array), sizeof(array))) == 0) break;
-  }
+   }
   printf("Inserimenti: %d\n", i);
   free_list(plist);
+ }
+
+int print_lli(all_type val, unsi size){
+  printf("%lli", val.lli);
+  return 1;
+ }
+void test_long_long_int(){
+  pvoid plist;
+  long long int val = 3;
+
+  plist = malloc_list(type_list_dynamic, "LONG LONG INT", 1);
+  insert_first(plist, (all_type) val, 0);
+  print_list(plist, print_lli);
+  return;
  }
 
 int main(int argc, char *argv[]){
@@ -502,5 +516,3 @@ int main(int argc, char *argv[]){
 
   return 0;
  }
-
-

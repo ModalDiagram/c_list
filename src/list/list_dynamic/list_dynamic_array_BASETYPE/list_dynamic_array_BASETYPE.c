@@ -10,7 +10,7 @@
 #define GET_PNEXT(pvalue) (*((ppvoid)(((pBASETYPE) pvalue )+size_array)))
 #endif
 
-static unsi size_type = sizeof(BASETYPE);
+static unsi size_type = sizeof(BASETYPE_SPACE);
 
 /* Sono fornite le seguenti funzioni membro: */
 

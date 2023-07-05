@@ -6,21 +6,26 @@
 
 /* Di seguito i typedef utilizzati: */
 
-typedef void*        pvoid;
-typedef void**       ppvoid;
+typedef int*                 pint;
+typedef long int*            plong_int;
+typedef long long int*       plong_long_int;
+typedef unsigned int         unsi;
+typedef unsi*                punsi;
 
-typedef unsigned int unsi;
-typedef unsi*        punsi;
+typedef unsigned*            punsigned;
+typedef long unsigned*       plong_unsigned;
+typedef long long unsigned*  plong_long_unsigned;
 
-typedef int*         pint;
+typedef float*               pfloat;
+typedef double*              pdouble;
+typedef long double*         plong_double;
 
-typedef long*        plong;
+typedef char*                pchar;
+typedef signed char*         psigned_char;
 
-typedef char*        pchar;
+typedef void*                pvoid;
+typedef void**               ppvoid;
 
-typedef float*       pfloat;
-
-typedef double*       pdouble;
 
 
 #endif

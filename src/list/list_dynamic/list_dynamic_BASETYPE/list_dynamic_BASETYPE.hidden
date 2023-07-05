@@ -19,7 +19,7 @@
  * pnext:          indirizzo all'elemento successivo della lista
  * */
 typedef struct _elem_BASETYPE {
-  BASETYPE val;
+  BASETYPE_SPACE        val;
   struct _elem_BASETYPE *pnext;
  } elem_BASETYPE;
 

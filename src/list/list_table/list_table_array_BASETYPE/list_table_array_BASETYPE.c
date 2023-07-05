@@ -59,7 +59,7 @@ pvoid malloc_list_specify_table_table_array_BASETYPE(unsi size_array, type_resiz
   pvoid                      pfirst_elem_of_new_list, ptable;
   ptable_info_array_BASETYPE                pmy_info;
   unsi                       idx_void_list;
-  unsi                       sizeof_array = size_array * sizeof(BASETYPE);
+  unsi                       sizeof_array = size_array * sizeof(BASETYPE_SPACE);
 
   /* se non esiste la lista di tabelle, la creo */
   if(pptables == NULL){
@@ -296,7 +296,6 @@ int resize_table_table_array_BASETYPE(pvoid plist, unsi n_entries){
       if(plist_extracted->ptable == ptable_and_elem){
         break;
        }
-      printf("Aggiornato\n");
       plist_extracted->ptable = ptable_and_elem;
       insert_last(ptable_and_elem->plist_of_lists, (all_type)((pvoid) plist_extracted), 0);
      }
@@ -910,7 +909,7 @@ int print_list_table_array_BASETYPE(pvoid plist, pcustom_print pinput_print){
 
   printf("type_list: type_list_table\n");
   printf("type_data: array BASETYPE\n");
-  printf("Numero di elementi degli array contenuti: %lu\n", sizeof_array / sizeof(BASETYPE));
+  printf("Numero di elementi degli array contenuti: %lu\n", sizeof_array / sizeof(BASETYPE_SPACE));
   printf("Numero di elementi della lista: %u\n", plist_casted->n_elem);
   #ifdef DEBUG_LIST_TABLE_GENERIC
   printf("---- DEBUG PRINT_LIST ----\n");
@@ -925,11 +924,11 @@ int print_list_table_array_BASETYPE(pvoid plist, pcustom_print pinput_print){
    {
     i++;
     if(i == 5) break;
-    if(!(pinput_print((all_type)(pelem_tmp), sizeof_array / sizeof(BASETYPE)))) return 0;
+    if(!(pinput_print((all_type)(pelem_tmp), sizeof_array / sizeof(BASETYPE_SPACE)))) return 0;
     printf("->");
     pelem_tmp = GET_NEXT_ELEM(ptable, GET_IDX_NEXT(pelem_tmp));
    }
-  if(!(pinput_print((all_type)(pelem_tmp), sizeof_array / sizeof(BASETYPE)))) return 0;
+  if(!(pinput_print((all_type)(pelem_tmp), sizeof_array / sizeof(BASETYPE_SPACE)))) return 0;
   printf("\n");
 
   return 1;

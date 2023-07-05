@@ -4,33 +4,53 @@
 #include "list.h"
 #include "list.hidden"
 #include "../util/defines_typedef.h"
-#include "./list_table/list_table_generic/list_table_generic.h"
-#include "./list_table/list_table_array_char/list_table_array_char.h"
-#include "./list_table/list_table_array_int/list_table_array_int.h"
-#include "./list_table/list_table_array_float/list_table_array_float.h"
-#include "./list_table/list_table_array_double/list_table_array_double.h"
-#include "./list_table/list_table_array_long/list_table_array_long.h"
-#include "./list_table/list_table_array_pvoid/list_table_array_pvoid.h"
-#include "./list_table/list_table_char/list_table_char.h"
 #include "./list_table/list_table_int/list_table_int.h"
+#include "./list_table/list_table_long_int/list_table_long_int.h"
+#include "./list_table/list_table_long_long_int/list_table_long_long_int.h"
+#include "./list_table/list_table_unsigned/list_table_unsigned.h"
+#include "./list_table/list_table_long_unsigned/list_table_long_unsigned.h"
+#include "./list_table/list_table_long_long_unsigned/list_table_long_long_unsigned.h"
 #include "./list_table/list_table_float/list_table_float.h"
 #include "./list_table/list_table_double/list_table_double.h"
-#include "./list_table/list_table_long/list_table_long.h"
+#include "./list_table/list_table_char/list_table_char.h"
+#include "./list_table/list_table_signed_char/list_table_signed_char.h"
 #include "./list_table/list_table_pvoid/list_table_pvoid.h"
+#include "./list_table/list_table_generic/list_table_generic.h"
+#include "./list_table/list_table_array_int/list_table_array_int.h"
+#include "./list_table/list_table_array_long_int/list_table_array_long_int.h"
+#include "./list_table/list_table_array_long_long_int/list_table_array_long_long_int.h"
+#include "./list_table/list_table_array_unsigned/list_table_array_unsigned.h"
+#include "./list_table/list_table_array_long_unsigned/list_table_array_long_unsigned.h"
+#include "./list_table/list_table_array_long_long_unsigned/list_table_array_long_long_unsigned.h"
+#include "./list_table/list_table_array_float/list_table_array_float.h"
+#include "./list_table/list_table_array_double/list_table_array_double.h"
+#include "./list_table/list_table_array_char/list_table_array_char.h"
+#include "./list_table/list_table_array_signed_char/list_table_array_signed_char.h"
+#include "./list_table/list_table_array_pvoid/list_table_array_pvoid.h"
 
-#include "./list_dynamic/list_dynamic_generic/list_dynamic_generic.h"
-#include "./list_dynamic/list_dynamic_array_char/list_dynamic_array_char.h"
-#include "./list_dynamic/list_dynamic_array_int/list_dynamic_array_int.h"
-#include "./list_dynamic/list_dynamic_array_float/list_dynamic_array_float.h"
-#include "./list_dynamic/list_dynamic_array_double/list_dynamic_array_double.h"
-#include "./list_dynamic/list_dynamic_array_long/list_dynamic_array_long.h"
-#include "./list_dynamic/list_dynamic_array_pvoid/list_dynamic_array_pvoid.h"
-#include "./list_dynamic/list_dynamic_char/list_dynamic_char.h"
 #include "./list_dynamic/list_dynamic_int/list_dynamic_int.h"
+#include "./list_dynamic/list_dynamic_long_int/list_dynamic_long_int.h"
+#include "./list_dynamic/list_dynamic_long_long_int/list_dynamic_long_long_int.h"
+#include "./list_dynamic/list_dynamic_unsigned/list_dynamic_unsigned.h"
+#include "./list_dynamic/list_dynamic_long_unsigned/list_dynamic_long_unsigned.h"
+#include "./list_dynamic/list_dynamic_long_long_unsigned/list_dynamic_long_long_unsigned.h"
 #include "./list_dynamic/list_dynamic_float/list_dynamic_float.h"
 #include "./list_dynamic/list_dynamic_double/list_dynamic_double.h"
-#include "./list_dynamic/list_dynamic_long/list_dynamic_long.h"
+#include "./list_dynamic/list_dynamic_char/list_dynamic_char.h"
+#include "./list_dynamic/list_dynamic_signed_char/list_dynamic_signed_char.h"
 #include "./list_dynamic/list_dynamic_pvoid/list_dynamic_pvoid.h"
+#include "./list_dynamic/list_dynamic_generic/list_dynamic_generic.h"
+#include "./list_dynamic/list_dynamic_array_int/list_dynamic_array_int.h"
+#include "./list_dynamic/list_dynamic_array_long_int/list_dynamic_array_long_int.h"
+#include "./list_dynamic/list_dynamic_array_long_long_int/list_dynamic_array_long_long_int.h"
+#include "./list_dynamic/list_dynamic_array_unsigned/list_dynamic_array_unsigned.h"
+#include "./list_dynamic/list_dynamic_array_long_unsigned/list_dynamic_array_long_unsigned.h"
+#include "./list_dynamic/list_dynamic_array_long_long_unsigned/list_dynamic_array_long_long_unsigned.h"
+#include "./list_dynamic/list_dynamic_array_float/list_dynamic_array_float.h"
+#include "./list_dynamic/list_dynamic_array_double/list_dynamic_array_double.h"
+#include "./list_dynamic/list_dynamic_array_char/list_dynamic_array_char.h"
+#include "./list_dynamic/list_dynamic_array_signed_char/list_dynamic_array_signed_char.h"
+#include "./list_dynamic/list_dynamic_array_pvoid/list_dynamic_array_pvoid.h"
 
 CREA_ARRAY(malloc_list)
 CREA_ARRAY_TABLE(malloc_list_specify_table)
@@ -51,7 +71,11 @@ CREA_ARRAY(print_list)
 
 
 /* malloc_list: istanzia una nuova lista che puo' contenere dati dei tipi:
- *              "CHAR", "INT", "FLOAT", "DOUBLE", "ADDRESS", "GENERIC",
+ *              "INT", "LONG INT", "LONG LONG INT",
+ *              "UNSIGNED", "LONG UNSIGNED", "LONG LONG UNSIGNED",
+ *              "FLOAT", "DOUBLE",
+ *              "CHAR", "SIGNED CHAR",
+ *              "PVOID", "GENERIC"
  *              o loro array.
  * type_list:   tipo di lista da instanziare, tra:
  *              - type_list_dynamic
@@ -387,9 +411,25 @@ type_list_data find_type(type_list type_list, pchar type_string, unsi dim_array)
       if(dim_array == 1){return type_dynamic_int;}
       else {return type_dynamic_array_int;}
      }
-    else if(!(strcmp(type_string, "CHAR"))){
-      if(dim_array == 1){return type_dynamic_char;}
-      else {return type_dynamic_array_char;}
+    else if(!(strcmp(type_string, "LONG INT"))){
+      if(dim_array == 1){return type_dynamic_long_int;}
+      else {return type_dynamic_array_long_int;}
+     }
+    else if(!(strcmp(type_string, "LONG LONG INT"))){
+      if(dim_array == 1){return type_dynamic_long_long_int;}
+      else {return type_dynamic_array_long_long_unsigned;}
+     }
+    if(!(strcmp(type_string, "UNSIGNED"))){
+      if(dim_array == 1){return type_dynamic_unsigned;}
+      else {return type_dynamic_array_unsigned;}
+     }
+    else if(!(strcmp(type_string, "LONG UNSIGNED"))){
+      if(dim_array == 1){return type_dynamic_long_unsigned;}
+      else {return type_dynamic_array_long_unsigned;}
+     }
+    else if(!(strcmp(type_string, "LONG LONG UNSIGNED"))){
+      if(dim_array == 1){return type_dynamic_long_long_unsigned;}
+      else {return type_dynamic_array_long_long_unsigned;}
      }
     else if(!(strcmp(type_string, "FLOAT"))){
       if(dim_array == 1){return type_dynamic_float;}
@@ -399,9 +439,17 @@ type_list_data find_type(type_list type_list, pchar type_string, unsi dim_array)
       if(dim_array == 1){return type_dynamic_double;}
       else {return type_dynamic_array_double;}
      }
+    else if(!(strcmp(type_string, "CHAR"))){
+      if(dim_array == 1){return type_dynamic_char;}
+      else {return type_dynamic_array_char;}
+     }
+    else if(!(strcmp(type_string, "SIGNED CHAR"))){
+      if(dim_array == 1){return type_dynamic_signed_char;}
+      else {return type_dynamic_array_signed_char;}
+     }
     else if(!(strcmp(type_string, "PVOID"))){
-      if(dim_array == 1){return type_dynamic_long;}
-      else {return type_dynamic_array_long;}
+      if(dim_array == 1){return type_dynamic_pvoid;}
+      else {return type_dynamic_array_pvoid;}
      }
     else if(!(strcmp(type_string, "GENERIC"))){
       return type_dynamic_generic;
@@ -413,9 +461,25 @@ type_list_data find_type(type_list type_list, pchar type_string, unsi dim_array)
       if(dim_array == 1){return type_table_int;}
       else {return type_table_array_int;}
      }
-    else if(!(strcmp(type_string, "CHAR"))){
-      if(dim_array == 1){return type_table_char;}
-      else {return type_table_array_char;}
+    else if(!(strcmp(type_string, "LONG INT"))){
+      if(dim_array == 1){return type_table_long_int;}
+      else {return type_table_array_long_int;}
+     }
+    else if(!(strcmp(type_string, "LONG LONG INT"))){
+      if(dim_array == 1){return type_table_long_long_int;}
+      else {return type_table_array_long_long_unsigned;}
+     }
+    if(!(strcmp(type_string, "UNSIGNED"))){
+      if(dim_array == 1){return type_table_unsigned;}
+      else {return type_table_array_unsigned;}
+     }
+    else if(!(strcmp(type_string, "LONG UNSIGNED"))){
+      if(dim_array == 1){return type_table_long_unsigned;}
+      else {return type_table_array_long_unsigned;}
+     }
+    else if(!(strcmp(type_string, "LONG LONG UNSIGNED"))){
+      if(dim_array == 1){return type_table_long_long_unsigned;}
+      else {return type_table_array_long_long_unsigned;}
      }
     else if(!(strcmp(type_string, "FLOAT"))){
       if(dim_array == 1){return type_table_float;}
@@ -425,9 +489,13 @@ type_list_data find_type(type_list type_list, pchar type_string, unsi dim_array)
       if(dim_array == 1){return type_table_double;}
       else {return type_table_array_double;}
      }
-    else if(!(strcmp(type_string, "LONG"))){
-      if(dim_array == 1){return type_table_long;}
-      else {return type_table_array_long;}
+    else if(!(strcmp(type_string, "CHAR"))){
+      if(dim_array == 1){return type_table_char;}
+      else {return type_table_array_char;}
+     }
+    else if(!(strcmp(type_string, "SIGNED CHAR"))){
+      if(dim_array == 1){return type_table_signed_char;}
+      else {return type_table_array_signed_char;}
      }
     else if(!(strcmp(type_string, "PVOID"))){
       if(dim_array == 1){return type_table_pvoid;}

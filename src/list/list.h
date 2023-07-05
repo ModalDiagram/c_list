@@ -44,12 +44,17 @@
  * extract_first(plist_float, (all_type)((pvoid)&f), ...)
  * */
 typedef union _all_type
-         {int      i;
-          long     l;
-          float    f;
-          double   d;
-          char     c;
-          void*    pv;
+         {int                i;
+          long int           li;
+          long long int      lli;
+          unsigned           u;
+          long unsigned      lu;
+          long long unsigned llu;
+          float              f;
+          double             d;
+          char               c;
+          signed char        sc;
+          void*              pv;
          } all_type;
 
 /* type_list: tipo della lista da istanziare, descritti precedentemente */
@@ -118,7 +123,11 @@ typedef int (*pcustom_compare)(all_type value1, unsi size1,
 
 /* malloc_list: istanzia una nuova lista di tipo type_list_dynamic o type_list_table
  *              che puo' contenere dati dei tipi:
- *              "CHAR", "INT", "FLOAT", "DOUBLE", "LONG", "GENERIC",
+ *              "INT", "LONG INT", "LONG LONG INT",
+ *              "UNSIGNED", "LONG UNSIGNED", "LONG LONG UNSIGNED",
+ *              "FLOAT", "DOUBLE",
+ *              "CHAR", "SIGNED CHAR",
+ *              "PVOID", "GENERIC"
  *              o loro array.
  * type_list:   tipo di lista da instanziare, tra:
  *              - type_list_dynamic

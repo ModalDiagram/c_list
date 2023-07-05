@@ -5,46 +5,78 @@
 #include "./list.h"
 
 #define CREA_ARRAY(nome_funz) \
- type_##nome_funz nome_funz##_arr[]={ nome_funz##_dynamic_char,         \
-                                      nome_funz##_dynamic_int,          \
-                                      nome_funz##_dynamic_float,        \
-                                      nome_funz##_dynamic_double,       \
-                                      nome_funz##_dynamic_long,        \
-                                      nome_funz##_dynamic_pvoid,        \
-                                      nome_funz##_dynamic_array_char,   \
-                                      nome_funz##_dynamic_array_int,    \
-                                      nome_funz##_dynamic_array_float,  \
-                                      nome_funz##_dynamic_array_double, \
-                                      nome_funz##_dynamic_array_long,  \
-                                      nome_funz##_dynamic_array_pvoid,  \
-                                      nome_funz##_dynamic_generic,      \
-                                      nome_funz##_table_char,           \
-                                      nome_funz##_table_int,            \
-                                      nome_funz##_table_float,          \
-                                      nome_funz##_table_double,         \
-                                      nome_funz##_table_long,          \
-                                      nome_funz##_table_pvoid,          \
-                                      nome_funz##_table_array_char,     \
-                                      nome_funz##_table_array_int,      \
-                                      nome_funz##_table_array_float,    \
-                                      nome_funz##_table_array_double,   \
-                                      nome_funz##_table_array_long,    \
-                                      nome_funz##_table_array_pvoid,    \
+ type_##nome_funz nome_funz##_arr[]={                                               \
+                                      nome_funz##_dynamic_int,                      \
+                                      nome_funz##_dynamic_long_int,                 \
+                                      nome_funz##_dynamic_long_long_int,            \
+                                      nome_funz##_dynamic_unsigned,                 \
+                                      nome_funz##_dynamic_long_unsigned,            \
+                                      nome_funz##_dynamic_long_long_unsigned,       \
+                                      nome_funz##_dynamic_float,                    \
+                                      nome_funz##_dynamic_double,                   \
+                                      nome_funz##_dynamic_char,                     \
+                                      nome_funz##_dynamic_signed_char,              \
+                                      nome_funz##_dynamic_pvoid,                    \
+                                      nome_funz##_dynamic_array_int,                \
+                                      nome_funz##_dynamic_array_long_int,           \
+                                      nome_funz##_dynamic_array_long_long_int,      \
+                                      nome_funz##_dynamic_array_unsigned,           \
+                                      nome_funz##_dynamic_array_long_unsigned,      \
+                                      nome_funz##_dynamic_array_long_long_unsigned, \
+                                      nome_funz##_dynamic_array_float,              \
+                                      nome_funz##_dynamic_array_double,             \
+                                      nome_funz##_dynamic_array_char,               \
+                                      nome_funz##_dynamic_array_signed_char,        \
+                                      nome_funz##_dynamic_array_pvoid,              \
+                                      nome_funz##_dynamic_generic,                  \
+                                      nome_funz##_table_int,                        \
+                                      nome_funz##_table_long_int,                   \
+                                      nome_funz##_table_long_long_int,              \
+                                      nome_funz##_table_unsigned,                   \
+                                      nome_funz##_table_long_unsigned,              \
+                                      nome_funz##_table_long_long_unsigned,         \
+                                      nome_funz##_table_float,                      \
+                                      nome_funz##_table_double,                     \
+                                      nome_funz##_table_char,                       \
+                                      nome_funz##_table_signed_char,                \
+                                      nome_funz##_table_pvoid,                      \
+                                      nome_funz##_table_array_int,                  \
+                                      nome_funz##_table_array_long_int,             \
+                                      nome_funz##_table_array_long_long_int,        \
+                                      nome_funz##_table_array_unsigned,             \
+                                      nome_funz##_table_array_long_unsigned,        \
+                                      nome_funz##_table_array_long_long_unsigned,   \
+                                      nome_funz##_table_array_float,                \
+                                      nome_funz##_table_array_double,               \
+                                      nome_funz##_table_array_char,                 \
+                                      nome_funz##_table_array_signed_char,          \
+                                      nome_funz##_table_array_pvoid,                \
                                       nome_funz##_table_generic,};
 
 #define CREA_ARRAY_TABLE(nome_funz) \
- type_##nome_funz nome_funz##_arr[]={ nome_funz##_table_char,           \
-                                      nome_funz##_table_int,            \
-                                      nome_funz##_table_float,          \
-                                      nome_funz##_table_double,         \
-                                      nome_funz##_table_long,          \
-                                      nome_funz##_table_pvoid,          \
-                                      nome_funz##_table_array_char,     \
-                                      nome_funz##_table_array_int,      \
-                                      nome_funz##_table_array_float,    \
-                                      nome_funz##_table_array_double,   \
-                                      nome_funz##_table_array_long,    \
-                                      nome_funz##_table_array_pvoid,    \
+ type_##nome_funz nome_funz##_arr[]={                                               \
+                                      nome_funz##_table_int,                        \
+                                      nome_funz##_table_long_int,                   \
+                                      nome_funz##_table_long_long_int,              \
+                                      nome_funz##_table_unsigned,                   \
+                                      nome_funz##_table_long_unsigned,              \
+                                      nome_funz##_table_long_long_unsigned,         \
+                                      nome_funz##_table_float,                      \
+                                      nome_funz##_table_double,                     \
+                                      nome_funz##_table_char,                       \
+                                      nome_funz##_table_signed_char,                \
+                                      nome_funz##_table_pvoid,                      \
+                                      nome_funz##_table_array_int,                  \
+                                      nome_funz##_table_array_long_int,             \
+                                      nome_funz##_table_array_long_long_int,        \
+                                      nome_funz##_table_array_unsigned,             \
+                                      nome_funz##_table_array_long_unsigned,        \
+                                      nome_funz##_table_array_long_long_unsigned,   \
+                                      nome_funz##_table_array_float,                \
+                                      nome_funz##_table_array_double,               \
+                                      nome_funz##_table_array_char,                 \
+                                      nome_funz##_table_array_signed_char,          \
+                                      nome_funz##_table_array_pvoid,                \
                                       nome_funz##_table_generic,};
 
 /* lista
@@ -67,33 +99,53 @@ typedef my_list* pmy_list;
  * e un unsi, la sua size.
  * */
 typedef enum{
-  type_dynamic_char         =0,
-  type_dynamic_int          =1,
-  type_dynamic_float        =2,
-  type_dynamic_double       =3,
-  type_dynamic_long         =4,
-  type_dynamic_pvoid        =5,
-  type_dynamic_array_char   =6,
-  type_dynamic_array_int    =7,
-  type_dynamic_array_float  =8,
-  type_dynamic_array_double =9,
-  type_dynamic_array_long   =10,
-  type_dynamic_array_pvoid  =11,
-  type_dynamic_generic      =12, /* deve essere l'ultimo dei tipi con lista dinamica */
+  type_dynamic_int                      =0,
+  type_dynamic_long_int                 =1,
+  type_dynamic_long_long_int            =2,
+  type_dynamic_unsigned                 =3,
+  type_dynamic_long_unsigned            =4,
+  type_dynamic_long_long_unsigned       =5,
+  type_dynamic_float                    =6,
+  type_dynamic_double                   =7,
+  type_dynamic_char                     =8,
+  type_dynamic_signed_char              =9,
+  type_dynamic_pvoid                    =10,
+  type_dynamic_array_int                =11,
+  type_dynamic_array_long_int           =12,
+  type_dynamic_array_long_long_int      =13,
+  type_dynamic_array_unsigned           =14,
+  type_dynamic_array_long_unsigned      =15,
+  type_dynamic_array_long_long_unsigned =16,
+  type_dynamic_array_float              =17,
+  type_dynamic_array_double             =18,
+  type_dynamic_array_char               =19,
+  type_dynamic_array_signed_char        =20,
+  type_dynamic_array_pvoid              =21,
+  type_dynamic_generic                  =22, /* deve essere l'ultimo dei tipi con lista dinamica */
 
-  type_table_char           =13,
-  type_table_int            =14,
-  type_table_float          =15,
-  type_table_double         =16,
-  type_table_long           =17,
-  type_table_pvoid          =18,
-  type_table_array_char     =19,
-  type_table_array_int      =20,
-  type_table_array_float    =21,
-  type_table_array_double   =22,
-  type_table_array_long     =23,
-  type_table_array_pvoid    =24,
-  type_table_generic        =25,
+  type_table_int                        =23,
+  type_table_long_int                   =24,
+  type_table_long_long_int              =25,
+  type_table_unsigned                   =26,
+  type_table_long_unsigned              =27,
+  type_table_long_long_unsigned         =28,
+  type_table_float                      =29,
+  type_table_double                     =30,
+  type_table_char                       =31,
+  type_table_signed_char                =32,
+  type_table_pvoid                      =33,
+  type_table_array_int                  =34,
+  type_table_array_long_int             =35,
+  type_table_array_long_long_int        =36,
+  type_table_array_unsigned             =37,
+  type_table_array_long_unsigned        =38,
+  type_table_array_long_long_unsigned   =39,
+  type_table_array_float                =40,
+  type_table_array_double               =41,
+  type_table_array_char                 =42,
+  type_table_array_signed_char          =43,
+  type_table_array_pvoid                =44,
+  type_table_generic                    =45,
  } type_list_data;
 
 // puntatori a fuzioni, utilizzati per generalizzare l'oggetto list
