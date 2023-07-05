@@ -108,7 +108,7 @@ typedef elem_table_generic* pelem_table_generic;
  * che mi serve al piu' una volta per funzione
  * */
 typedef struct _table_info_generic{
-  pvoid list_of_lists;
+  pvoid plist_of_lists;
   unsi n_entries;
   unsi n_occupied;
  } table_info_generic;

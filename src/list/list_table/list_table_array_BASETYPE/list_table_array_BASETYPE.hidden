@@ -119,7 +119,7 @@ typedef list_table_array_BASETYPE* plist_table_array_BASETYPE;
  * calcolare comunque ogni volta idx_void_list, che qui non posso mettere static
  * */
 typedef struct _table_info_array_BASETYPE {
-  pvoid list_of_lists;
+  pvoid plist_of_lists;
   unsi sizeof_array;
   unsi idx_void_list;
   unsi n_entries;

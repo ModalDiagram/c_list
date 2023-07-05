@@ -106,7 +106,7 @@ pvoid malloc_list_specify_table_table_array_BASETYPE(unsi size_array, type_resiz
   if((pnew_list = (plist_table_array_BASETYPE) malloc(sizeof(plist_table_array_BASETYPE))) == NULL) return NULL;
 
   /* devo aggiungere la lista creata alla lista di liste contenute nella table */
-  if(!insert_first(pmy_info->list_of_lists, (all_type)((pvoid)pnew_list), 0)){
+  if(!insert_first(pmy_info->plist_of_lists, (all_type)((pvoid)pnew_list), 0)){
     free(pnew_list);
     return 0;
    }
@@ -191,7 +191,7 @@ pvoid create_table_array_BASETYPE(unsi sizeof_array, type_resize type_resize, un
 
   /* STEP 2 */
   pinfo_new_table = ptable;
-  if((pinfo_new_table->list_of_lists = malloc_list(type_list_dynamic, "PVOID", 1)) == NULL){
+  if((pinfo_new_table->plist_of_lists = malloc_list(type_list_dynamic, "PVOID", 1)) == NULL){
     free(ptable);
     return 0;
    }
@@ -292,15 +292,15 @@ int resize_table_table_array_BASETYPE(pvoid plist, unsi n_entries){
     ptable_and_elem->idx_void_list = pmy_info->n_entries + 1;
 
     /* aggiorno il ptable di tutte le liste della table alla nuova table */
-    while (extract_first(ptable_and_elem->list_of_lists, (all_type)((pvoid) &plist_extracted), NULL)) {
+    while (extract_first(ptable_and_elem->plist_of_lists, (all_type)((pvoid) &plist_extracted), NULL)) {
       if(plist_extracted->ptable == ptable_and_elem){
         break;
        }
       printf("Aggiornato\n");
       plist_extracted->ptable = ptable_and_elem;
-      insert_last(ptable_and_elem->list_of_lists, (all_type)((pvoid) plist_extracted), 0);
+      insert_last(ptable_and_elem->plist_of_lists, (all_type)((pvoid) plist_extracted), 0);
      }
-    insert_last(ptable_and_elem->list_of_lists, (all_type)((pvoid) plist_extracted), 0);
+    insert_last(ptable_and_elem->plist_of_lists, (all_type)((pvoid) plist_extracted), 0);
 
     /* devo aggiungere la nuova tabella alla lista di tabelle e rimuovere quella vecchia */
     while(extract_first(pptables, (all_type)((pvoid)&ptable_extracted), 0)){
@@ -327,7 +327,7 @@ int resize_table_table_array_BASETYPE(pvoid plist, unsi n_entries){
   else{
     /* STEP 1 */
     if((ptable_and_elem = malloc(sizeof(table_info_array_BASETYPE) + SIZEOFELEM * actual_size)) == NULL) return 0;
-    if((ptable_and_elem->list_of_lists = malloc_list(type_list_dynamic, "PVOID", 1)) == NULL){
+    if((ptable_and_elem->plist_of_lists = malloc_list(type_list_dynamic, "PVOID", 1)) == NULL){
       free(ptable_and_elem);
       return 0;
      }
@@ -337,11 +337,11 @@ int resize_table_table_array_BASETYPE(pvoid plist, unsi n_entries){
      * in ordine, aumentando di volta in volta di 1 il new_idx_void */
     new_idx_void = 1;
     pnew_table_start = (pvoid)(ptable_and_elem + 1);
-    while(extract_first(pmy_info->list_of_lists, (all_type)((pvoid)&plist_extracted), NULL)){
+    while(extract_first(pmy_info->plist_of_lists, (all_type)((pvoid)&plist_extracted), NULL)){
       printf("Copio una lista\n");
       /* qui si devono aggiungere controlli appropriati */
       /* devo copiare il resize */
-      insert_first(ptable_and_elem->list_of_lists, (all_type)((pvoid)plist_extracted), 0);
+      insert_first(ptable_and_elem->plist_of_lists, (all_type)((pvoid)plist_extracted), 0);
       /* se ha 0 elementi basta aggiungere il posto della lista */
       if(plist_extracted->n_elem == 0){
         plist_extracted->idx_start = plist_extracted->idx_end = new_idx_void;
@@ -370,7 +370,7 @@ int resize_table_table_array_BASETYPE(pvoid plist, unsi n_entries){
     ptable_and_elem->sizeof_array = sizeof_array;
     ptable_and_elem->n_entries = n_entries;
     ptable_and_elem->n_occupied = pmy_info->n_occupied;
-    ptable_and_elem->list_of_lists = pmy_info->list_of_lists;
+    ptable_and_elem->plist_of_lists = pmy_info->plist_of_lists;
     ptable_and_elem->idx_void_list = new_idx_void;
 
     /* devo aggiungere la nuova tabella alla lista di tabelle e rimuovere quella vecchia */
@@ -450,11 +450,11 @@ void free_list_table_array_BASETYPE(pvoid plist){
     idx_void_list = plist_casted->idx_start;
 
     /* tolgo la lista liberata dalla list_of_lists */
-    while (extract_first(pmy_info->list_of_lists, (all_type)((pvoid) &pextracted), NULL)) {
+    while (extract_first(pmy_info->plist_of_lists, (all_type)((pvoid) &pextracted), NULL)) {
       if(pextracted == plist){
         break;
        }
-      insert_last(pmy_info->list_of_lists, (all_type)pextracted, 0);
+      insert_last(pmy_info->plist_of_lists, (all_type)pextracted, 0);
      }
 
     free(plist);
@@ -477,11 +477,11 @@ void free_list_table_array_BASETYPE(pvoid plist){
 
   /* STEP 3 */
   /* tolgo la lista liberata dalla list_of_lists */
-  while (extract_first(pmy_info->list_of_lists, (all_type)((pvoid) &pextracted), NULL)) {
+  while (extract_first(pmy_info->plist_of_lists, (all_type)((pvoid) &pextracted), NULL)) {
     if(pextracted == plist){
       break;
      }
-    insert_last(pmy_info->list_of_lists, (all_type)pextracted, 0);
+    insert_last(pmy_info->plist_of_lists, (all_type)pextracted, 0);
    }
   ((pmy_info)->n_occupied) -= plist_casted->n_elem;
   free(plist);
