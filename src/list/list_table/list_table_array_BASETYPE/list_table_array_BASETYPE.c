@@ -625,7 +625,6 @@ int extract_first_table_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize
  * */
 int insert_last_table_array_BASETYPE(pvoid plist, all_type value, unsi size){
   plist_table_array_BASETYPE plist_casted = (plist_table_array_BASETYPE) plist;
-  int                        int_tmp;
   ptable_info_array_BASETYPE pmy_info = (ptable_info_array_BASETYPE) (plist_casted->ptable);
   pvoid                      pfirst_free_elem, ptable = pmy_info + 1;
   unsi                       sizeof_array = pmy_info->sizeof_array;
@@ -649,8 +648,6 @@ int insert_last_table_array_BASETYPE(pvoid plist, all_type value, unsi size){
 
   /* salvo le informazioni prese in input nell'elemento */
   memcpy(pfirst_free_elem,value.pv, sizeof_array);
-  int_tmp = GET_IDX_NEXT(pfirst_free_elem);
-  GET_IDX_NEXT(pfirst_free_elem) = IDX_FINE_LISTA;
 
   /* aggiorno l'idx_next del penultimo elemento nell'indice del nuovo elemento */
   GET_IDX_NEXT(GET_NEXT_ELEM(ptable, plist_casted->idx_end)) = idx_void_list;
@@ -659,8 +656,9 @@ int insert_last_table_array_BASETYPE(pvoid plist, all_type value, unsi size){
   plist_casted->idx_end = idx_void_list;
   (plist_casted->n_elem)++;
 
-  /* aggiorno l'indice della lista dei vuoti */
-  pmy_info->idx_void_list = int_tmp;
+  /* aggiorno l'indice della lista dei vuoti e dell'ultimo elemento della lista */
+  pmy_info->idx_void_list = GET_IDX_NEXT(pfirst_free_elem);
+  GET_IDX_NEXT(pfirst_free_elem) = IDX_FINE_LISTA;
 
   (pmy_info->n_occupied)++;
 

@@ -534,7 +534,6 @@ int extract_first_table_generic(pvoid plist, all_type pvalue, punsi psize){
 int insert_last_table_generic(pvoid plist, all_type value, unsi size){
   pelem_table_generic pfirst_free_elem;
   plist_table_generic plist_casted = (plist_table_generic) plist;
-  int                 int_tmp;
 
   /* se la lista ha 0 elementi ha gia' uno spazio nella tabella
    * ma con paddr e size vuoti, quindi e' sufficiente che scriva li' */
@@ -556,8 +555,6 @@ int insert_last_table_generic(pvoid plist, all_type value, unsi size){
   /* salvo le informazioni prese in input nell'elemento */
   if((pfirst_free_elem->paddr = malloc(size)) == NULL) return 0;
   memcpy(pfirst_free_elem->paddr,value.pv,(pfirst_free_elem->size)=size);
-  int_tmp = pfirst_free_elem->idx_next;
-  pfirst_free_elem->idx_next = IDX_FINE_LISTA;
 
   /* aggiorno l'idx_next del penultimo elemento nell'indice del nuovo elemento */
   (((pelem_table_generic) ptable) + (plist_casted->idx_end))->idx_next = idx_void_list;
@@ -566,8 +563,9 @@ int insert_last_table_generic(pvoid plist, all_type value, unsi size){
   plist_casted->idx_end = idx_void_list;
   (plist_casted->n_elem)++;
 
-  /* aggiorno l'indice della lista dei vuoti */
-  idx_void_list = int_tmp;
+  /* aggiorno l'indice della lista dei vuoti e dell'ultimo elemento della lista */
+  idx_void_list = pfirst_free_elem->idx_next;
+  pfirst_free_elem->idx_next = IDX_FINE_LISTA;
 
   (*(((punsi)ptable)-1))++;
 
@@ -620,10 +618,10 @@ int extract_last_table_generic(pvoid plist, all_type pvalue, punsi psize){
   while(pelem_moving->idx_next != idx_end){
     pelem_moving = ptable_casted + (idx_current = pelem_moving->idx_next);
    }
-  pelem_moving = ptable_casted + pelem_moving->idx_next;
 
   /* scrivo IDX_FINE_LISTA nell'idx_next del penultimo elemento */
-  (ptable_casted + idx_current)->idx_next = IDX_FINE_LISTA;
+  pelem_moving->idx_next = IDX_FINE_LISTA;
+  pelem_moving = ptable_casted + idx_end;
 
   /* restituisco il valore estratto */
   *ppvalue_input = pelem_moving->paddr;

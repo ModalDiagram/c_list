@@ -508,7 +508,6 @@ int extract_first_table_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
 int insert_last_table_BASETYPE(pvoid plist, all_type value, unsi size){
   pelem_table_BASETYPE pfirst_free_elem;
   plist_table_BASETYPE plist_casted = (plist_table_BASETYPE) plist;
-  int                  int_tmp;
 
   /* se la lista ha 0 elementi ha gia' uno spazio nella tabella
    * ma con paddr e size vuoti, quindi e' sufficiente che scriva li' */
@@ -528,8 +527,6 @@ int insert_last_table_BASETYPE(pvoid plist, all_type value, unsi size){
 
   /* salvo le informazioni prese in input nell'elemento */
   pfirst_free_elem->val = value.MEMBERTYPE;
-  int_tmp = pfirst_free_elem->idx_next;
-  pfirst_free_elem->idx_next = IDX_FINE_LISTA;
 
   /* aggiorno l'idx_next del penultimo elemento nell'indice del nuovo elemento */
   (((pelem_table_BASETYPE) ptable) + (plist_casted->idx_end))->idx_next = idx_void_list;
@@ -538,8 +535,9 @@ int insert_last_table_BASETYPE(pvoid plist, all_type value, unsi size){
   plist_casted->idx_end = idx_void_list;
   (plist_casted->n_elem)++;
 
-  /* aggiorno l'indice della lista dei vuoti */
-  idx_void_list = int_tmp;
+  /* aggiorno l'indice della lista dei vuoti e dell'ultimo elemento della lista */
+  idx_void_list = pfirst_free_elem->idx_next;
+  pfirst_free_elem->idx_next = IDX_FINE_LISTA;
 
   (*(((punsi)ptable)-1))++;
 
