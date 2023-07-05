@@ -753,7 +753,40 @@ int extract_last_table_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize)
  *      in cima alla lista, n=2 dopo il primo elemento e cosi' via
  * */
 int insert_nth_table_array_BASETYPE(pvoid plist, all_type value, unsi size, unsi n){
-  return 0;
+  plist_table_array_BASETYPE plist_casted = (plist_table_array_BASETYPE) plist;
+  ptable_info_array_BASETYPE pmy_info = (ptable_info_array_BASETYPE) (plist_casted->ptable);
+  pvoid                      pnew_elem, pelem_moving, ptable = (pvoid)(pmy_info + 1);
+  int                        int_tmp, i;
+  unsi                       sizeof_array = pmy_info->sizeof_array;
+  unsi                       idx_void_list = pmy_info->idx_void_list;
+
+  /* gestisco casi particolari */
+  if(n > (plist_casted->n_elem + 1)) return 0;
+  if(n == (plist_casted->n_elem + 1)) return insert_last(plist, value, size);
+  if(n == 1) return insert_first(plist, value, size);
+
+  /* salvo l'indirizzo del nuovo elemento e vi salvo il valore preso in input */
+  pnew_elem = GET_NEXT_ELEM(ptable, idx_void_list);
+  memcpy(pnew_elem, value.pv, sizeof_array);
+
+  /* salvo il suo idx_next, che corrisponde al nuovo inizio della idx_void_list */
+  int_tmp = GET_IDX_NEXT(pnew_elem);
+
+  /* raggiungo l'(n-1)-esimo elemento con pelem_moving */
+  for (i = 2, pelem_moving = GET_NEXT_ELEM(ptable, plist_casted->idx_start); i < n; i++) {
+    pelem_moving = GET_NEXT_ELEM(ptable, GET_IDX_NEXT(pelem_moving));
+  }
+  /* metto pnew elem tra l'(n-1)-esimo e l'n-esimo elemento */
+  GET_IDX_NEXT(pnew_elem) = GET_IDX_NEXT(pelem_moving);
+  GET_IDX_NEXT(pelem_moving) = idx_void_list;
+
+  /* aggiorno l'indice di inizio della lista dei vuoti */
+  pmy_info->idx_void_list = int_tmp;
+
+  (plist_casted->n_elem)++;
+  (*(((punsi)ptable)-1))++;
+
+  return 1;
  }
 
 /* extract_first: estrae l'elemento all'n-esima posizione della lista
@@ -778,7 +811,45 @@ int insert_nth_table_array_BASETYPE(pvoid plist, all_type value, unsi size, unsi
  *      in cima alla lista, n=2 dopo il primo elemento e cosi' via
  * */
 int extract_nth_table_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize, unsi n){
-  return 0;
+  plist_table_array_BASETYPE plist_casted = (plist_table_array_BASETYPE) plist;
+  ptable_info_array_BASETYPE pmy_info = (ptable_info_array_BASETYPE) plist_casted->ptable;
+  pvoid  pelem_to_extract, pelem_moving, ptable = (pvoid)(pmy_info + 1);
+  int    int_tmp, i;
+  ppvoid ppvalue_input = (ppvoid) (pvalue.pv);
+  unsi sizeof_array = pmy_info->sizeof_array, idx_void_list = pmy_info->idx_void_list;
+
+  /* gestisco casi particolari */
+  if(n > (plist_casted->n_elem)) return 0;
+  if(n == (plist_casted->n_elem)){
+    return extract_last(plist, pvalue, psize);
+   }
+  if(n == 1){
+    return extract_first(plist, pvalue, psize);
+   }
+
+  /* raggiungo con pelem_moving l'(n-1)-esimo elemento */
+  for (i = 2, pelem_moving = GET_NEXT_ELEM(ptable, plist_casted->idx_start); i < n; i++) {
+    pelem_moving = GET_NEXT_ELEM(ptable, GET_IDX_NEXT(pelem_moving));
+   }
+  /* salvo in pelem_to_extract l'indirizzo dell'n-esimo elemento, ovvero quello da estrarre */
+  pelem_to_extract = GET_NEXT_ELEM(ptable, GET_IDX_NEXT(pelem_moving));
+
+  /* restituisco il valore contenuto in pelem_to_extract */
+  if((*ppvalue_input = malloc(sizeof_array)) == NULL) return 0;
+  memcpy(*ppvalue_input, pelem_to_extract, sizeof_array);
+  int_tmp = GET_IDX_NEXT(pelem_to_extract);
+
+  /* cambio l'idx_next di pelem_to_extract in modo che diventi il primo elemento della void_list */
+  GET_IDX_NEXT(pelem_to_extract) = idx_void_list;
+  pmy_info->idx_void_list = GET_IDX_NEXT(pelem_moving);
+
+  /* aggiorno l'idx_next dell'(n-1)-esimo elemento */
+  GET_IDX_NEXT(pelem_moving) = int_tmp;
+
+  (plist_casted->n_elem)--;
+  (*(((punsi)ptable)-1))--;
+
+  return 1;
  }
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo

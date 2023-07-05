@@ -231,7 +231,7 @@ void test_table_generic(){
 
 void test_table_char(){
   pvoid plist, plistdue;
-  char  c='a';
+  char  c='a', ex;
   unsi tot, occupied;
 
   /* if((plist = malloc_list(type_list_table, "GENERIC", 3)) == NULL) printf("Non creata.\n"); */
@@ -239,7 +239,15 @@ void test_table_char(){
   if((insert_first(plist, (all_type)c, 0)) == 0) printf("Non inserito\n");
   c='b';
   if((insert_last(plist, (all_type)c, 0)) == 0) printf("Non inserito\n");
+  c='f';
+  if((insert_last(plist, (all_type)c, 0)) == 0) printf("Non inserito\n");
+  c='e';
+  if((insert_nth(plist, (all_type)c, 0, 3)) == 0) printf("Non inserito\n");
   c='c';
+  print_list(plist, print_char);
+  extract_nth(plist, (all_type)((pvoid)&ex), NULL, 2);
+  print_list(plist, print_char);
+  printf("Estratto %c\n", ex);
   free_list(plist);
   if((plist = malloc_list_specify_table("CHAR", 1, type_resize_default, 100)) == NULL) printf("Non creata.\n");
   c='d';
@@ -298,13 +306,21 @@ void test_table_array_float(){
   float array[5]={1,2,3,4,5};
   unsi tot, occupied;
   int i;
-  /* pfloat pextracted; */
+  pfloat pextracted;
 
   if((plist = malloc_list_specify_table("FLOAT", 5, type_resize_manual, 70)) == NULL) printf("Non creata.\n");
+  if((insert_first(plist, (all_type)((pvoid) array), 0)) == 0) printf("Non inserito\n");
+  array[0] = 5;
   if((insert_last(plist, (all_type)((pvoid) array), 0)) == 0) printf("Non inserito\n");
+  array[0] = 15;
   if((insert_last(plist, (all_type)((pvoid) array), 0)) == 0) printf("Non inserito\n");
-  free_list(plist);
-  if((plist = malloc_list(type_list_table, "FLOAT", 5)) == NULL) printf("Non creata.\n");
+  array[0] = 55;
+  if((insert_nth(plist, (all_type)((pvoid) array), 0, 2)) == 0) printf("Non inserito\n");
+  print_list(plist, print_array_float);
+  extract_nth(plist, (all_type)(pvoid)&pextracted, 0, 3);
+  printf("Estratto: ");
+  print_array_float((all_type)(pvoid)pextracted, 5);
+  print_list(plist, print_array_float);
   array[0] = 10;
   if((insert_last(plist, (all_type)((pvoid) array), sizeof(float))) == 0) printf("Non inserito\n");
   if((plistdue = malloc_list(type_list_table, "FLOAT", 5)) == NULL) printf("Non creata.\n");
@@ -482,7 +498,7 @@ void test_table_resize(){
  }
 
 int main(int argc, char *argv[]){
-  test_float();
+  test_table_array_float();
 
   return 0;
  }

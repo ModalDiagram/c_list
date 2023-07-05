@@ -626,7 +626,37 @@ int extract_last_table_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
  *      in cima alla lista, n=2 dopo il primo elemento e cosi' via
  * */
 int insert_nth_table_BASETYPE(pvoid plist, all_type value, unsi size, unsi n){
-  return 0;
+  plist_table_BASETYPE plist_casted = (plist_table_BASETYPE) plist;
+  pelem_table_BASETYPE pnew_elem, pelem_moving, ptable_casted = (pelem_table_BASETYPE) ptable;
+  int                  int_tmp, i;
+
+  /* gestisco casi particolari */
+  if(n > (plist_casted->n_elem + 1)) return 0;
+  if(n == (plist_casted->n_elem + 1)) return insert_last(plist, value, size);
+  if(n == 1) return insert_first(plist, value, size);
+
+  /* salvo l'indirizzo del nuovo elemento e vi salvo il valore preso in input */
+  pnew_elem = ptable_casted + idx_void_list;
+  pnew_elem->val = value.MEMBERTYPE;
+
+  /* salvo il suo idx_next, che corrisponde al nuovo inizio della idx_void_list */
+  int_tmp = pnew_elem->idx_next;
+
+  /* raggiungo l'(n-1)-esimo elemento con pelem_moving */
+  for (i = 2, pelem_moving = ptable_casted + plist_casted->idx_start; i < n; i++) {
+    pelem_moving = ptable_casted + pelem_moving->idx_next;
+  }
+  /* metto pnew elem tra l'(n-1)-esimo e l'n-esimo elemento */
+  pnew_elem->idx_next = pelem_moving->idx_next;
+  pelem_moving->idx_next = idx_void_list;
+
+  /* aggiorno l'indice di inizio della lista dei vuoti */
+  idx_void_list = int_tmp;
+
+  (plist_casted->n_elem)++;
+  (*(((punsi)ptable)-1))++;
+
+  return 1;
  }
 
 /* extract_first: estrae l'elemento all'n-esima posizione della lista
@@ -651,7 +681,42 @@ int insert_nth_table_BASETYPE(pvoid plist, all_type value, unsi size, unsi n){
  *      in cima alla lista, n=2 dopo il primo elemento e cosi' via
  * */
 int extract_nth_table_BASETYPE(pvoid plist, all_type pvalue, punsi psize, unsi n){
-  return 0;
+  plist_table_BASETYPE plist_casted = (plist_table_BASETYPE) plist;
+  pelem_table_BASETYPE pelem_to_extract, pelem_moving, ptable_casted = (pelem_table_BASETYPE) ptable;
+  int                  int_tmp, i;
+  pBASETYPE            pvalue_input = (pBASETYPE)(pvalue.pv);
+
+  /* gestisco casi particolari */
+  if(n > (plist_casted->n_elem)) return 0;
+  if(n == (plist_casted->n_elem)){
+    return extract_last(plist, pvalue, psize);
+   }
+  if(n == 1){
+    return extract_first(plist, pvalue, psize);
+   }
+
+  /* raggiungo con pelem_moving l'(n-1)-esimo elemento */
+  for (i = 2, pelem_moving = ptable_casted + plist_casted->idx_start; i < n; i++) {
+    pelem_moving = ptable_casted + pelem_moving->idx_next;
+   }
+  /* salvo in pelem_to_extract l'indirizzo dell'n-esimo elemento, ovvero quello da estrarre */
+  pelem_to_extract = ptable_casted + pelem_moving->idx_next;
+
+  /* restituisco il valore contenuto in pelem_to_extract */
+  *pvalue_input = pelem_to_extract->val;
+  int_tmp = pelem_to_extract->idx_next;
+
+  /* cambio l'idx_next di pelem_to_extract in modo che diventi il primo elemento della void_list */
+  pelem_to_extract->idx_next = idx_void_list;
+  idx_void_list = pelem_moving->idx_next;
+
+  /* aggiorno l'idx_next dell'(n-1)-esimo elemento */
+  pelem_moving->idx_next = int_tmp;
+
+  (plist_casted->n_elem)--;
+  (*(((punsi)ptable)-1))--;
+
+  return 1;
  }
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo
