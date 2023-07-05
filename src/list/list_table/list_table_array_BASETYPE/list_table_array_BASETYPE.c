@@ -783,7 +783,7 @@ int insert_nth_table_array_BASETYPE(pvoid plist, all_type value, unsi size, unsi
   pmy_info->idx_void_list = int_tmp;
 
   (plist_casted->n_elem)++;
-  (*(((punsi)ptable)-1))++;
+  (pmy_info->n_occupied)++;
 
   return 1;
  }
@@ -846,7 +846,7 @@ int extract_nth_table_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize, 
   GET_IDX_NEXT(pelem_moving) = int_tmp;
 
   (plist_casted->n_elem)--;
-  (*(((punsi)ptable)-1))--;
+  (pmy_info->n_occupied)--;
 
   return 1;
  }

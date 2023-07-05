@@ -360,7 +360,7 @@ void free_list_table_generic(pvoid plist){
      }
 
     free(plist);
-    (*(((punsi)ptable)-1))--;
+    ((((ptable_info_generic)ptable)-1)->n_occupied)--;
     #ifdef DEBUG_LISTA_VELOCE
     printf("---- DEBUG ----\n");
     printf("Lista liberata. Indirizzo lista dei vuoti: %d\n", idx_void_list);
@@ -375,10 +375,10 @@ void free_list_table_generic(pvoid plist){
    {
     free(pelem_tmp->paddr);
     pelem_tmp = pelem_start + (pelem_tmp->idx_next);
-    (*(((punsi)ptable)-1))--;
+    ((((ptable_info_generic)ptable)-1)->n_occupied)--;
    }
   free(pelem_tmp->paddr);
-  (*(((punsi)ptable)-1))--;
+  ((((ptable_info_generic)ptable)-1)->n_occupied)--;
 
   /* STEP 2 */
   pelem_tmp->idx_next = idx_void_list;
@@ -448,7 +448,7 @@ int insert_first_table_generic(pvoid plist, all_type value, unsi size){
   /* STEP 4 */
   idx_void_list = int_tmp;
 
-  (*(((punsi)ptable)-1))++;
+  ((((ptable_info_generic)ptable)-1)->n_occupied)++;
 
   #ifdef DEBUG_LIST_TABLE_GENERIC
   printf("---- DEBUG INSERT_FIRST ----\n");
@@ -513,7 +513,7 @@ int extract_first_table_generic(pvoid plist, all_type pvalue, punsi psize){
   plist_casted->idx_start = tmp_int;
   (plist_casted->n_elem)--;
 
-  (*(((punsi)ptable)-1))--;
+  ((((ptable_info_generic)ptable)-1)->n_occupied)--;
 
   return 1;
  }
@@ -567,7 +567,7 @@ int insert_last_table_generic(pvoid plist, all_type value, unsi size){
   idx_void_list = pfirst_free_elem->idx_next;
   pfirst_free_elem->idx_next = IDX_FINE_LISTA;
 
-  (*(((punsi)ptable)-1))++;
+  ((((ptable_info_generic)ptable)-1)->n_occupied)++;
 
   return 1;
  }
@@ -637,7 +637,7 @@ int extract_last_table_generic(pvoid plist, all_type pvalue, punsi psize){
   plist_casted->idx_end = idx_current;
   (plist_casted->n_elem)--;
 
-  (*(((punsi)ptable)-1))--;
+  ((((ptable_info_generic)ptable)-1)->n_occupied)--;
 
   return 1;
  }
@@ -688,7 +688,7 @@ int insert_nth_table_generic(pvoid plist, all_type value, unsi size, unsi n){
   idx_void_list = int_tmp;
 
   (plist_casted->n_elem)++;
-  (*(((punsi)ptable)-1))++;
+  ((((ptable_info_generic)ptable)-1)->n_occupied)++;
 
   return 1;
  }
@@ -751,7 +751,7 @@ int extract_nth_table_generic(pvoid plist, all_type pvalue, punsi psize, unsi n)
   pelem_moving->idx_next = int_tmp;
 
   (plist_casted->n_elem)--;
-  (*(((punsi)ptable)-1))--;
+  ((((ptable_info_generic)ptable)-1)->n_occupied)--;
 
   return 1;
  }

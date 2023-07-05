@@ -426,7 +426,7 @@ int insert_first_table_BASETYPE(pvoid plist, all_type value, unsi size){
   /* STEP 4 */
   idx_void_list = int_tmp;
 
-  (*(((punsi)ptable)-1))++;
+  ((((ptable_info_BASETYPE)ptable)-1)->n_occupied)++;
 
   #ifdef DEBUG_LIST_TABLE_BASETYPE
   printf("---- DEBUG INSERT_FIRST ----\n");
@@ -487,7 +487,7 @@ int extract_first_table_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
   /* STEP 5 */
   plist_casted->idx_start = tmp_int;
   (plist_casted->n_elem)--;
-  (*(((punsi)ptable)-1))--;
+  ((((ptable_info_BASETYPE)ptable)-1)->n_occupied)--;
 
   return 1;
  }
@@ -539,7 +539,7 @@ int insert_last_table_BASETYPE(pvoid plist, all_type value, unsi size){
   idx_void_list = pfirst_free_elem->idx_next;
   pfirst_free_elem->idx_next = IDX_FINE_LISTA;
 
-  (*(((punsi)ptable)-1))++;
+  ((((ptable_info_BASETYPE)ptable)-1)->n_occupied)++;
 
   return 1;
  }
@@ -604,7 +604,7 @@ int extract_last_table_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
   /* aggiorno le informazioni della lista */
   plist_casted->idx_end = idx_current;
   (plist_casted->n_elem)--;
-  (*(((punsi)ptable)-1))--;
+  ((((ptable_info_BASETYPE)ptable)-1)->n_occupied)--;
 
   return 1;
  }
@@ -654,7 +654,7 @@ int insert_nth_table_BASETYPE(pvoid plist, all_type value, unsi size, unsi n){
   idx_void_list = int_tmp;
 
   (plist_casted->n_elem)++;
-  (*(((punsi)ptable)-1))++;
+  ((((ptable_info_BASETYPE)ptable)-1)->n_occupied)++;
 
   return 1;
  }
@@ -714,7 +714,7 @@ int extract_nth_table_BASETYPE(pvoid plist, all_type pvalue, punsi psize, unsi n
   pelem_moving->idx_next = int_tmp;
 
   (plist_casted->n_elem)--;
-  (*(((punsi)ptable)-1))--;
+  ((((ptable_info_BASETYPE)ptable)-1)->n_occupied)--;
 
   return 1;
  }
