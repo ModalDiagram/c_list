@@ -35,7 +35,7 @@ typedef struct _list_dynamic_array_BASETYPE {
   pvoid pstart;
   pvoid pend;
   unsi n_elem;
-  unsi size_array;
+  unsi sizeof_array;
  } list_dynamic_array_BASETYPE;
 
 typedef list_dynamic_array_BASETYPE* plist_dynamic_array_BASETYPE;

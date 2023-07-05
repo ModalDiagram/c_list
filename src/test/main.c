@@ -512,7 +512,7 @@ void test_long_long_int(){
  }
 
 int main(int argc, char *argv[]){
-  test_table_array_float();
+  test_array_float();
 
   return 0;
  }
