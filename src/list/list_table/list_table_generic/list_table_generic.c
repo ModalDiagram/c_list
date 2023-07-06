@@ -96,6 +96,7 @@ pvoid malloc_list_specify_table_table_generic(unsi dim_array, type_resize type_r
   pfirst_elem_of_new_list->idx_next = IDX_FINE_LISTA;
 
   (pmy_info->n_occupied)++;
+  (pmy_info->n_insert)++;
 
   #ifdef DEBUG_LIST_TABLE_GENERIC
   printf("---- DEBUG MALLOC ----\n");
@@ -449,6 +450,7 @@ int insert_first_table_generic(pvoid plist, all_type value, unsi size){
   idx_void_list = int_tmp;
 
   ((((ptable_info_generic)ptable)-1)->n_occupied)++;
+  ((((ptable_info_generic)ptable)-1)->n_insert)++;
 
   #ifdef DEBUG_LIST_TABLE_GENERIC
   printf("---- DEBUG INSERT_FIRST ----\n");
@@ -754,6 +756,15 @@ int extract_nth_table_generic(pvoid plist, all_type pvalue, punsi psize, unsi n)
   ((((ptable_info_generic)ptable)-1)->n_occupied)--;
 
   return 1;
+ }
+
+/* get_n_elem: restituisce il numero di elementi della lista
+ * plist:      lista di cui si vuole conoscere il numero di elementi
+ *
+ * return:     numero di elementi della lista
+ * */
+unsi get_n_elem_table_generic(pvoid plist){
+  return ((plist_table_generic) plist)->n_elem;
  }
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo

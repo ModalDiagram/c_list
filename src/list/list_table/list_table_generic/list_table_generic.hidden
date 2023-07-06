@@ -109,6 +109,8 @@ typedef elem_table_generic* pelem_table_generic;
  * */
 typedef struct _table_info_generic{
   pvoid plist_of_lists;
+  pvoid plist_of_occupation;
+  unsi n_insert;
   unsi n_entries;
   unsi n_occupied;
  } table_info_generic;

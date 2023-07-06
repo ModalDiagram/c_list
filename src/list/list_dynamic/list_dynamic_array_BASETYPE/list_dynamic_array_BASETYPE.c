@@ -320,6 +320,15 @@ int extract_nth_dynamic_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize
   return 1;
  }
 
+/* get_n_elem: restituisce il numero di elementi della lista
+ * plist:      lista di cui si vuole conoscere il numero di elementi
+ *
+ * return:     numero di elementi della lista
+ * */
+unsi get_n_elem_dynamic_array_BASETYPE(pvoid plist){
+  return ((plist_dynamic_array_BASETYPE) plist)->n_elem;
+ }
+
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo
  *                 elemento della lista uguale a quello fornito in input
  *                 secondo pinput_compare)

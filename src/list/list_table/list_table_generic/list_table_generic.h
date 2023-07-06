@@ -182,6 +182,12 @@ int insert_nth_table_generic(pvoid plist, all_type value, unsi size, unsi n);
  * */
 int extract_nth_table_generic(pvoid plist, all_type pvalue, punsi psize, unsi n);
 
+/* get_n_elem: restituisce il numero di elementi della lista
+ * plist:      lista di cui si vuole conoscere il numero di elementi
+ *
+ * return:     numero di elementi della lista
+ * */
+unsi get_n_elem_table_generic(pvoid plist);
 
 /* search_first:   ritorna la prima occorrenza dell'elemento cercato (cioe' il primo
  *                 elemento della lista uguale a quello fornito in input
