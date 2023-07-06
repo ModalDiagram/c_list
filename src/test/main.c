@@ -161,11 +161,13 @@ void test_table_generic(){
   /* if((insert_last(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n"); */
   /* if((insert_last(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n"); */
   /* return; */
-  if((plist = malloc_list_specify_table("GENERIC", 3, type_resize_default, 10)) == NULL) printf("Non creata.\n");
+  if((plist = malloc_list_specify_table("GENERIC", 3, type_resize_default, 1000)) == NULL) printf("Non creata.\n");
+  resize_table(plist, 10);
+  printf("Resizata\n");
   for (i = 0;; i++) {
-    if(i%2){
-      extract_last(plist, (all_type)((pvoid)&pf), &size);
-     }
+    /* if(i%2){ */
+    /*   extract_last(plist, (all_type)((pvoid)&pf), &size); */
+    /*  } */
     if((insert_last(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) break;
    }
   printf("Inserimenti %d\n", i);
@@ -562,7 +564,7 @@ void compare_perf_float(){
  }
 
 int main(int argc, char *argv[]){
-  compare_generic();
+  test_table_generic();
 
   return 0;
  }

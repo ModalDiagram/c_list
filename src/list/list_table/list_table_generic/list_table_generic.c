@@ -226,6 +226,7 @@ int resize_table_table_generic(pvoid plist, unsi n_entries){
     /* copio la tabella */
     memcpy(ptable_and_elem, pmy_info, sizeof(table_info_generic) + sizeof(elem_table_generic) * (pmy_info->n_entries + 1));
 
+    while(extract_first(ptable_and_elem->plist_of_occupations, (all_type)NULL, NULL)){}
     ptable_and_elem->n_entries = n_entries;
     ptable_and_elem->n_insert = 0;
     pnew_table_start = (pelem_table_generic)(ptable_and_elem + 1);
@@ -297,6 +298,8 @@ int resize_table_table_generic(pvoid plist, unsi n_entries){
     ptable_and_elem->n_entries = n_entries;
     ptable_and_elem->n_occupied = pmy_info->n_occupied;
     ptable_and_elem->n_insert = 0;
+    ptable_and_elem->plist_of_occupations = pmy_info->plist_of_occupations;
+    while(extract_first(ptable_and_elem->plist_of_occupations, (all_type)NULL, NULL)){}
     free(pmy_info);
     ptable = (pvoid) (ptable_and_elem + 1);
     idx_void_list = new_idx_void;
@@ -510,7 +513,9 @@ int extract_first_table_generic(pvoid plist, all_type pvalue, punsi psize){
   pelem_to_extract = ((pelem_table_generic) ptable) + plist_casted->idx_start;
 
   /* STEP 2 */
-  *ppvalue_input = pelem_to_extract->paddr;
+  if(ppvalue_input != NULL){
+    *ppvalue_input = pelem_to_extract->paddr;
+   }
   if(psize != NULL){
     *psize = pelem_to_extract->size;
    }
@@ -572,6 +577,7 @@ int insert_last_table_generic(pvoid plist, all_type value, unsi size){
   if(idx_void_list == IDX_FINE_LISTA){
     printf("Memoria preallocata piena\n");
     if((ptable_casted->idx_next) == type_resize_default){
+      printf("Cerco di espandere\n");
       if(!expand_table_fit(plist)) return 0;
       ptable_casted = (pelem_table_generic) ptable;
       printf("Ridimensionata\n");
@@ -639,8 +645,12 @@ int extract_last_table_generic(pvoid plist, all_type pvalue, punsi psize){
    * sara' sovrascritti essendo n_elem==0 */
   pelem_moving = ptable_casted + plist_casted->idx_start;
   if(plist_casted->n_elem == 1){
-    *ppvalue_input = pelem_moving->paddr;
-    *psize = pelem_moving->size;
+    if(ppvalue_input != NULL){
+      *ppvalue_input = pelem_moving->paddr;
+     }
+    if(psize != NULL){
+      *psize = pelem_moving->size;
+     }
     (plist_casted->n_elem)--;
     return 1;
    }
@@ -656,7 +666,9 @@ int extract_last_table_generic(pvoid plist, all_type pvalue, punsi psize){
   pelem_moving = ptable_casted + idx_end;
 
   /* restituisco il valore estratto */
-  *ppvalue_input = pelem_moving->paddr;
+  if(ppvalue_input != NULL){
+    *ppvalue_input = pelem_moving->paddr;
+   }
   if(psize != NULL){
     *psize = pelem_moving->size;
    }
@@ -783,7 +795,9 @@ int extract_nth_table_generic(pvoid plist, all_type pvalue, punsi psize, unsi n)
   pelem_to_extract = ptable_casted + pelem_moving->idx_next;
 
   /* restituisco il valore contenuto in pelem_to_extract */
-  *ppvalue_input = pelem_to_extract->paddr;
+  if(ppvalue_input != NULL){
+    *ppvalue_input = pelem_to_extract->paddr;
+   }
   if(psize != NULL){
     *psize = pelem_to_extract->size;
    }
@@ -919,6 +933,7 @@ void print_table_generic(){
   }
  }
 
+/* manage_moving_window: gestisce la finestra mobile da cui si calcola l'occupazione media */
 void manage_moving_window(pvoid pinfo_table){
   ptable_info_generic pmy_info = (ptable_info_generic) pinfo_table;
   pfloat              pmoving_array = pmy_info->pmoving_window;
@@ -927,9 +942,12 @@ void manage_moving_window(pvoid pinfo_table){
   double pfit_var[2];
   unsi   my_idx = (pmy_info->n_insert / OCCUP_FREQ) - 1;
 
-  /* printf("n_insert %u freq %u n_entries %u\n", pmy_info->n_insert, pmy_info->occup_freq, pmy_info->n_entries); */
-  /* printf("sostituisco %f con %f\n", pmoving_array[my_idx % DIM_MOVING_WINDOW], ((float) pmy_info->n_occupied) / pmy_info->n_entries); */
-  pmoving_array[my_idx % DIM_MOVING_WINDOW] = ((float) pmy_info->n_occupied) / pmy_info->n_entries;
+  /* l'array con l'indice che scorre simula una coda. L'indice aumenta di 1 ogni volta
+   * che viene chiamata questa funzione e mi muovo lungo l'array. Non esco dalla zona
+   * di memoria perche' prendo il resto */
+  pmoving_array[my_idx % DIM_MOVING_WINDOW] = (double) pmy_info->n_occupied;
+  /* se l'array e' pieno calcolo la media e la salvo in plist_of_occupations
+   * assieme al n_insert attuale */
   if(my_idx>= DIM_MOVING_WINDOW){
     for (i = 0; i < DIM_MOVING_WINDOW; i++) {
       sum += pmoving_array[i];
@@ -943,27 +961,28 @@ void manage_moving_window(pvoid pinfo_table){
   return;
  }
 
-/* expand_table_fit: calcola con un fit parabolico di quanto dovrebbe crescere la tabella
+/* expand_table_fit: calcola con un fit lineare di quanto dovrebbe crescere la tabella
  *                   e la ridimensiona
  *
  * return: 1 se tutto va bene, 0 altrimenti
  */
 int expand_table_fit(pvoid plist){
   ptable_info_generic pmy_info = ((ptable_info_generic) ptable) - 1;
-  pvoid plist_of_occupations = pmy_info->plist_of_occupations;
-  int n_elem = get_n_elem(plist_of_occupations), i;
-  double x, y, sumx=0, sumy=0, sumxy=0, sumx2=0;
-  double a,b;
-  double* pd;
-  double n_entries_bigger;
+  pvoid               plist_of_occupations = pmy_info->plist_of_occupations;
+  int                 n_elem = get_n_elem(plist_of_occupations), i;
+  double              x, y, sumx=0, sumy=0, sumxy=0, sumx2=0;
+  double              a,b;
+  double*             pd;
+  double              n_entries_bigger;
 
-
+  /* se non ho abbastanza dati per fare il fit, aumento la tabella di 3 volte */
   if(n_elem < 5){
     while(extract_first(plist_of_occupations, (all_type)((pvoid) &pd), 0)){}
     resize_table_table_generic(plist, 3 * pmy_info->n_entries);
-    printf("Ridimensiono da %u a dim: %u\n",pmy_info->n_entries, 3*pmy_info->n_entries);
+    /* printf("Ridimensiono da %u a dim: %u\n",pmy_info->n_entries, 3*pmy_info->n_entries); */
     return 1;
    }
+  /* se ho abbastanza dati faccio fit */
   else{
     for (i = 1; i <= n_elem; i++) {
       extract_first(plist_of_occupations, (all_type)((pvoid)&pd), 0);
@@ -974,11 +993,22 @@ int expand_table_fit(pvoid plist){
       sumxy += x * y;
       sumx2 += x * x;
     }
+    /* a e b sono i coefficienti della retta
+     * occupaz% = a * n_insert + b
+     * per scegliere l'occupazione futura dobbiamo scegliere il valore di n_insert
+     * a cui secondo la legge avvera' il prossimo ridimensionamento.
+     * Lo scelgo con una legge esponenziale
+     * 1.5 + 2.5*e^(0.5*(1-velocita_occupazione))
+     * dove velocita_occupazione = n_insert / n_entries.
+     * Se ci sono solo inserimenti (velocita_occupazione = 1)
+     * il numero di inserimenti previsti aumenta di 4 volte, mentre quando il numero di
+     * inserimenti netti è molto piccolo il numero aumenta di 1.5 volte
+     * */
     a = (n_elem*sumxy - sumx*sumy) / (n_elem * sumx2 - sumx * sumx);
     b = (sumy * sumx2 - sumx * sumxy) / (n_elem * sumx2 - sumx * sumx);
     /* printf("Coefficienti a %f b %f\n", a, b); */
     /* printf("Fattore %f\n", tmp1); */
-    n_entries_bigger =  pmy_info->n_entries * (a * pmy_info->n_insert*(1.5+2.5*exp(0.5*(1-(((double)pmy_info->n_insert) / pmy_info->n_entries)))) + b);
+    n_entries_bigger = a * pmy_info->n_insert*(1.5+2.5*exp(0.5*(1-(((double)pmy_info->n_insert) / pmy_info->n_entries)))) + b;
     /* printf("Occupazione futura: %f\n", tmp2); */
     printf("Ridimensiono da %u a dim: %f\n",pmy_info->n_entries, n_entries_bigger);
     return resize_table_table_generic(plist, n_entries_bigger);
