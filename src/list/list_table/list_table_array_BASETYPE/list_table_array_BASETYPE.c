@@ -875,6 +875,23 @@ int search_first_table_array_BASETYPE(pvoid plist,
                          all_type value_searched, unsi size_searched,
                          all_type pvalue_found,   punsi psize_found,
                          pcustom_compare pinput_compare){
+  plist_table_array_BASETYPE plist_casted = (plist_table_array_BASETYPE) plist;
+  pvoid  pelem_moving;
+  ppvoid ppvalue_input = (ppvoid)(pvalue_found.pv);
+  ptable_info_array_BASETYPE pmy_info = (ptable_info_array_BASETYPE) plist_casted->ptable;
+  pvoid ptable = plist_casted->ptable;
+  unsi sizeof_array = pmy_info->sizeof_array;
+
+  if (pinput_compare == NULL) return 0;
+  pelem_moving = GET_NEXT_ELEM(ptable, plist_casted->idx_start);
+  while(pelem_moving != NULL){
+    if(!pinput_compare(value_searched, 0,(all_type)pelem_moving, 0)){
+      if((*ppvalue_input = malloc(sizeof_array)) == NULL) return 0;
+      memcpy(*ppvalue_input, pelem_moving, sizeof_array);
+      return 1;
+     }
+    pelem_moving = GET_NEXT_ELEM(ptable, GET_IDX_NEXT(pelem_moving));
+   }
   return 0;
  }
 

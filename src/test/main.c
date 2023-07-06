@@ -511,8 +511,31 @@ void test_long_long_int(){
   return;
  }
 
+void compare_perf_float(){
+  pvoid plist_dynamic, plist_table;
+  float f=4;
+  clock_t time;
+  int i;
+
+  plist_table = malloc_list_specify_table("FLOAT", 1, type_resize_manual, 100010);
+  time = clock();
+  for (i = 0; i < 1000000; i++) {
+    insert_first(plist_table, (all_type)(f), 0);
+    extract_first(plist_table, (all_type)((pvoid)&f), NULL);
+   }
+  printf("Impiegato tempo table %ld\n", clock() - time);
+
+  plist_dynamic = malloc_list(type_list_dynamic, "FLOAT", 1);
+  time = clock();
+  for (i = 0; i < 1000000; i++) {
+    insert_first(plist_dynamic, (all_type)(f), 0);
+    extract_first(plist_dynamic, (all_type)((pvoid)&f), NULL);
+   }
+  printf("Impiegato tempo dynamic %ld\n", clock() - time);
+ }
+
 int main(int argc, char *argv[]){
-  test_table_array_float();
+  compare_perf_float();
 
   return 0;
  }
