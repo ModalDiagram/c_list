@@ -157,36 +157,33 @@ void test_table_generic(){
   unsi size, tot, occupied;
 
   if((plist = malloc_list_specify_table("GENERIC", 3, type_resize_default, 10)) == NULL) printf("Non creata.\n");
-  get_info_table(plist, &tot, &occupied);
-  printf("Totali: %u, occupati: %u\n", tot, occupied);
-  if((plistdue = malloc_list_specify_table("GENERIC", 3, type_resize_default, 3)) == NULL) printf("Non creata.\n");
-  free_list(plistdue);
-  get_info_table(plist, &tot, &occupied);
-  printf("Totali: %u, occupati: %u\n", tot, occupied);
-  if((plistdue = malloc_list_specify_table("GENERIC", 3, type_resize_default, 3)) == NULL) printf("Non creata.\n");
-  f=9;
-  if((insert_last(plistdue, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n");
-  f=99;
-  if((insert_last(plistdue, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n");
-  free_list(plistdue);
-  get_info_table(plist, &tot, &occupied);
-  printf("Totali: %u, occupati: %u\n", tot, occupied);
-  change_resize_table(plist, type_resize_manual);
   resize_table(plist, 4);
-  print_list(plistdue, print_generic);
   if((insert_last(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n");
-  if((insert_last(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n");
-  if((insert_last(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n");
-  if((insert_last(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n");
-  change_resize_table(plist, type_resize_default);
-  if((insert_last(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n");
-  extract_last(plist, (all_type)((pvoid)&pf), &size);
-  printf("Estratto %f con size %u\n", *pf, size);
-  get_info_table(plist, &tot, &occupied);
-  printf("Totali: %u, occupati: %u\n", tot, occupied);
-  for (i = 0;; i++) {
-    if((insert_last(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n");
-   }
+  print_list(plist, print_generic);
+  /* if((plistdue = malloc_list_specify_table("GENERIC", 3, type_resize_default, 3)) == NULL) printf("Non creata.\n"); */
+  /* f=9; */
+  /* if((insert_last(plistdue, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n"); */
+  /* f=99; */
+  /* if((insert_last(plistdue, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n"); */
+  /* free_list(plistdue); */
+  /* get_info_table(plist, &tot, &occupied); */
+  /* printf("Totali: %u, occupati: %u\n", tot, occupied); */
+  /* change_resize_table(plist, type_resize_manual); */
+  /* resize_table(plist, 4); */
+  /* print_list(plistdue, print_generic); */
+  /* if((insert_last(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n"); */
+  /* if((insert_last(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n"); */
+  /* if((insert_last(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n"); */
+  /* if((insert_last(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n"); */
+  /* change_resize_table(plist, type_resize_default); */
+  /* if((insert_last(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n"); */
+  /* extract_last(plist, (all_type)((pvoid)&pf), &size); */
+  /* printf("Estratto %f con size %u\n", *pf, size); */
+  /* get_info_table(plist, &tot, &occupied); */
+  /* printf("Totali: %u, occupati: %u\n", tot, occupied); */
+  /* for (i = 0;; i++) { */
+  /*   if((insert_last(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n"); */
+  /*  } */
  }
 
 void test_table_char(){

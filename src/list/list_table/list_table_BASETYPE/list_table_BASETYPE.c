@@ -275,6 +275,7 @@ int resize_table_table_BASETYPE(pvoid plist, unsi n_entries){
       /* se ha 0 elementi basta aggiungere il posto della lista */
       if(plist_extracted->n_elem == 0){
         plist_extracted->idx_start = plist_extracted->idx_end = new_idx_void;
+        (pnew_table_start + new_idx_void)->idx_next = IDX_FINE_LISTA;
         new_idx_void++;
        }
       /* se ha piu' elementi li ricopio */
