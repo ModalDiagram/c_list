@@ -8,7 +8,9 @@
 #endif /* ifndef IDX_FINE_LISTA */
 
 #define DIM_MOVING_WINDOW 5
-#define MIN_OCCUP_FREQ 10
+#define RATIO_OCCUP 10
+#define MIN_OCCUP_FREQ 50
+#define OCCUP_FREQ 100
 
 /* FUNZIONAMENTO
  * E' piu' veloce della lista_leggera perche' lavoriamo con una tabella e i suoi
@@ -114,9 +116,6 @@ typedef struct _table_info_generic{
   pvoid plist_of_lists;
   pvoid plist_of_occupations;
   float pmoving_window[DIM_MOVING_WINDOW];
-  unsi  idx_moving_window;
-  unsi  occup_freq; /* la frequenza con cui calcolare la media mobile dipende da quanto
-                       e' grande la tabella */
   unsi  n_insert;
   unsi n_entries;
   unsi n_occupied;

@@ -69,10 +69,12 @@ pvoid malloc_list_specify_table_table_generic(unsi dim_array, type_resize type_r
     if((create_table_generic(type_resize, dim_table)) == NULL) return NULL;
    }
 
-  if(idx_void_list == IDX_FINE_LISTA)
-   {
-    printf("Memoria preallocata esaurita\n");
-    return NULL;
+  if(idx_void_list == IDX_FINE_LISTA){
+    printf("Memoria preallocata piena\n");
+    if((((pelem_table_generic)ptable)->idx_next) == type_resize_default){
+      if(!expand_table_fit(NULL)) return 0;
+      printf("Ridimensionata\n");
+     }
    }
 
   /* STEP 1 */
@@ -97,7 +99,7 @@ pvoid malloc_list_specify_table_table_generic(unsi dim_array, type_resize type_r
   pfirst_elem_of_new_list->idx_next = IDX_FINE_LISTA;
 
   (pmy_info->n_occupied)++;
-  if(!((++(pmy_info->n_insert)) % pmy_info->occup_freq)){
+  if(!((++(pmy_info->n_insert)) % OCCUP_FREQ)){
     manage_moving_window(pmy_info);
    }
 
@@ -146,9 +148,6 @@ pvoid create_table_generic(type_resize type_resize, unsi dim)
    }
 
   ptable_and_elem->n_entries = dim;
-  ptable_and_elem->occup_freq = dim / 10;
-  if(ptable_and_elem->occup_freq < MIN_OCCUP_FREQ) ptable_and_elem->occup_freq = MIN_OCCUP_FREQ;
-  printf("Frequenza di calcolo occupazione: %u\n", ptable_and_elem->occup_freq);
   ptable_and_elem->n_occupied = 0;
 
   ptable = ((pchar) ptable_and_elem) + sizeof(table_info_generic);
@@ -228,6 +227,7 @@ int resize_table_table_generic(pvoid plist, unsi n_entries){
     memcpy(ptable_and_elem, pmy_info, sizeof(table_info_generic) + sizeof(elem_table_generic) * (pmy_info->n_entries + 1));
 
     ptable_and_elem->n_entries = n_entries;
+    ptable_and_elem->n_insert = 0;
     pnew_table_start = (pelem_table_generic)(ptable_and_elem + 1);
 
     /* collego tutti i nuovi elementi con una lista che termina all'inizio della lista dei vuoti */
@@ -296,6 +296,7 @@ int resize_table_table_generic(pvoid plist, unsi n_entries){
     pnew_table_start->idx_next = ((pelem_table_generic) ptable)->idx_next;
     ptable_and_elem->n_entries = n_entries;
     ptable_and_elem->n_occupied = pmy_info->n_occupied;
+    ptable_and_elem->n_insert = 0;
     free(pmy_info);
     ptable = (pvoid) (ptable_and_elem + 1);
     idx_void_list = new_idx_void;
@@ -429,7 +430,7 @@ void free_list_table_generic(pvoid plist){
 int insert_first_table_generic(pvoid plist, all_type value, unsi size){
   pelem_table_generic pfirst_free_elem;
   plist_table_generic plist_casted = (plist_table_generic) plist;
-  ptable_info_generic pmy_info = ((ptable_info_generic) ptable) - 1;
+  ptable_info_generic pmy_info;
   int                 int_tmp;
 
   /* se la lista ha 0 elementi ha gia' uno spazio nella tabella
@@ -443,11 +444,14 @@ int insert_first_table_generic(pvoid plist, all_type value, unsi size){
     return 1;
    }
 
-  if(idx_void_list == IDX_FINE_LISTA)
-   {
+  if(idx_void_list == IDX_FINE_LISTA){
     printf("Memoria preallocata piena\n");
-    return 0;
+    if((((pelem_table_generic) ptable)->idx_next) == type_resize_default){
+      if(!expand_table_fit(plist)) return 0;
+      printf("Ridimensionata\n");
+     }
    }
+  pmy_info  = ((ptable_info_generic) ptable) - 1;
   /* STEP 1 */
   pfirst_free_elem = ((pelem_table_generic) ptable) + idx_void_list;
 
@@ -465,7 +469,7 @@ int insert_first_table_generic(pvoid plist, all_type value, unsi size){
   idx_void_list = int_tmp;
 
   (pmy_info->n_occupied)++;
-  if(!((++(pmy_info->n_insert)) % pmy_info->occup_freq)){
+  if(!((++(pmy_info->n_insert)) % OCCUP_FREQ)){
     manage_moving_window(pmy_info);
    }
 
@@ -553,7 +557,7 @@ int extract_first_table_generic(pvoid plist, all_type pvalue, punsi psize){
 int insert_last_table_generic(pvoid plist, all_type value, unsi size){
   pelem_table_generic pfirst_free_elem, ptable_casted = (pelem_table_generic) ptable;
   plist_table_generic plist_casted = (plist_table_generic) plist;
-  ptable_info_generic pmy_info  = ((ptable_info_generic) ptable) - 1;
+  ptable_info_generic pmy_info;
 
   /* se la lista ha 0 elementi ha gia' uno spazio nella tabella
    * ma con paddr e size vuoti, quindi e' sufficiente che scriva li' */
@@ -569,11 +573,11 @@ int insert_last_table_generic(pvoid plist, all_type value, unsi size){
     printf("Memoria preallocata piena\n");
     if((ptable_casted->idx_next) == type_resize_default){
       if(!expand_table_fit(plist)) return 0;
-      pmy_info  = ((ptable_info_generic) ptable) - 1;
       ptable_casted = (pelem_table_generic) ptable;
       printf("Ridimensionata\n");
      }
    }
+  pmy_info  = ((ptable_info_generic) ptable) - 1;
   /* salvo l'indirizzo del primo elemento libero */
   pfirst_free_elem = ptable_casted + idx_void_list;
 
@@ -593,7 +597,7 @@ int insert_last_table_generic(pvoid plist, all_type value, unsi size){
   pfirst_free_elem->idx_next = IDX_FINE_LISTA;
 
   (pmy_info->n_occupied)++;
-  if(!((++(pmy_info->n_insert)) % pmy_info->occup_freq)){
+  if(!((++(pmy_info->n_insert)) % OCCUP_FREQ)){
     manage_moving_window(pmy_info);
    }
 
@@ -699,7 +703,12 @@ int insert_nth_table_generic(pvoid plist, all_type value, unsi size, unsi n){
 
   if(idx_void_list == IDX_FINE_LISTA){
     printf("Memoria preallocata piena\n");
-    return 0;
+    if((ptable_casted->idx_next) == type_resize_default){
+      if(!expand_table_fit(plist)) return 0;
+      pmy_info  = ((ptable_info_generic) ptable) - 1;
+      ptable_casted = (pelem_table_generic) ptable;
+      printf("Ridimensionata\n");
+     }
    }
 
   /* salvo l'indirizzo del nuovo elemento e vi salvo il valore preso in input */
@@ -723,7 +732,7 @@ int insert_nth_table_generic(pvoid plist, all_type value, unsi size, unsi n){
 
   (plist_casted->n_elem)++;
   (pmy_info->n_occupied)++;
-  if(!((++(pmy_info->n_insert)) % pmy_info->occup_freq)){
+  if(!((++(pmy_info->n_insert)) % OCCUP_FREQ)){
     manage_moving_window(pmy_info);
    }
 
@@ -916,17 +925,19 @@ void manage_moving_window(pvoid pinfo_table){
   int i;
   double sum = 0;
   double pfit_var[2];
+  unsi   my_idx = (pmy_info->n_insert / OCCUP_FREQ) - 1;
 
-  /* printf("aggiungo elemento ad array\n"); */
-  pmoving_array[(pmy_info->idx_moving_window)++ % DIM_MOVING_WINDOW] = ((float) pmy_info->n_occupied) / pmy_info->n_entries;
-  if((pmy_info->idx_moving_window) >= DIM_MOVING_WINDOW){
-    /* printf("Calcolo media mobile\n"); */
+  /* printf("n_insert %u freq %u n_entries %u\n", pmy_info->n_insert, pmy_info->occup_freq, pmy_info->n_entries); */
+  /* printf("sostituisco %f con %f\n", pmoving_array[my_idx % DIM_MOVING_WINDOW], ((float) pmy_info->n_occupied) / pmy_info->n_entries); */
+  pmoving_array[my_idx % DIM_MOVING_WINDOW] = ((float) pmy_info->n_occupied) / pmy_info->n_entries;
+  if(my_idx>= DIM_MOVING_WINDOW){
     for (i = 0; i < DIM_MOVING_WINDOW; i++) {
       sum += pmoving_array[i];
      }
     pfit_var[0] = pmy_info->n_insert;
     pfit_var[1] = sum / DIM_MOVING_WINDOW;
     insert_last(pmy_info->plist_of_occupations, (all_type) ((pvoid) pfit_var), 0);
+    /* printf("Calcolo media mobile %f\n", sum /DIM_MOVING_WINDOW); */
     /* printf("aggiunta media di occupazione: %f\n", sum / DIM_MOVING_WINDOW); */
    }
   return;
@@ -947,18 +958,17 @@ int expand_table_fit(pvoid plist){
   double n_entries_bigger;
 
 
-  printf("n_elem %d\n", n_elem);
   if(n_elem < 5){
-    resize_table_table_generic(plist, 2 * pmy_info->n_entries);
+    while(extract_first(plist_of_occupations, (all_type)((pvoid) &pd), 0)){}
+    resize_table_table_generic(plist, 3 * pmy_info->n_entries);
+    printf("Ridimensiono da %u a dim: %u\n",pmy_info->n_entries, 3*pmy_info->n_entries);
     return 1;
    }
   else{
     for (i = 1; i <= n_elem; i++) {
       extract_first(plist_of_occupations, (all_type)((pvoid)&pd), 0);
-      insert_last(plist_of_occupations, (all_type)((pvoid) pd), 0);
       x = pd[0];
       y = pd[1];
-      /* printf("x %f, y %f\n", x, y); */
       sumx += x;
       sumy += y;
       sumxy += x * y;

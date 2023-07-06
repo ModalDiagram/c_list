@@ -161,16 +161,7 @@ void test_table_generic(){
   /* if((insert_last(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n"); */
   /* if((insert_last(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n"); */
   /* return; */
-  if((plist = malloc_list_specify_table("GENERIC", 3, type_resize_default, 1000)) == NULL) printf("Non creata.\n");
-  for (i = 0;; i++) {
-    /* if(i%2){ */
-    /*   extract_last(plist, (all_type)((pvoid)&pf), &size); */
-    /*  } */
-    if((insert_last(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) break;
-   }
-  printf("Inserimenti %d\n", i);
-  get_info_table(plist, &tot, &occupied);
-  printf("Totali: %u, occupati: %u\n", tot, occupied);
+  if((plist = malloc_list_specify_table("GENERIC", 3, type_resize_default, 10)) == NULL) printf("Non creata.\n");
   for (i = 0;; i++) {
     if(i%2){
       extract_last(plist, (all_type)((pvoid)&pf), &size);
@@ -178,6 +169,15 @@ void test_table_generic(){
     if((insert_last(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) break;
    }
   printf("Inserimenti %d\n", i);
+  get_info_table(plist, &tot, &occupied);
+  printf("Totali: %u, occupati: %u\n", tot, occupied);
+  /* for (i = 0;; i++) { */
+  /*   if(i%2){ */
+  /*     extract_last(plist, (all_type)((pvoid)&pf), &size); */
+  /*    } */
+  /*   if((insert_last(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) break; */
+  /*  } */
+  /* printf("Inserimenti %d\n", i); */
   /* for (i = 0;; i++) { */
   /*   /1* if(i%2){ *1/ */
   /*   /1*   extract_last(plist, (all_type)((pvoid)&pf), &size); *1/ */
@@ -544,7 +544,7 @@ void compare_perf_float(){
   clock_t time;
   int i;
 
-  plist_table = malloc_list_specify_table("FLOAT", 1, type_resize_manual, 100010);
+  plist_table = malloc_list_specify_table("FLOAT", 1, type_resize_manual, 1010);
   time = clock();
   for (i = 0; i < 1000000; i++) {
     insert_first(plist_table, (all_type)(f), 0);
@@ -562,7 +562,7 @@ void compare_perf_float(){
  }
 
 int main(int argc, char *argv[]){
-  test_table_generic();
+  compare_generic();
 
   return 0;
  }
