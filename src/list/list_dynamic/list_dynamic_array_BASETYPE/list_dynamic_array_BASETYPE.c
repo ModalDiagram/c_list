@@ -48,6 +48,7 @@ void free_list_dynamic_array_BASETYPE(pvoid plist){
   pvoid pelem_moving, pelem_tmp;
   unsi sizeof_array = plist_casted->sizeof_array;
 
+  /* scorro lungo la lista e libero l'elemento della lista */
   pelem_moving = plist_casted->pstart;
   if(pelem_moving != NULL){
     pelem_tmp = GET_PNEXT(pelem_moving);
@@ -58,6 +59,7 @@ void free_list_dynamic_array_BASETYPE(pvoid plist){
      }
     free(pelem_moving);
    }
+  /* infine libero l'intera struttura */
   free(plist_casted);
 
   return;
@@ -77,15 +79,18 @@ int insert_first_dynamic_array_BASETYPE(pvoid plist, all_type value, unsi size){
   pvoid pnew_elem;
   unsi  sizeof_array;
 
+  /* alloco il nuovo elemento e salvo il valore preso in input */
   plist_casted = (plist_dynamic_array_BASETYPE) plist;
   sizeof_array = plist_casted->sizeof_array;
   if((pnew_elem = malloc(sizeof_array + sizeof(pvoid))) == NULL) return 0;
 
   memcpy(pnew_elem, value.pv, sizeof_array);
 
+  /* lo metto in cima alla lista */
   GET_PNEXT(pnew_elem) = plist_casted->pstart;
   plist_casted->pstart = pnew_elem;
 
+  /* se e' il primo elemento devo anche cambiare pend */
   if(!((plist_casted->n_elem)++)) plist_casted->pend = pnew_elem;
 
   return 1;
@@ -114,15 +119,18 @@ int extract_first_dynamic_array_BASETYPE(pvoid plist, all_type pvalue, punsi psi
     return 0;
    }
 
+  /* salvo l'indirizzo dell'elemento da rimuovere e sposto l'inizio della lista */
   pelem_to_remove = plist_casted->pstart;
   plist_casted->pstart = GET_PNEXT(pelem_to_remove);
 
+  /* restituisco il valore contenuto nell'elemento e lo libero */
   if(ppvalue_input != NULL){
     if((*ppvalue_input = malloc(sizeof_array)) == NULL) return 0;
     memcpy(*ppvalue_input, pelem_to_remove, sizeof_array);
    }
   free(pelem_to_remove);
 
+  /* se era l'ultimo elemento devo anche aggiornare pend */
   if(!(--(plist_casted->n_elem))) plist_casted->pend = NULL;
 
   return 1;
@@ -365,6 +373,8 @@ int search_first_dynamic_array_BASETYPE(pvoid plist,
   unsi sizeof_array = plist_casted->sizeof_array;
 
   if (pinput_compare == NULL) return 0;
+  /* scorro lungo la lista e applico pinput_compare a ciascun elemento e quello cercato.
+   * Se trovo un match (pinput_compare ritorna 0) scrivo l'elemento trovato ed esco */
   pelem_moving = plist_casted->pstart;
   while(pelem_moving != NULL){
     if(!pinput_compare(value_searched, 0,(all_type)pelem_moving, 0)){

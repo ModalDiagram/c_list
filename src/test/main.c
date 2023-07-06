@@ -157,11 +157,20 @@ void test_table_generic(){
   unsi size, tot, occupied;
 
   if((plist = malloc_list_specify_table("GENERIC", 3, type_resize_default, 10)) == NULL) printf("Non creata.\n");
+  get_info_table(plist, &tot, &occupied);
+  printf("Totali: %u, occupati: %u\n", tot, occupied);
+  if((plistdue = malloc_list_specify_table("GENERIC", 3, type_resize_default, 3)) == NULL) printf("Non creata.\n");
+  free_list(plistdue);
+  get_info_table(plist, &tot, &occupied);
+  printf("Totali: %u, occupati: %u\n", tot, occupied);
   if((plistdue = malloc_list_specify_table("GENERIC", 3, type_resize_default, 3)) == NULL) printf("Non creata.\n");
   f=9;
   if((insert_last(plistdue, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n");
   f=99;
   if((insert_last(plistdue, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n");
+  free_list(plistdue);
+  get_info_table(plist, &tot, &occupied);
+  printf("Totali: %u, occupati: %u\n", tot, occupied);
   change_resize_table(plist, type_resize_manual);
   resize_table(plist, 4);
   print_list(plistdue, print_generic);
@@ -503,7 +512,7 @@ void compare_perf_float(){
  }
 
 int main(int argc, char *argv[]){
-  test_table_array_float();
+  test_table_generic();
 
   return 0;
  }

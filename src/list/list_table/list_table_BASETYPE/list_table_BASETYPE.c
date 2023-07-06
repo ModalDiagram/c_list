@@ -68,10 +68,14 @@ pvoid malloc_list_specify_table_table_BASETYPE(unsi dim_array, type_resize type_
   if(ptable == NULL) printf("Ancora vuota\n");
 
   if(idx_void_list == IDX_FINE_LISTA){
+    #ifdef DEBUG_LIST_TABLE_BASETYPE
     printf("Memoria preallocata piena\n");
+    #endif
     if((((pelem_table_BASETYPE)ptable)->idx_next) == type_resize_default){
       if(!expand_table_fit_BASETYPE()) return 0;
+      #ifdef DEBUG_LIST_TABLE_BASETYPE
       printf("Ridimensionata\n");
+      #endif
      }
     else return 0;
    }
@@ -213,11 +217,13 @@ int resize_table_table_BASETYPE(pvoid plist, unsi n_entries){
    * posso semplicemente allocare una zona di memoria piu' grande e fare un memcopy.
    * Poi aggiungo tutti gli elementi successivi in cima alla lista dei vuoti */
   if(n_entries > pmy_info->n_entries){
-    /* alloco la nuovo table e inizializzo le info */
+    /* alloco la nuovo table */
     if((ptable_and_elem = malloc(sizeof(table_info_BASETYPE) + sizeof(elem_table_BASETYPE) * actual_size)) == NULL) return 0;
     /* copio la tabella */
     memcpy(ptable_and_elem, pmy_info, sizeof(table_info_BASETYPE) + sizeof(elem_table_BASETYPE) * (pmy_info->n_entries + 1));
 
+    /* svuoto la lista contenente le medie dell'occupazione perche' le calcoliamo
+     * per ciascuna tabella separatamente */
     while(extract_first(ptable_and_elem->plist_of_occupations, (all_type)NULL, NULL)){}
     ptable_and_elem->n_entries = n_entries;
     ptable_and_elem->n_insert = 0;
@@ -241,14 +247,16 @@ int resize_table_table_BASETYPE(pvoid plist, unsi n_entries){
    * in questo caso n_entries<ptable->n_entries quindi dobbiamo rimpicciolire, ma non
    * possiamo usare memcopy.
    * Procedo per step:
-   * 1) Alloco la nuova table con una nuova lista di liste
-   * 2) ricopio ogni lista nella vecchia lista di liste e la inserisco in quella nuova
+   * 1) Alloco la nuova table
+   * 2) prendo ciascuna lista contenuta nella vecchia table, la ricopio e la reinserisco
+   *    nella list_of_lists
    * 3) metto tutti gli elementi successivi in coda alla lista dei vuoti
    * 4) aggiorno info e sostituisco vecchia table
    * */
   else{
     /* print_list(pmy_info->plist_of_lists, print_list_of_lists); */
     /* STEP 1 */
+    /* alloco nuova table */
     if((ptable_and_elem = malloc(sizeof(table_info_BASETYPE) + sizeof(elem_table_BASETYPE) * actual_size)) == NULL) return 0;
 
     ptable_and_elem->plist_of_lists = pmy_info->plist_of_lists;
@@ -260,9 +268,9 @@ int resize_table_table_BASETYPE(pvoid plist, unsi n_entries){
     n_list_to_copy = get_n_elem(ptable_and_elem->plist_of_lists);
     for (i = 0; i < n_list_to_copy; i++) {
       extract_first(ptable_and_elem->plist_of_lists, (all_type)((pvoid)&plist_extracted), NULL);
+      #ifdef DEBUG_LIST_TABLE_BASETYPE
       printf("Copio una lista\n");
-      /* qui si devono aggiungere controlli appropriati */
-      /* devo copiare il resize */
+      #endif
       insert_last(ptable_and_elem->plist_of_lists, (all_type)((pvoid)plist_extracted), 0);
       /* se ha 0 elementi basta aggiungere il posto della lista */
       if(plist_extracted->n_elem == 0){
@@ -278,6 +286,7 @@ int resize_table_table_BASETYPE(pvoid plist, unsi n_entries){
        }
      }
     /* STEP 3 */
+    /* metto tutti gli elementi successivi in coda alla lista dei vuoti */
     for (i = new_idx_void, pelem_moving = pnew_table_start + i; i < n_entries; i++) {
       pelem_moving->idx_next = i + 1;
       pelem_moving++;
@@ -285,12 +294,16 @@ int resize_table_table_BASETYPE(pvoid plist, unsi n_entries){
     pelem_moving->idx_next = IDX_FINE_LISTA;
 
     /* STEP 4 */
+    /* aggiorno info */
     pnew_table_start->idx_next = ((pelem_table_BASETYPE) ptable)->idx_next;
     ptable_and_elem->n_entries = n_entries;
     ptable_and_elem->n_occupied = pmy_info->n_occupied;
     ptable_and_elem->n_insert = 0;
     ptable_and_elem->plist_of_occupations = pmy_info->plist_of_occupations;
+    /* svuoto la lista contenente le medie dell'occupazione perche' le calcoliamo
+     * per ciascuna tabella separatamente */
     while(extract_first(ptable_and_elem->plist_of_occupations, (all_type)NULL, NULL)){}
+    /* libero la vecchia tabella */
     free(pmy_info);
     ptable = (pvoid) (ptable_and_elem + 1);
     idx_void_list = new_idx_void;
@@ -313,6 +326,12 @@ int copy_list_BASETYPE(pelem_table_BASETYPE ptable_dest, punsi pidx_void_list_de
               unsi idx_start){
   pelem_table_BASETYPE pelem_moving_dest, pelem_moving_origin;
 
+  /* sfrutto il fatto che la lista di destinazione è fatta solo dalla
+   * lista dei vuoti ordinata.
+   * pelem_moving_dest scorre lungo la tabella di destinazione un elemento alla volta
+   * mentre pelem_moving_origin salta lungo la tabella di origine passando
+   * per tutti gli elementi della lista.
+   * Alla fine quindi le liste ricopiate risultano anche ordinate */
   pelem_moving_dest = ptable_dest + *pidx_void_list_dest;
   pelem_moving_origin = ptable_orig + idx_start;
   while(pelem_moving_origin->idx_next != IDX_FINE_LISTA){
@@ -353,6 +372,8 @@ void free_list_table_BASETYPE(pvoid plist){
   ptable_info_BASETYPE pmy_info = ((ptable_info_BASETYPE) ptable) - 1;
   pvoid                pextracted;
 
+  /* se la lista ha zero elementi non bisogna scorrere sulla lista ma basta
+   * liberare l'elemento che contiene la struttura lista */
   if(plist_to_free->n_elem == 0)
    {
     (pelem_start + plist_to_free->idx_start)->idx_next = idx_void_list;
@@ -376,10 +397,11 @@ void free_list_table_BASETYPE(pvoid plist){
     return;
    }
 
-  /* STEP 1 */
+  /* cambio l'idx_next dell'ultimo elemento della lista in idx_void_list */
   (pelem_start + plist_to_free->idx_end)->idx_next = idx_void_list;
 
-  /* STEP 2 */
+  /* cambio idx_void_list nell'indice del primo elemento della lista.
+   * In questo modo ho messo la lista in cima alla void_list */
   idx_void_list = plist_to_free->idx_start;
 
   /* tolgo la lista liberata dalla plist_of_lists */
@@ -390,7 +412,8 @@ void free_list_table_BASETYPE(pvoid plist){
     insert_last(pmy_info->plist_of_lists, (all_type)pextracted, 0);
    }
   (pmy_info->n_occupied)-= plist_to_free->n_elem;
-  /* STEP 3 */
+
+  /* libero la struttura lista */
   free(plist);
 
   #ifdef DEBUG_LIST_TABLE_BASETYPE
@@ -426,28 +449,32 @@ int insert_first_table_BASETYPE(pvoid plist, all_type value, unsi size){
    }
 
   if(idx_void_list == IDX_FINE_LISTA){
+    #ifdef DEBUG_LIST_TABLE_BASETYPE
     printf("Memoria preallocata piena\n");
+    #endif
     if((((pelem_table_BASETYPE)ptable)->idx_next) == type_resize_default){
       if(!expand_table_fit_BASETYPE()) return 0;
+      #ifdef DEBUG_LIST_TABLE_BASETYPE
       printf("Ridimensionata\n");
+      #endif
      }
     else return 0;
    }
 
   pmy_info = ((ptable_info_BASETYPE) ptable) - 1;
-  /* STEP 1 */
+  /* salvo l'indirizzo del nuovo elemento */
   pfirst_free_elem = ((pelem_table_BASETYPE) ptable) + idx_void_list;
 
-  /* STEP 2 */
+  /* scrivo il valore del nuovo elemento e scrivo nell'idx_next l'inizio della lista */
   pfirst_free_elem->val = value.MEMBERTYPE;
   int_tmp = pfirst_free_elem->idx_next;
   pfirst_free_elem->idx_next = plist_casted->idx_start;
 
-  /* STEP 3 */
+  /* sposto l'inizio della lista al nuovo elemento */
   plist_casted->idx_start = idx_void_list;
   (plist_casted->n_elem)++;
 
-  /* STEP 4 */
+  /* sposto l'inizio della void_list all'idx_next del nuovo elemento */
   idx_void_list = int_tmp;
 
   (pmy_info->n_occupied)++;
@@ -488,10 +515,10 @@ int extract_first_table_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
     return 0;
    }
 
-  /* STEP 1 */
+  /* salvo l'indirizzo dell'elemento da rimuovere */
   pelem_to_extract = ((pelem_table_BASETYPE) ptable) + plist_casted->idx_start;
 
-  /* STEP 2 */
+  /* restituisco il valore contenuto nell'elemento */
   if(pvalue_input != NULL){
     *pvalue_input = pelem_to_extract->val;
    }
@@ -506,14 +533,12 @@ int extract_first_table_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
     return 1;
    }
 
-  /* STEP 3 */
+  /* metto l'elemento da estrarre in cima alla lista dei vuoti */
   tmp_int = pelem_to_extract->idx_next;
   pelem_to_extract->idx_next = idx_void_list;
-
-  /* STEP 4 */
   idx_void_list = plist_casted->idx_start;
 
-  /* STEP 5 */
+  /* sposto l'inizio della lista */
   plist_casted->idx_start = tmp_int;
   (plist_casted->n_elem)--;
   ((((ptable_info_BASETYPE)ptable)-1)->n_occupied)--;
@@ -549,10 +574,14 @@ int insert_last_table_BASETYPE(pvoid plist, all_type value, unsi size){
    }
 
   if(idx_void_list == IDX_FINE_LISTA){
+    #ifdef DEBUG_LIST_TABLE_BASETYPE
     printf("Memoria preallocata piena\n");
+    #endif
     if((((pelem_table_BASETYPE)ptable)->idx_next) == type_resize_default){
       if(!expand_table_fit_BASETYPE()) return 0;
+      #ifdef DEBUG_LIST_TABLE_BASETYPE
       printf("Ridimensionata\n");
+      #endif
      }
     else return 0;
    }
@@ -680,10 +709,14 @@ int insert_nth_table_BASETYPE(pvoid plist, all_type value, unsi size, unsi n){
   if(n == 1) return insert_first(plist, value, size);
 
   if(idx_void_list == IDX_FINE_LISTA){
+    #ifdef DEBUG_LIST_TABLE_BASETYPE
     printf("Memoria preallocata piena\n");
+    #endif
     if((((pelem_table_BASETYPE)ptable)->idx_next) == type_resize_default){
       if(!expand_table_fit_BASETYPE()) return 0;
+      #ifdef DEBUG_LIST_TABLE_BASETYPE
       printf("Ridimensionata\n");
+      #endif
      }
     else return 0;
    }
@@ -967,7 +1000,9 @@ int expand_table_fit_BASETYPE(){
     /* printf("Fattore %f\n", tmp1); */
     n_entries_bigger = a * pmy_info->n_insert*(1.5+2.5*exp(0.5*(1-(((double)pmy_info->n_insert) / pmy_info->n_entries)))) + b;
     /* printf("Occupazione futura: %f\n", tmp2); */
+    #ifdef DEBUG_LIST_TABLE_BASETYPE
     printf("Ridimensiono da %u a dim: %f\n",pmy_info->n_entries, n_entries_bigger);
+    #endif
     return resize_table_table_BASETYPE(NULL, n_entries_bigger);
    }
   return 0;
