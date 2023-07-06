@@ -1,0 +1,10 @@
+#ifndef _DEFINES_TYPEDEF_HIDDEN
+#define _DEFINES_TYPEDEF_HIDDEN
+
+#define DIM_MOVING_WINDOW 5
+#define RATIO_OCCUP 10
+#define MIN_OCCUP_FREQ 50
+#define OCCUP_FREQ 100
+#define IDX_FINE_LISTA 0
+
+#endif

@@ -2,10 +2,7 @@
 #define _LIST_TABLE_ARRAY_BASETYPE_HIDDEN
 
 #include "./../../../util/defines_typedef.h"
-
-#ifndef IDX_FINE_LISTA
-#define IDX_FINE_LISTA 0
-#endif /* ifndef IDX_FINE_LISTA */
+#include "./../../../util/defines_typedef.hidden"
 
 /* FUNZIONAMENTO
  * E' piu' veloce della lista_leggera perche' lavoriamo con una tabella e i suoi
@@ -120,6 +117,9 @@ typedef list_table_array_BASETYPE* plist_table_array_BASETYPE;
  * */
 typedef struct _table_info_array_BASETYPE {
   pvoid plist_of_lists;
+  pvoid plist_of_occupations;
+  double pmoving_window[DIM_MOVING_WINDOW];
+  unsi  n_insert;
   unsi sizeof_array;
   unsi idx_void_list;
   unsi n_entries;
@@ -165,5 +165,9 @@ int copy_list_array_BASETYPE(pvoid ptable_dest, punsi pidx_void_list_dest,
 void print_table_array_BASETYPE(plist_table_array_BASETYPE plist);
 
 int print_list_of_lists_array_BASETYPE(all_type plist, unsi size);
+
+void manage_moving_window_array_BASETYPE(pvoid pinfo_table);
+
+int expand_table_fit_array_BASETYPE(plist_table_array_BASETYPE plist);
 
 #endif

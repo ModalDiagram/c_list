@@ -2,10 +2,7 @@
 #define _LIST_TABLE_BASETYPE_HIDDEN
 
 #include "./../../../util/defines_typedef.h"
-
-#ifndef IDX_FINE_LISTA
-#define IDX_FINE_LISTA 0
-#endif /* ifndef IDX_FINE_LISTA */
+#include "./../../../util/defines_typedef.hidden"
 
 /* FUNZIONAMENTO
  * E' piu' veloce della lista_leggera perche' lavoriamo con una tabella e i suoi
@@ -108,6 +105,9 @@ typedef elem_table_BASETYPE* pelem_table_BASETYPE;
  * */
 typedef struct _table_info_BASETYPE{
   pvoid plist_of_lists;
+  pvoid plist_of_occupations;
+  double pmoving_window[DIM_MOVING_WINDOW];
+  unsi  n_insert;
   unsi n_entries;
   unsi n_occupied;
  } table_info_BASETYPE;
@@ -138,5 +138,9 @@ void print_table_BASETYPE();
 int copy_list_BASETYPE(pelem_table_BASETYPE ptable_dest, punsi pidx_void_list_dest,
                        pelem_table_BASETYPE ptable_orig, punsi pidx_void_list_orig,
                        unsi idx_start);
+
+void manage_moving_window_BASETYPE(pvoid pinfo_table);
+
+int expand_table_fit_BASETYPE();
 
 #endif

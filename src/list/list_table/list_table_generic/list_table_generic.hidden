@@ -2,15 +2,7 @@
 #define _LIST_TABLE_GENERIC_HIDDEN
 
 #include "./../../../util/defines_typedef.h"
-
-#ifndef IDX_FINE_LISTA
-#define IDX_FINE_LISTA 0
-#endif /* ifndef IDX_FINE_LISTA */
-
-#define DIM_MOVING_WINDOW 5
-#define RATIO_OCCUP 10
-#define MIN_OCCUP_FREQ 50
-#define OCCUP_FREQ 100
+#include "./../../../util/defines_typedef.hidden"
 
 /* FUNZIONAMENTO
  * E' piu' veloce della lista_leggera perche' lavoriamo con una tabella e i suoi
@@ -115,7 +107,7 @@ typedef elem_table_generic* pelem_table_generic;
 typedef struct _table_info_generic{
   pvoid plist_of_lists;
   pvoid plist_of_occupations;
-  float pmoving_window[DIM_MOVING_WINDOW];
+  double pmoving_window[DIM_MOVING_WINDOW];
   unsi  n_insert;
   unsi n_entries;
   unsi n_occupied;
@@ -146,8 +138,8 @@ int copy_list_generic(pelem_table_generic ptable_dest, punsi pidx_void_list_dest
                       pelem_table_generic ptable_orig, punsi pidx_void_list_orig,
                       unsi idx_start);
 
-void manage_moving_window(pvoid pinfo_table);
+void manage_moving_window_generic(pvoid pinfo_table);
 
-int expand_table_fit(pvoid plist);
+int expand_table_fit_generic();
 
 #endif

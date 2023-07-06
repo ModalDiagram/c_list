@@ -72,9 +72,10 @@ pvoid malloc_list_specify_table_table_generic(unsi dim_array, type_resize type_r
   if(idx_void_list == IDX_FINE_LISTA){
     printf("Memoria preallocata piena\n");
     if((((pelem_table_generic)ptable)->idx_next) == type_resize_default){
-      if(!expand_table_fit(NULL)) return 0;
+      if(!expand_table_fit_generic()) return 0;
       printf("Ridimensionata\n");
      }
+    else return 0;
    }
 
   /* STEP 1 */
@@ -100,7 +101,7 @@ pvoid malloc_list_specify_table_table_generic(unsi dim_array, type_resize type_r
 
   (pmy_info->n_occupied)++;
   if(!((++(pmy_info->n_insert)) % OCCUP_FREQ)){
-    manage_moving_window(pmy_info);
+    manage_moving_window_generic(pmy_info);
    }
 
 
@@ -207,7 +208,7 @@ int resize_table_table_generic(pvoid plist, unsi n_entries){
   ptable_info_generic pmy_info;
   ptable_info_generic ptable_and_elem;
   pelem_table_generic pnew_table_start, pelem_moving;
-  int                 i;
+  int                 i, n_list_to_copy;
   unsi                actual_size = n_entries + 1, new_idx_void;
   plist_table_generic plist_extracted;
 
@@ -258,21 +259,20 @@ int resize_table_table_generic(pvoid plist, unsi n_entries){
     /* print_list(pmy_info->plist_of_lists, print_list_of_lists); */
     /* STEP 1 */
     if((ptable_and_elem = malloc(sizeof(table_info_generic) + sizeof(elem_table_generic) * actual_size)) == NULL) return 0;
-    if((ptable_and_elem->plist_of_lists = malloc_list(type_list_dynamic, "PVOID", 1)) == NULL){
-      free(ptable_and_elem);
-      return 0;
-     }
 
+    ptable_and_elem->plist_of_lists = pmy_info->plist_of_lists;
     /* STEP 2
      * Per ricopiare sfrutto il fatto che la tabella e' vuota quindi ricopio ogni lista
      * in ordine, aumentando di volta in volta di 1 il new_idx_void */
     new_idx_void = 1;
     pnew_table_start = (pelem_table_generic)(ptable_and_elem + 1);
-    while(extract_first(pmy_info->plist_of_lists, (all_type)((pvoid)&plist_extracted), NULL)){
+    n_list_to_copy = get_n_elem(ptable_and_elem->plist_of_lists);
+    for (i = 0; i < n_list_to_copy; i++) {
+      extract_first(ptable_and_elem->plist_of_lists, (all_type)((pvoid)&plist_extracted), NULL);
       printf("Copio una lista\n");
       /* qui si devono aggiungere controlli appropriati */
       /* devo copiare il resize */
-      insert_first(ptable_and_elem->plist_of_lists, (all_type)((pvoid)plist_extracted), 0);
+      insert_last(ptable_and_elem->plist_of_lists, (all_type)((pvoid)plist_extracted), 0);
       /* se ha 0 elementi basta aggiungere il posto della lista */
       if(plist_extracted->n_elem == 0){
         plist_extracted->idx_start = plist_extracted->idx_end = new_idx_void;
@@ -450,9 +450,10 @@ int insert_first_table_generic(pvoid plist, all_type value, unsi size){
   if(idx_void_list == IDX_FINE_LISTA){
     printf("Memoria preallocata piena\n");
     if((((pelem_table_generic) ptable)->idx_next) == type_resize_default){
-      if(!expand_table_fit(plist)) return 0;
+      if(!expand_table_fit_generic()) return 0;
       printf("Ridimensionata\n");
      }
+    else return 0;
    }
   pmy_info  = ((ptable_info_generic) ptable) - 1;
   /* STEP 1 */
@@ -473,7 +474,7 @@ int insert_first_table_generic(pvoid plist, all_type value, unsi size){
 
   (pmy_info->n_occupied)++;
   if(!((++(pmy_info->n_insert)) % OCCUP_FREQ)){
-    manage_moving_window(pmy_info);
+    manage_moving_window_generic(pmy_info);
    }
 
   #ifdef DEBUG_LIST_TABLE_GENERIC
@@ -578,10 +579,11 @@ int insert_last_table_generic(pvoid plist, all_type value, unsi size){
     printf("Memoria preallocata piena\n");
     if((ptable_casted->idx_next) == type_resize_default){
       printf("Cerco di espandere\n");
-      if(!expand_table_fit(plist)) return 0;
+      if(!expand_table_fit_generic()) return 0;
       ptable_casted = (pelem_table_generic) ptable;
       printf("Ridimensionata\n");
      }
+    else return 0;
    }
   pmy_info  = ((ptable_info_generic) ptable) - 1;
   /* salvo l'indirizzo del primo elemento libero */
@@ -604,7 +606,7 @@ int insert_last_table_generic(pvoid plist, all_type value, unsi size){
 
   (pmy_info->n_occupied)++;
   if(!((++(pmy_info->n_insert)) % OCCUP_FREQ)){
-    manage_moving_window(pmy_info);
+    manage_moving_window_generic(pmy_info);
    }
 
   return 1;
@@ -716,11 +718,12 @@ int insert_nth_table_generic(pvoid plist, all_type value, unsi size, unsi n){
   if(idx_void_list == IDX_FINE_LISTA){
     printf("Memoria preallocata piena\n");
     if((ptable_casted->idx_next) == type_resize_default){
-      if(!expand_table_fit(plist)) return 0;
+      if(!expand_table_fit_generic()) return 0;
       pmy_info  = ((ptable_info_generic) ptable) - 1;
       ptable_casted = (pelem_table_generic) ptable;
       printf("Ridimensionata\n");
      }
+    else return 0;
    }
 
   /* salvo l'indirizzo del nuovo elemento e vi salvo il valore preso in input */
@@ -745,7 +748,7 @@ int insert_nth_table_generic(pvoid plist, all_type value, unsi size, unsi n){
   (plist_casted->n_elem)++;
   (pmy_info->n_occupied)++;
   if(!((++(pmy_info->n_insert)) % OCCUP_FREQ)){
-    manage_moving_window(pmy_info);
+    manage_moving_window_generic(pmy_info);
    }
 
   return 1;
@@ -934,9 +937,9 @@ void print_table_generic(){
  }
 
 /* manage_moving_window: gestisce la finestra mobile da cui si calcola l'occupazione media */
-void manage_moving_window(pvoid pinfo_table){
+void manage_moving_window_generic(pvoid pinfo_table){
   ptable_info_generic pmy_info = (ptable_info_generic) pinfo_table;
-  pfloat              pmoving_array = pmy_info->pmoving_window;
+  pdouble             pmoving_array = pmy_info->pmoving_window;
   int i;
   double sum = 0;
   double pfit_var[2];
@@ -966,7 +969,7 @@ void manage_moving_window(pvoid pinfo_table){
  *
  * return: 1 se tutto va bene, 0 altrimenti
  */
-int expand_table_fit(pvoid plist){
+int expand_table_fit_generic(){
   ptable_info_generic pmy_info = ((ptable_info_generic) ptable) - 1;
   pvoid               plist_of_occupations = pmy_info->plist_of_occupations;
   int                 n_elem = get_n_elem(plist_of_occupations), i;
@@ -977,8 +980,7 @@ int expand_table_fit(pvoid plist){
 
   /* se non ho abbastanza dati per fare il fit, aumento la tabella di 3 volte */
   if(n_elem < 5){
-    while(extract_first(plist_of_occupations, (all_type)((pvoid) &pd), 0)){}
-    resize_table_table_generic(plist, 3 * pmy_info->n_entries);
+    resize_table_table_generic(NULL, 3 * pmy_info->n_entries);
     /* printf("Ridimensiono da %u a dim: %u\n",pmy_info->n_entries, 3*pmy_info->n_entries); */
     return 1;
    }
@@ -1011,7 +1013,7 @@ int expand_table_fit(pvoid plist){
     n_entries_bigger = a * pmy_info->n_insert*(1.5+2.5*exp(0.5*(1-(((double)pmy_info->n_insert) / pmy_info->n_entries)))) + b;
     /* printf("Occupazione futura: %f\n", tmp2); */
     printf("Ridimensiono da %u a dim: %f\n",pmy_info->n_entries, n_entries_bigger);
-    return resize_table_table_generic(plist, n_entries_bigger);
+    return resize_table_table_generic(NULL, n_entries_bigger);
    }
   return 0;
  }
