@@ -764,6 +764,11 @@ int insert_nth_table_array_BASETYPE(pvoid plist, all_type value, unsi size, unsi
   if(n == (plist_casted->n_elem + 1)) return insert_last(plist, value, size);
   if(n == 1) return insert_first(plist, value, size);
 
+  if(idx_void_list == IDX_FINE_LISTA){
+    printf("Memoria preallocata piena\n");
+    return 0;
+   }
+
   /* salvo l'indirizzo del nuovo elemento e vi salvo il valore preso in input */
   pnew_elem = GET_NEXT_ELEM(ptable, idx_void_list);
   memcpy(pnew_elem, value.pv, sizeof_array);

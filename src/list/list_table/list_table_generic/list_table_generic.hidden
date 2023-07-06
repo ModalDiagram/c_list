@@ -7,6 +7,9 @@
 #define IDX_FINE_LISTA 0
 #endif /* ifndef IDX_FINE_LISTA */
 
+#define DIM_MOVING_WINDOW 5
+#define MIN_OCCUP_FREQ 10
+
 /* FUNZIONAMENTO
  * E' piu' veloce della lista_leggera perche' lavoriamo con una tabella e i suoi
  * indici invece che con puntatori ad elementi.
@@ -109,8 +112,12 @@ typedef elem_table_generic* pelem_table_generic;
  * */
 typedef struct _table_info_generic{
   pvoid plist_of_lists;
-  pvoid plist_of_occupation;
-  unsi n_insert;
+  pvoid plist_of_occupations;
+  float pmoving_window[DIM_MOVING_WINDOW];
+  unsi  idx_moving_window;
+  unsi  occup_freq; /* la frequenza con cui calcolare la media mobile dipende da quanto
+                       e' grande la tabella */
+  unsi  n_insert;
   unsi n_entries;
   unsi n_occupied;
  } table_info_generic;
@@ -139,5 +146,9 @@ void print_table_generic();
 int copy_list_generic(pelem_table_generic ptable_dest, punsi pidx_void_list_dest,
                       pelem_table_generic ptable_orig, punsi pidx_void_list_orig,
                       unsi idx_start);
+
+void manage_moving_window(pvoid pinfo_table);
+
+int expand_table_fit(pvoid plist);
 
 #endif

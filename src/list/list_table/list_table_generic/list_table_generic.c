@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "./../../../util/defines_typedef.h"
 #include "./../../list.h"
 #include "list_table_generic.hidden"
@@ -96,7 +97,10 @@ pvoid malloc_list_specify_table_table_generic(unsi dim_array, type_resize type_r
   pfirst_elem_of_new_list->idx_next = IDX_FINE_LISTA;
 
   (pmy_info->n_occupied)++;
-  (pmy_info->n_insert)++;
+  if(!((++(pmy_info->n_insert)) % pmy_info->occup_freq)){
+    manage_moving_window(pmy_info);
+   }
+
 
   #ifdef DEBUG_LIST_TABLE_GENERIC
   printf("---- DEBUG MALLOC ----\n");
@@ -135,7 +139,16 @@ pvoid create_table_generic(type_resize type_resize, unsi dim)
     return 0;
    }
 
+  if((ptable_and_elem->plist_of_occupations = malloc_list(type_list_dynamic, "DOUBLE", 2)) == NULL){
+    free(ptable_and_elem->plist_of_lists);
+    free(ptable_and_elem);
+    return 0;
+   }
+
   ptable_and_elem->n_entries = dim;
+  ptable_and_elem->occup_freq = dim / 10;
+  if(ptable_and_elem->occup_freq < MIN_OCCUP_FREQ) ptable_and_elem->occup_freq = MIN_OCCUP_FREQ;
+  printf("Frequenza di calcolo occupazione: %u\n", ptable_and_elem->occup_freq);
   ptable_and_elem->n_occupied = 0;
 
   ptable = ((pchar) ptable_and_elem) + sizeof(table_info_generic);
@@ -280,6 +293,7 @@ int resize_table_table_generic(pvoid plist, unsi n_entries){
     pelem_moving->idx_next = IDX_FINE_LISTA;
 
     /* STEP 4 */
+    pnew_table_start->idx_next = ((pelem_table_generic) ptable)->idx_next;
     ptable_and_elem->n_entries = n_entries;
     ptable_and_elem->n_occupied = pmy_info->n_occupied;
     free(pmy_info);
@@ -415,6 +429,7 @@ void free_list_table_generic(pvoid plist){
 int insert_first_table_generic(pvoid plist, all_type value, unsi size){
   pelem_table_generic pfirst_free_elem;
   plist_table_generic plist_casted = (plist_table_generic) plist;
+  ptable_info_generic pmy_info = ((ptable_info_generic) ptable) - 1;
   int                 int_tmp;
 
   /* se la lista ha 0 elementi ha gia' uno spazio nella tabella
@@ -449,8 +464,10 @@ int insert_first_table_generic(pvoid plist, all_type value, unsi size){
   /* STEP 4 */
   idx_void_list = int_tmp;
 
-  ((((ptable_info_generic)ptable)-1)->n_occupied)++;
-  ((((ptable_info_generic)ptable)-1)->n_insert)++;
+  (pmy_info->n_occupied)++;
+  if(!((++(pmy_info->n_insert)) % pmy_info->occup_freq)){
+    manage_moving_window(pmy_info);
+   }
 
   #ifdef DEBUG_LIST_TABLE_GENERIC
   printf("---- DEBUG INSERT_FIRST ----\n");
@@ -534,8 +551,9 @@ int extract_first_table_generic(pvoid plist, all_type pvalue, punsi psize){
  * - insert_last(mia_lista_generic, (all_type)((pvoid)&var_da_inserire), sizeof(var_da_inserire))
  * */
 int insert_last_table_generic(pvoid plist, all_type value, unsi size){
-  pelem_table_generic pfirst_free_elem;
+  pelem_table_generic pfirst_free_elem, ptable_casted = (pelem_table_generic) ptable;
   plist_table_generic plist_casted = (plist_table_generic) plist;
+  ptable_info_generic pmy_info  = ((ptable_info_generic) ptable) - 1;
 
   /* se la lista ha 0 elementi ha gia' uno spazio nella tabella
    * ma con paddr e size vuoti, quindi e' sufficiente che scriva li' */
@@ -549,17 +567,22 @@ int insert_last_table_generic(pvoid plist, all_type value, unsi size){
 
   if(idx_void_list == IDX_FINE_LISTA){
     printf("Memoria preallocata piena\n");
-    return 0;
+    if((ptable_casted->idx_next) == type_resize_default){
+      if(!expand_table_fit(plist)) return 0;
+      pmy_info  = ((ptable_info_generic) ptable) - 1;
+      ptable_casted = (pelem_table_generic) ptable;
+      printf("Ridimensionata\n");
+     }
    }
   /* salvo l'indirizzo del primo elemento libero */
-  pfirst_free_elem = ((pelem_table_generic) ptable) + idx_void_list;
+  pfirst_free_elem = ptable_casted + idx_void_list;
 
   /* salvo le informazioni prese in input nell'elemento */
   if((pfirst_free_elem->paddr = malloc(size)) == NULL) return 0;
   memcpy(pfirst_free_elem->paddr,value.pv,(pfirst_free_elem->size)=size);
 
   /* aggiorno l'idx_next del penultimo elemento nell'indice del nuovo elemento */
-  (((pelem_table_generic) ptable) + (plist_casted->idx_end))->idx_next = idx_void_list;
+  (ptable_casted + (plist_casted->idx_end))->idx_next = idx_void_list;
 
   /* aggiorno le informazioni sulla lista */
   plist_casted->idx_end = idx_void_list;
@@ -569,7 +592,10 @@ int insert_last_table_generic(pvoid plist, all_type value, unsi size){
   idx_void_list = pfirst_free_elem->idx_next;
   pfirst_free_elem->idx_next = IDX_FINE_LISTA;
 
-  ((((ptable_info_generic)ptable)-1)->n_occupied)++;
+  (pmy_info->n_occupied)++;
+  if(!((++(pmy_info->n_insert)) % pmy_info->occup_freq)){
+    manage_moving_window(pmy_info);
+   }
 
   return 1;
  }
@@ -664,11 +690,17 @@ int insert_nth_table_generic(pvoid plist, all_type value, unsi size, unsi n){
   plist_table_generic plist_casted = (plist_table_generic) plist;
   pelem_table_generic pnew_elem, pelem_moving, ptable_casted = (pelem_table_generic) ptable;
   int                  int_tmp, i;
+  ptable_info_generic pmy_info  = ((ptable_info_generic) ptable) - 1;
 
   /* gestisco casi particolari */
   if(n > (plist_casted->n_elem + 1)) return 0;
   if(n == (plist_casted->n_elem + 1)) return insert_last(plist, value, size);
   if(n == 1) return insert_first(plist, value, size);
+
+  if(idx_void_list == IDX_FINE_LISTA){
+    printf("Memoria preallocata piena\n");
+    return 0;
+   }
 
   /* salvo l'indirizzo del nuovo elemento e vi salvo il valore preso in input */
   pnew_elem = ptable_casted + idx_void_list;
@@ -690,12 +722,15 @@ int insert_nth_table_generic(pvoid plist, all_type value, unsi size, unsi n){
   idx_void_list = int_tmp;
 
   (plist_casted->n_elem)++;
-  ((((ptable_info_generic)ptable)-1)->n_occupied)++;
+  (pmy_info->n_occupied)++;
+  if(!((++(pmy_info->n_insert)) % pmy_info->occup_freq)){
+    manage_moving_window(pmy_info);
+   }
 
   return 1;
  }
 
-/* extract_first: estrae l'elemento all'n-esima posizione della lista
+/* extract_nth: estrae l'elemento all'n-esima posizione della lista
  * plist:         lista da cui estrarre l'elemento
  * pvalue:        indirizzo in cui verra' scritto rispettivamente:
  *                - type_data_generic: indirizzo dell'elemento estratto
@@ -873,4 +908,70 @@ void print_table_generic(){
     pelem_moving = ((pelem_table_generic) ptable) + i;
     printf("%d -> %d\n", i, pelem_moving->idx_next);
   }
+ }
+
+void manage_moving_window(pvoid pinfo_table){
+  ptable_info_generic pmy_info = (ptable_info_generic) pinfo_table;
+  pfloat              pmoving_array = pmy_info->pmoving_window;
+  int i;
+  double sum = 0;
+  double pfit_var[2];
+
+  /* printf("aggiungo elemento ad array\n"); */
+  pmoving_array[(pmy_info->idx_moving_window)++ % DIM_MOVING_WINDOW] = ((float) pmy_info->n_occupied) / pmy_info->n_entries;
+  if((pmy_info->idx_moving_window) >= DIM_MOVING_WINDOW){
+    /* printf("Calcolo media mobile\n"); */
+    for (i = 0; i < DIM_MOVING_WINDOW; i++) {
+      sum += pmoving_array[i];
+     }
+    pfit_var[0] = pmy_info->n_insert;
+    pfit_var[1] = sum / DIM_MOVING_WINDOW;
+    insert_last(pmy_info->plist_of_occupations, (all_type) ((pvoid) pfit_var), 0);
+    /* printf("aggiunta media di occupazione: %f\n", sum / DIM_MOVING_WINDOW); */
+   }
+  return;
+ }
+
+/* expand_table_fit: calcola con un fit parabolico di quanto dovrebbe crescere la tabella
+ *                   e la ridimensiona
+ *
+ * return: 1 se tutto va bene, 0 altrimenti
+ */
+int expand_table_fit(pvoid plist){
+  ptable_info_generic pmy_info = ((ptable_info_generic) ptable) - 1;
+  pvoid plist_of_occupations = pmy_info->plist_of_occupations;
+  int n_elem = get_n_elem(plist_of_occupations), i;
+  double x, y, sumx=0, sumy=0, sumxy=0, sumx2=0;
+  double a,b;
+  double* pd;
+  double n_entries_bigger;
+
+
+  printf("n_elem %d\n", n_elem);
+  if(n_elem < 5){
+    resize_table_table_generic(plist, 2 * pmy_info->n_entries);
+    return 1;
+   }
+  else{
+    for (i = 1; i <= n_elem; i++) {
+      extract_first(plist_of_occupations, (all_type)((pvoid)&pd), 0);
+      insert_last(plist_of_occupations, (all_type)((pvoid) pd), 0);
+      x = pd[0];
+      y = pd[1];
+      /* printf("x %f, y %f\n", x, y); */
+      sumx += x;
+      sumy += y;
+      sumxy += x * y;
+      sumx2 += x * x;
+    }
+    a = (n_elem*sumxy - sumx*sumy) / (n_elem * sumx2 - sumx * sumx);
+    b = (sumy * sumx2 - sumx * sumxy) / (n_elem * sumx2 - sumx * sumx);
+    /* printf("Coefficienti a %f b %f\n", a, b); */
+    /* printf("Fattore %f\n", tmp1); */
+    n_entries_bigger =  pmy_info->n_entries * (a * pmy_info->n_insert*(1.5+2.5*exp(0.5*(1-(((double)pmy_info->n_insert) / pmy_info->n_entries)))) + b);
+    /* printf("Occupazione futura: %f\n", tmp2); */
+    printf("Ridimensiono da %u a dim: %f\n",pmy_info->n_entries, n_entries_bigger);
+    return resize_table_table_generic(plist, n_entries_bigger);
+   }
+  return 0;
  }
