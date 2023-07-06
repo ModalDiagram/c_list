@@ -103,8 +103,12 @@ int extract_first_dynamic_generic(pvoid plist, all_type pvalue, punsi psize){
   pelem_to_remove = plist_casted->pstart;
   plist_casted->pstart = pelem_to_remove->pnext;
 
-  *ppvalue_input = pelem_to_remove->paddr;
-  *psize = pelem_to_remove->size;
+  if(ppvalue_input != NULL){
+    *ppvalue_input = pelem_to_remove->paddr;
+   }
+  if(psize != NULL){
+    *psize = pelem_to_remove->size;
+   }
   free(pelem_to_remove);
 
   if(!(--(plist_casted->n_elem))) plist_casted->pend = NULL;
@@ -188,8 +192,12 @@ int extract_last_dynamic_generic(pvoid plist, all_type pvalue, punsi psize){
    }
 
   /* restituisco il valore estratto e libero l'elemento */
-  *ppvalue_input = pelem_moving->paddr;
-  *psize = pelem_moving->size;
+  if(ppvalue_input != NULL){
+    *ppvalue_input = pelem_moving->paddr;
+   }
+  if(psize != NULL){
+    *psize = pelem_moving->size;
+   }
   free(pelem_moving);
   /* cambio il pnext del penultimo solo se questo e' diverso da NULL (che e'
    * il caso in cui la lista ha un solo elemento) */
@@ -302,8 +310,12 @@ int extract_nth_dynamic_generic(pvoid plist, all_type pvalue, punsi psize, unsi 
   pelem_to_extract = pelem_moving->pnext;
 
   /* restituisco il valore contenuto in pelem_to_extract */
-  *ppvalue_input = pelem_to_extract->paddr;
-  *psize = pelem_to_extract->size;
+  if(ppvalue_input != NULL){
+    *ppvalue_input = pelem_to_extract->paddr;
+   }
+  if(psize != NULL){
+    *psize = pelem_to_extract->size;
+   }
 
   /* sposto il puntatore dell'(n-1)-esimo elemento e libero l'n-esimo */
   pelem_moving->pnext = pelem_to_extract->pnext;

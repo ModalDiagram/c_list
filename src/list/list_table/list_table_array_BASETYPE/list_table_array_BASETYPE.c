@@ -581,8 +581,10 @@ int extract_first_table_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize
   pelem_to_extract = GET_NEXT_ELEM(ptable, plist_casted->idx_start);
 
   /* STEP 2 */
-  if((*ppvalue_input = malloc(sizeof_array)) == NULL) return 0;
-  memcpy(*ppvalue_input, pelem_to_extract, sizeof_array);
+  if(ppvalue_input != NULL){
+    if((*ppvalue_input = malloc(sizeof_array)) == NULL) return 0;
+    memcpy(*ppvalue_input, pelem_to_extract, sizeof_array);
+   }
 
   /* se la lista ha 1 solo elemento non devo liberare lo spazio (ogni lista
    * ha almeno uno spazio), ma basta decrementare il n_elem,
@@ -703,8 +705,10 @@ int extract_last_table_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize)
    * sara' sovrascritti essendo n_elem==0 */
   pelem_moving = GET_NEXT_ELEM(ptable, plist_casted->idx_start);
   if(plist_casted->n_elem == 1){
-    if((*ppvalue_input = malloc(sizeof_array)) == NULL) return 0;
-    memcpy(*ppvalue_input, pelem_moving, sizeof_array);
+    if(ppvalue_input != NULL){
+      if((*ppvalue_input = malloc(sizeof_array)) == NULL) return 0;
+      memcpy(*ppvalue_input, pelem_moving, sizeof_array);
+     }
     (plist_casted->n_elem)--;
     return 1;
    }
@@ -720,8 +724,10 @@ int extract_last_table_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize)
   GET_IDX_NEXT(GET_NEXT_ELEM(ptable, idx_current)) = IDX_FINE_LISTA;
 
   /* restituisco il valore estratto */
-  if((*ppvalue_input = malloc(sizeof_array)) == NULL) return 0;
-  memcpy(*ppvalue_input, pelem_moving, sizeof_array);
+  if(ppvalue_input != NULL){
+    if((*ppvalue_input = malloc(sizeof_array)) == NULL) return 0;
+    memcpy(*ppvalue_input, pelem_moving, sizeof_array);
+   }
 
   /* metto l'ultimo elemento in cima alla lista dei vuoti */
   GET_IDX_NEXT(pelem_moving) = idx_void_list;
@@ -839,8 +845,10 @@ int extract_nth_table_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize, 
   pelem_to_extract = GET_NEXT_ELEM(ptable, GET_IDX_NEXT(pelem_moving));
 
   /* restituisco il valore contenuto in pelem_to_extract */
-  if((*ppvalue_input = malloc(sizeof_array)) == NULL) return 0;
-  memcpy(*ppvalue_input, pelem_to_extract, sizeof_array);
+  if(ppvalue_input != NULL){
+    if((*ppvalue_input = malloc(sizeof_array)) == NULL) return 0;
+    memcpy(*ppvalue_input, pelem_to_extract, sizeof_array);
+   }
   int_tmp = GET_IDX_NEXT(pelem_to_extract);
 
   /* cambio l'idx_next di pelem_to_extract in modo che diventi il primo elemento della void_list */

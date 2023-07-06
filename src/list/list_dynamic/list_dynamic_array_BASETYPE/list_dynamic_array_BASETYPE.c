@@ -117,8 +117,10 @@ int extract_first_dynamic_array_BASETYPE(pvoid plist, all_type pvalue, punsi psi
   pelem_to_remove = plist_casted->pstart;
   plist_casted->pstart = GET_PNEXT(pelem_to_remove);
 
-  if((*ppvalue_input = malloc(sizeof_array)) == NULL) return 0;
-  memcpy(*ppvalue_input, pelem_to_remove, sizeof_array);
+  if(ppvalue_input != NULL){
+    if((*ppvalue_input = malloc(sizeof_array)) == NULL) return 0;
+    memcpy(*ppvalue_input, pelem_to_remove, sizeof_array);
+   }
   free(pelem_to_remove);
 
   if(!(--(plist_casted->n_elem))) plist_casted->pend = NULL;
@@ -196,8 +198,10 @@ int extract_last_dynamic_array_BASETYPE(pvoid plist, all_type pvalue, punsi psiz
    }
 
   /* restituisco il valore estratto e libero l'elemento */
-  if((*ppvalue_input = malloc(sizeof_array)) == NULL) return 0;
-  memcpy(*ppvalue_input, pelem_moving, sizeof_array);
+  if(ppvalue_input != NULL){
+    if((*ppvalue_input = malloc(sizeof_array)) == NULL) return 0;
+    memcpy(*ppvalue_input, pelem_moving, sizeof_array);
+   }
 
   free(pelem_moving);
   /* cambio il pnext del penultimo solo se questo e' diverso da NULL (che e'
@@ -308,8 +312,10 @@ int extract_nth_dynamic_array_BASETYPE(pvoid plist, all_type pvalue, punsi psize
   pelem_to_extract = GET_PNEXT(pelem_moving);
 
   /* restituisco il valore contenuto in pelem_to_extract */
-  if((*ppvalue_input = malloc(sizeof_array)) == NULL) return 0;
-  memcpy(*ppvalue_input, pelem_to_extract, sizeof_array);
+  if(ppvalue_input != NULL){
+    if((*ppvalue_input = malloc(sizeof_array)) == NULL) return 0;
+    memcpy(*ppvalue_input, pelem_to_extract, sizeof_array);
+   }
 
   /* sposto il puntatore dell'(n-1)-esimo elemento e libero l'n-esimo */
   GET_PNEXT(pelem_moving) = GET_PNEXT(pelem_to_extract);

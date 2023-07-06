@@ -465,7 +465,9 @@ int extract_first_table_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
   pelem_to_extract = ((pelem_table_BASETYPE) ptable) + plist_casted->idx_start;
 
   /* STEP 2 */
-  *pvalue_input = pelem_to_extract->val;
+  if(pvalue_input != NULL){
+    *pvalue_input = pelem_to_extract->val;
+   }
 
   /* se la lista ha 1 solo elemento non devo liberare lo spazio (ogni lista
    * ha almeno uno spazio), ma basta decrementare il n_elem,
@@ -579,7 +581,9 @@ int extract_last_table_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
    * sara' sovrascritti essendo n_elem==0 */
   pelem_moving = ptable_casted + plist_casted->idx_start;
   if(plist_casted->n_elem == 1){
-    *pvalue_input = pelem_moving->val;
+    if(pvalue_input != NULL){
+      *pvalue_input = pelem_moving->val;
+     }
     (plist_casted->n_elem)--;
     return 1;
    }
@@ -595,7 +599,9 @@ int extract_last_table_BASETYPE(pvoid plist, all_type pvalue, punsi psize){
   (ptable_casted + idx_current)->idx_next = IDX_FINE_LISTA;
 
   /* restituisco il valore estratto */
-  *pvalue_input = pelem_moving->val;
+  if(pvalue_input != NULL){
+    *pvalue_input = pelem_moving->val;
+   }
 
   /* metto l'ultimo elemento in cima alla lista dei vuoti */
   (pelem_moving->idx_next) = idx_void_list;
@@ -708,7 +714,9 @@ int extract_nth_table_BASETYPE(pvoid plist, all_type pvalue, punsi psize, unsi n
   pelem_to_extract = ptable_casted + pelem_moving->idx_next;
 
   /* restituisco il valore contenuto in pelem_to_extract */
-  *pvalue_input = pelem_to_extract->val;
+  if(pvalue_input != NULL){
+    *pvalue_input = pelem_to_extract->val;
+   }
   int_tmp = pelem_to_extract->idx_next;
 
   /* cambio l'idx_next di pelem_to_extract in modo che diventi il primo elemento della void_list */
