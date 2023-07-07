@@ -153,7 +153,6 @@ pvoid create_table_generic(type_resize type_resize, unsi dim)
 
   ptable_and_elem->n_entries = dim;
   ptable_and_elem->n_occupied = 0;
-  ptable_and_elem->idx_moving_window = 0;
 
   ptable = ((pchar) ptable_and_elem) + sizeof(table_info_generic);
   pelem_tmp = (pelem_table_generic) ptable;
@@ -233,10 +232,9 @@ int resize_table_table_generic(pvoid plist, unsi n_entries){
 
     /* svuoto la lista contenente le medie dell'occupazione perche' le calcoliamo
      * per ciascuna tabella separatamente */
-    while(extract_first(ptable_and_elem->plist_of_occupations, (all_type)NULL, NULL)){}
+    /* while(extract_first(ptable_and_elem->plist_of_occupations, (all_type)NULL, NULL)){} */
     ptable_and_elem->n_entries = n_entries;
-    ptable_and_elem->n_insert = pmy_info->n_entries;
-    ptable_and_elem->idx_moving_window = 0;
+    /* ptable_and_elem->n_insert = pmy_info->n_entries; */
     pnew_table_start = (pelem_table_generic)(ptable_and_elem + 1);
 
     /* collego tutti i nuovi elementi con una lista che termina all'inizio della lista dei vuoti */
@@ -307,14 +305,14 @@ int resize_table_table_generic(pvoid plist, unsi n_entries){
     /* STEP 4 */
     /* aggiorno info */
     pnew_table_start->idx_next = ((pelem_table_generic) ptable)->idx_next;
-    ptable_and_elem->idx_moving_window = 0;
     ptable_and_elem->n_entries = n_entries;
     ptable_and_elem->n_occupied = pmy_info->n_occupied;
-    ptable_and_elem->n_insert = pmy_info->n_entries;
+    ptable_and_elem->n_insert = pmy_info->n_insert;
+    memcpy(ptable_and_elem->pmoving_window, pmy_info->pmoving_window, sizeof(double)*DIM_MOVING_WINDOW);
     ptable_and_elem->plist_of_occupations = pmy_info->plist_of_occupations;
     /* svuoto la lista contenente le medie dell'occupazione perche' le calcoliamo
      * per ciascuna tabella separatamente */
-    while(extract_first(ptable_and_elem->plist_of_occupations, (all_type)NULL, NULL)){}
+    /* while(extract_first(ptable_and_elem->plist_of_occupations, (all_type)NULL, NULL)){} */
     /* libero la vecchia tabella */
     free(pmy_info);
     ptable = (pvoid) (ptable_and_elem + 1);
@@ -977,7 +975,7 @@ void manage_moving_window_generic(pvoid pinfo_table){
   int i;
   double sum = 0;
   double pfit_var[2];
-  unsi   my_idx = pmy_info->idx_moving_window;
+  unsi   my_idx = (pmy_info->n_insert) / OCCUP_FREQ;
 
   /* l'array con l'indice che scorre simula una coda. L'indice aumenta di 1 ogni volta
    * che viene chiamata questa funzione e mi muovo lungo l'array. Non esco dalla zona
@@ -995,7 +993,6 @@ void manage_moving_window_generic(pvoid pinfo_table){
     /* printf("Calcolo media mobile %f\n", sum /DIM_MOVING_WINDOW); */
     /* printf("aggiunta media di occupazione: %f\n", sum / DIM_MOVING_WINDOW); */
    }
-  (pmy_info->idx_moving_window)++;
   return;
  }
 
@@ -1015,9 +1012,8 @@ int expand_table_fit_generic(){
 
   /* se non ho abbastanza dati per fare il fit, aumento la tabella di 3 volte */
   if(n_elem < 5){
-    resize_table_table_generic(NULL, 3 * pmy_info->n_entries);
     /* printf("Ridimensiono da %u a dim: %u\n",pmy_info->n_entries, 3*pmy_info->n_entries); */
-    return 1;
+    return resize_table_table_generic(NULL, 3 * pmy_info->n_entries);
    }
   /* se ho abbastanza dati faccio fit */
   else{
@@ -1029,6 +1025,7 @@ int expand_table_fit_generic(){
       sumy += y;
       sumxy += x * y;
       sumx2 += x * x;
+      insert_last(plist_of_occupations, (all_type)((pvoid) pd), 0);
     }
     /* a e b sono i coefficienti della retta
      * occupaz% = a * n_insert + b
@@ -1047,9 +1044,13 @@ int expand_table_fit_generic(){
     n_entries_bigger = a * (pmy_info->n_insert) *3 + b;
     /* printf("Occupazione futura: %f\n", tmp2); */
     #ifdef DEBUG_LIST_TABLE_GENERIC
+    printf("Dati utilizzati: %u\n", n_elem);
     printf("Coefficienti del fit a %f b %f\n", a, b);
     printf("Ridimensiono da %u a dim: %f\n",pmy_info->n_entries, n_entries_bigger);
     #endif
+    if(n_entries_bigger < pmy_info->n_entries){
+      return resize_table_table_generic(NULL, 3 * pmy_info->n_entries);
+     }
     return resize_table_table_generic(NULL, n_entries_bigger);
    }
   return 0;

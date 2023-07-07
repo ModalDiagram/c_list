@@ -107,7 +107,6 @@ typedef struct _table_info_BASETYPE{
   pvoid plist_of_lists;
   pvoid plist_of_occupations;
   double pmoving_window[DIM_MOVING_WINDOW];
-  unsi idx_moving_window;
   unsi  n_insert;
   unsi n_entries;
   unsi n_occupied;

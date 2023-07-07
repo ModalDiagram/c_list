@@ -6,7 +6,7 @@
 #include "list_table_array_BASETYPE.hidden"
 #include "list_table_array_BASETYPE.h"
 
-#define DEBUG_LIST_TABLE_ARRAY_BASETYPE
+/* #define DEBUG_LIST_TABLE_ARRAY_BASETYPE */
 
 #define GET_IDX_NEXT(pvalue) (*((punsi)(((pchar)( pvalue ))+sizeof_array)))
 #define GET_NEXT_ELEM(pvalue, i) (((pchar) pvalue ) + (sizeof_array + sizeof(unsi))* i)
@@ -223,7 +223,6 @@ pvoid create_table_array_BASETYPE(unsi sizeof_array, type_resize type_resize, un
   pinfo_new_table->idx_void_list = 1;
   pinfo_new_table->n_occupied = 0;
   pinfo_new_table->n_entries = dim;
-  pinfo_new_table->idx_moving_window = 0;
   ptable = pinfo_new_table + 1;
   pelem_tmp = ptable;
   GET_IDX_NEXT(pelem_tmp) = type_resize;
@@ -303,10 +302,9 @@ int resize_table_table_array_BASETYPE(pvoid plist, unsi n_entries){
 
     /* svuoto la lista contenente le medie dell'occupazione perche' le calcoliamo
      * per ciascuna tabella separatamente */
-    while(extract_first(ptable_and_elem->plist_of_occupations, (all_type)NULL, NULL)){}
+    /* while(extract_first(ptable_and_elem->plist_of_occupations, (all_type)NULL, NULL)){} */
     ptable_and_elem->n_entries = n_entries;
-    ptable_and_elem->n_insert = pmy_info->n_entries;
-    ptable_and_elem->idx_moving_window = 0;
+    /* ptable_and_elem->n_insert = pmy_info->n_entries; */
     pnew_table_start = (pvoid)(ptable_and_elem + 1);
 
     /* collego tutti i nuovi elementi con una lista che termina all'inizio della lista dei vuoti */
@@ -402,15 +400,15 @@ int resize_table_table_array_BASETYPE(pvoid plist, unsi n_entries){
     /* aggiorno info */
     ptable_and_elem->sizeof_array = sizeof_array;
     ptable_and_elem->n_entries = n_entries;
-    ptable_and_elem->idx_moving_window = 0;
     ptable_and_elem->n_occupied = pmy_info->n_occupied;
     ptable_and_elem->plist_of_lists = pmy_info->plist_of_lists;
     ptable_and_elem->idx_void_list = new_idx_void;
-    ptable_and_elem->n_insert = pmy_info->n_entries;
+    ptable_and_elem->n_insert = pmy_info->n_insert;
+    memcpy(ptable_and_elem->pmoving_window, pmy_info->pmoving_window, sizeof(double)*DIM_MOVING_WINDOW);
     ptable_and_elem->plist_of_occupations = pmy_info->plist_of_occupations;
     /* svuoto la lista contenente le medie dell'occupazione perche' le calcoliamo
      * per ciascuna tabella separatamente */
-    while(extract_first(ptable_and_elem->plist_of_occupations, (all_type)NULL, NULL)){}
+    /* while(extract_first(ptable_and_elem->plist_of_occupations, (all_type)NULL, NULL)){} */
 
     /* devo aggiungere la nuova tabella alla lista di tabelle e rimuovere quella vecchia */
     while(extract_first(pptables, (all_type)((pvoid)&ptable_extracted), 0)){
@@ -1097,14 +1095,11 @@ void manage_moving_window_array_BASETYPE(pvoid pinfo_table){
   int                        i;
   double                     sum = 0;
   double                     pfit_var[2];
-  unsi                       my_idx = pmy_info->idx_moving_window;
+  unsi                       my_idx = pmy_info->n_insert / OCCUP_FREQ;
 
   /* l'array con l'indice che scorre simula una coda. L'indice aumenta di 1 ogni volta
    * che viene chiamata questa funzione e mi muovo lungo l'array. Non esco dalla zona
    * di memoria perche' prendo il resto */
-  #ifdef DEBUG_LIST_TABLE_ARRAY_BASETYPE
-  printf("aggiungo all'array\n");
-  #endif
   pmoving_array[my_idx % DIM_MOVING_WINDOW] = (double) pmy_info->n_occupied;
   /* se l'array e' pieno calcolo la media e la salvo in plist_of_occupations
    * assieme al n_insert attuale */
@@ -1112,16 +1107,12 @@ void manage_moving_window_array_BASETYPE(pvoid pinfo_table){
     for (i = 0; i < DIM_MOVING_WINDOW; i++) {
       sum += pmoving_array[i];
      }
-    #ifdef DEBUG_LIST_TABLE_ARRAY_BASETYPE
-    printf("aggiungo alla lista\n");
-    #endif
     pfit_var[0] = pmy_info->n_insert;
     pfit_var[1] = sum / DIM_MOVING_WINDOW;
     insert_last(pmy_info->plist_of_occupations, (all_type) ((pvoid)pfit_var), 0);
     /* printf("Calcolo media mobile %f\n", sum /DIM_MOVING_WINDOW); */
     /* printf("aggiunta media di occupazione: %f\n", sum / DIM_MOVING_WINDOW); */
    }
-  (pmy_info->idx_moving_window)++;
   return;
  }
 
@@ -1143,9 +1134,8 @@ int expand_table_fit_array_BASETYPE(plist_table_array_BASETYPE plist){
 
   /* se non ho abbastanza dati per fare il fit, aumento la tabella di 3 volte */
   if(n_elem < 5){
-    resize_table_table_array_BASETYPE(plist, 3 * pmy_info->n_entries);
     /* printf("Ridimensiono da %u a dim: %u\n",pmy_info->n_entries, 3*pmy_info->n_entries); */
-    return 1;
+    return resize_table_table_array_BASETYPE(plist, 3 * pmy_info->n_entries);
    }
   /* se ho abbastanza dati faccio fit */
   else{
@@ -1157,6 +1147,7 @@ int expand_table_fit_array_BASETYPE(plist_table_array_BASETYPE plist){
       sumy += y;
       sumxy += x * y;
       sumx2 += x * x;
+      insert_last(plist_of_occupations, (all_type) ((pvoid)pd), 0);
     }
     /* a e b sono i coefficienti della retta
      * occupaz% = a * n_insert + b
@@ -1176,9 +1167,13 @@ int expand_table_fit_array_BASETYPE(plist_table_array_BASETYPE plist){
     n_entries_bigger = a * (pmy_info->n_insert)*3 + b;
     /* printf("Occupazione futura: %f\n", tmp2); */
     #ifdef DEBUG_LIST_TABLE_ARRAY_BASETYPE
+    printf("Dati utilizzati: %u\n", n_elem);
     printf("Coefficienti del fit a %f b %f\n", a, b);
     printf("Ridimensiono da %u a dim: %f\n",pmy_info->n_entries, n_entries_bigger);
     #endif
+    if(n_entries_bigger < pmy_info->n_entries){
+      return resize_table_table_array_BASETYPE(plist, 3 * pmy_info->n_entries);
+     }
     return resize_table_table_array_BASETYPE(plist, n_entries_bigger);
    }
   return 0;

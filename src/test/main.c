@@ -156,7 +156,7 @@ void test_table_generic(){
   int i;
   unsi size, tot, occupied;
 
-  if((plist= malloc_list_specify_table("FLOAT", 3, type_resize_default, 1000)) == NULL) printf("Non creata.\n");
+  if((plist= malloc_list_specify_table("GENERIC", 3, type_resize_default, 2000)) == NULL) printf("Non creata.\n");
   /* f=9; */
   /* if((insert_last(plistdue, (all_type)((pvoid)&f), sizeof(float))) == 0) printf("non aggiunto\n"); */
   /* f=99; */
@@ -177,16 +177,6 @@ void test_table_generic(){
   /* printf("Estratto %f con size %u\n", *pf, size); */
   /* get_info_table(plist, &tot, &occupied); */
   /* printf("Totali: %u, occupati: %u\n", tot, occupied); */
-  for (i = 0; i<1100; i++) {
-    /* if(i%2){ */
-    /*   extract_last(plist, (all_type)((pvoid)&pf), &size); */
-    /*  } */
-    /* if(i%3){ */
-    /*   extract_last(plist, (all_type)((pvoid)&pf), &size); */
-    /*  } */
-    insert_last(plist, (all_type)((pvoid)pf), sizeof(float));
-   }
-  resize_table(plist, 2000);
   for (i = 0; i<700; i++) {
     /* if(i%2){ */
     /*   extract_last(plist, (all_type)((pvoid)&pf), &size); */
@@ -194,7 +184,17 @@ void test_table_generic(){
     /* if(i%3){ */
     /*   extract_last(plist, (all_type)((pvoid)&pf), &size); */
     /*  } */
-    insert_last(plist, (all_type)((pvoid)pf), sizeof(float));
+    insert_last(plist, (all_type)((pvoid)&f), sizeof(float));
+   }
+  resize_table(plist, 900);
+  for (i = 0; i<700; i++) {
+    /* if(i%2){ */
+    /*   extract_last(plist, (all_type)((pvoid)&pf), &size); */
+    /*  } */
+    /* if(i%3){ */
+    /*   extract_last(plist, (all_type)((pvoid)&pf), &size); */
+    /*  } */
+    if((insert_last(plist, (all_type)((pvoid)&f), sizeof(float))) == 0) break;
    }
  }
 
