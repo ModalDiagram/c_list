@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 #include "./../../../util/defines_typedef.h"
 #include "./../../list.h"
 #include "list_table_generic.hidden"
@@ -154,6 +153,7 @@ pvoid create_table_generic(type_resize type_resize, unsi dim)
 
   ptable_and_elem->n_entries = dim;
   ptable_and_elem->n_occupied = 0;
+  ptable_and_elem->idx_moving_window = 0;
 
   ptable = ((pchar) ptable_and_elem) + sizeof(table_info_generic);
   pelem_tmp = (pelem_table_generic) ptable;
@@ -235,7 +235,8 @@ int resize_table_table_generic(pvoid plist, unsi n_entries){
      * per ciascuna tabella separatamente */
     while(extract_first(ptable_and_elem->plist_of_occupations, (all_type)NULL, NULL)){}
     ptable_and_elem->n_entries = n_entries;
-    ptable_and_elem->n_insert = 0;
+    ptable_and_elem->n_insert = pmy_info->n_entries;
+    ptable_and_elem->idx_moving_window = 0;
     pnew_table_start = (pelem_table_generic)(ptable_and_elem + 1);
 
     /* collego tutti i nuovi elementi con una lista che termina all'inizio della lista dei vuoti */
@@ -306,9 +307,10 @@ int resize_table_table_generic(pvoid plist, unsi n_entries){
     /* STEP 4 */
     /* aggiorno info */
     pnew_table_start->idx_next = ((pelem_table_generic) ptable)->idx_next;
+    ptable_and_elem->idx_moving_window = 0;
     ptable_and_elem->n_entries = n_entries;
     ptable_and_elem->n_occupied = pmy_info->n_occupied;
-    ptable_and_elem->n_insert = 0;
+    ptable_and_elem->n_insert = pmy_info->n_entries;
     ptable_and_elem->plist_of_occupations = pmy_info->plist_of_occupations;
     /* svuoto la lista contenente le medie dell'occupazione perche' le calcoliamo
      * per ciascuna tabella separatamente */
@@ -975,7 +977,7 @@ void manage_moving_window_generic(pvoid pinfo_table){
   int i;
   double sum = 0;
   double pfit_var[2];
-  unsi   my_idx = (pmy_info->n_insert / OCCUP_FREQ) - 1;
+  unsi   my_idx = pmy_info->idx_moving_window;
 
   /* l'array con l'indice che scorre simula una coda. L'indice aumenta di 1 ogni volta
    * che viene chiamata questa funzione e mi muovo lungo l'array. Non esco dalla zona
@@ -993,6 +995,7 @@ void manage_moving_window_generic(pvoid pinfo_table){
     /* printf("Calcolo media mobile %f\n", sum /DIM_MOVING_WINDOW); */
     /* printf("aggiunta media di occupazione: %f\n", sum / DIM_MOVING_WINDOW); */
    }
+  (pmy_info->idx_moving_window)++;
   return;
  }
 
@@ -1040,11 +1043,11 @@ int expand_table_fit_generic(){
      * */
     a = (n_elem*sumxy - sumx*sumy) / (n_elem * sumx2 - sumx * sumx);
     b = (sumy * sumx2 - sumx * sumxy) / (n_elem * sumx2 - sumx * sumx);
-    /* printf("Coefficienti a %f b %f\n", a, b); */
     /* printf("Fattore %f\n", tmp1); */
-    n_entries_bigger = a * pmy_info->n_insert*(1.5+2.5*exp(0.5*(1-(((double)pmy_info->n_insert) / pmy_info->n_entries)))) + b;
+    n_entries_bigger = a * (pmy_info->n_insert) *3 + b;
     /* printf("Occupazione futura: %f\n", tmp2); */
     #ifdef DEBUG_LIST_TABLE_GENERIC
+    printf("Coefficienti del fit a %f b %f\n", a, b);
     printf("Ridimensiono da %u a dim: %f\n",pmy_info->n_entries, n_entries_bigger);
     #endif
     return resize_table_table_generic(NULL, n_entries_bigger);

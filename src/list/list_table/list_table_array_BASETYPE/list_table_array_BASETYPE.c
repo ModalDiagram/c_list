@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 #include "./../../../util/defines_typedef.h"
 #include "./../../list.h"
 #include "list_table_array_BASETYPE.hidden"
@@ -214,7 +213,7 @@ pvoid create_table_array_BASETYPE(unsi sizeof_array, type_resize type_resize, un
     return 0;
    }
 
-  if((pinfo_new_table->plist_of_occupations = malloc_list(type_list_dynamic, "DOUBLE", 1)) == NULL){
+  if((pinfo_new_table->plist_of_occupations = malloc_list(type_list_dynamic, "DOUBLE", 2)) == NULL){
     free(pinfo_new_table->plist_of_lists);
     free(pinfo_new_table);
     return 0;
@@ -224,6 +223,7 @@ pvoid create_table_array_BASETYPE(unsi sizeof_array, type_resize type_resize, un
   pinfo_new_table->idx_void_list = 1;
   pinfo_new_table->n_occupied = 0;
   pinfo_new_table->n_entries = dim;
+  pinfo_new_table->idx_moving_window = 0;
   ptable = pinfo_new_table + 1;
   pelem_tmp = ptable;
   GET_IDX_NEXT(pelem_tmp) = type_resize;
@@ -305,7 +305,8 @@ int resize_table_table_array_BASETYPE(pvoid plist, unsi n_entries){
      * per ciascuna tabella separatamente */
     while(extract_first(ptable_and_elem->plist_of_occupations, (all_type)NULL, NULL)){}
     ptable_and_elem->n_entries = n_entries;
-    ptable_and_elem->n_insert = 0;
+    ptable_and_elem->n_insert = pmy_info->n_entries;
+    ptable_and_elem->idx_moving_window = 0;
     pnew_table_start = (pvoid)(ptable_and_elem + 1);
 
     /* collego tutti i nuovi elementi con una lista che termina all'inizio della lista dei vuoti */
@@ -401,10 +402,11 @@ int resize_table_table_array_BASETYPE(pvoid plist, unsi n_entries){
     /* aggiorno info */
     ptable_and_elem->sizeof_array = sizeof_array;
     ptable_and_elem->n_entries = n_entries;
+    ptable_and_elem->idx_moving_window = 0;
     ptable_and_elem->n_occupied = pmy_info->n_occupied;
     ptable_and_elem->plist_of_lists = pmy_info->plist_of_lists;
     ptable_and_elem->idx_void_list = new_idx_void;
-    ptable_and_elem->n_insert = 0;
+    ptable_and_elem->n_insert = pmy_info->n_entries;
     ptable_and_elem->plist_of_occupations = pmy_info->plist_of_occupations;
     /* svuoto la lista contenente le medie dell'occupazione perche' le calcoliamo
      * per ciascuna tabella separatamente */
@@ -714,7 +716,7 @@ int insert_last_table_array_BASETYPE(pvoid plist, all_type value, unsi size){
       printf("Ridimensionata\n");
       #endif
       pmy_info = (ptable_info_array_BASETYPE)(plist_casted->ptable);
-      ptable = (pvoid) pmy_info + 1;
+      ptable = (pvoid) (pmy_info + 1);
       idx_void_list = pmy_info->idx_void_list;
      }
     else return 0;
@@ -864,7 +866,7 @@ int insert_nth_table_array_BASETYPE(pvoid plist, all_type value, unsi size, unsi
     else return 0;
    }
 
-  ptable = (pvoid) pmy_info + 1;
+  ptable = (pvoid) (pmy_info + 1);
   /* salvo l'indirizzo del nuovo elemento e vi salvo il valore preso in input */
   pnew_elem = GET_NEXT_ELEM(ptable, idx_void_list);
   memcpy(pnew_elem, value.pv, sizeof_array);
@@ -1094,11 +1096,15 @@ void manage_moving_window_array_BASETYPE(pvoid pinfo_table){
   pdouble                    pmoving_array = pmy_info->pmoving_window;
   int                        i;
   double                     sum = 0;
-  unsi                       my_idx = (pmy_info->n_insert / OCCUP_FREQ) - 1;
+  double                     pfit_var[2];
+  unsi                       my_idx = pmy_info->idx_moving_window;
 
   /* l'array con l'indice che scorre simula una coda. L'indice aumenta di 1 ogni volta
    * che viene chiamata questa funzione e mi muovo lungo l'array. Non esco dalla zona
    * di memoria perche' prendo il resto */
+  #ifdef DEBUG_LIST_TABLE_ARRAY_BASETYPE
+  printf("aggiungo all'array\n");
+  #endif
   pmoving_array[my_idx % DIM_MOVING_WINDOW] = (double) pmy_info->n_occupied;
   /* se l'array e' pieno calcolo la media e la salvo in plist_of_occupations
    * assieme al n_insert attuale */
@@ -1106,10 +1112,16 @@ void manage_moving_window_array_BASETYPE(pvoid pinfo_table){
     for (i = 0; i < DIM_MOVING_WINDOW; i++) {
       sum += pmoving_array[i];
      }
-    insert_last(pmy_info->plist_of_occupations, (all_type) (sum / DIM_MOVING_WINDOW), 0);
+    #ifdef DEBUG_LIST_TABLE_ARRAY_BASETYPE
+    printf("aggiungo alla lista\n");
+    #endif
+    pfit_var[0] = pmy_info->n_insert;
+    pfit_var[1] = sum / DIM_MOVING_WINDOW;
+    insert_last(pmy_info->plist_of_occupations, (all_type) ((pvoid)pfit_var), 0);
     /* printf("Calcolo media mobile %f\n", sum /DIM_MOVING_WINDOW); */
     /* printf("aggiunta media di occupazione: %f\n", sum / DIM_MOVING_WINDOW); */
    }
+  (pmy_info->idx_moving_window)++;
   return;
  }
 
@@ -1125,6 +1137,7 @@ int expand_table_fit_array_BASETYPE(plist_table_array_BASETYPE plist){
   /* la x e la y del fit sono rispettivamente il n_insert e il n_occupied
    * corrispondente  */
   double              x, y, sumx=0, sumy=0, sumxy=0, sumx2=0;
+  double*             pd;
   double              a,b;
   double              n_entries_bigger;
 
@@ -1137,8 +1150,9 @@ int expand_table_fit_array_BASETYPE(plist_table_array_BASETYPE plist){
   /* se ho abbastanza dati faccio fit */
   else{
     for (i = 1; i <= n_elem; i++) {
-      extract_first(plist_of_occupations, (all_type)((pvoid)&y), 0);
-      x = (i + 5) * OCCUP_FREQ;
+      extract_first(plist_of_occupations, (all_type)((pvoid)&pd), 0);
+      x = pd[0];
+      y = pd[1];
       sumx += x;
       sumy += y;
       sumxy += x * y;
@@ -1159,9 +1173,10 @@ int expand_table_fit_array_BASETYPE(plist_table_array_BASETYPE plist){
     b = (sumy * sumx2 - sumx * sumxy) / (n_elem * sumx2 - sumx * sumx);
     /* printf("Coefficienti a %f b %f\n", a, b); */
     /* printf("Fattore %f\n", tmp1); */
-    n_entries_bigger = a * pmy_info->n_insert*(1.5+2.5*exp(0.5*(1-(((double)pmy_info->n_insert) / pmy_info->n_entries)))) + b;
+    n_entries_bigger = a * (pmy_info->n_insert)*3 + b;
     /* printf("Occupazione futura: %f\n", tmp2); */
     #ifdef DEBUG_LIST_TABLE_ARRAY_BASETYPE
+    printf("Coefficienti del fit a %f b %f\n", a, b);
     printf("Ridimensiono da %u a dim: %f\n",pmy_info->n_entries, n_entries_bigger);
     #endif
     return resize_table_table_array_BASETYPE(plist, n_entries_bigger);
