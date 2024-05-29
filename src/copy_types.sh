@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 types=(int long_int long_long_int unsigned long_unsigned long_long_unsigned float double char signed_char pvoid)
 members=(i li lli u lu llu f d c sc pv)

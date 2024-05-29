@@ -503,9 +503,9 @@ void compare_perf_float(){
   clock_t time;
   int i;
 
-  plist_table = malloc_list_specify_table("FLOAT", 1, type_resize_manual, 1010);
+  plist_table = malloc_list(type_list_table, "FLOAT", 1);
   time = clock();
-  for (i = 0; i < 1000000; i++) {
+  for (i = 0; i < 10000000; i++) {
     insert_first(plist_table, (all_type)(f), 0);
     extract_first(plist_table, (all_type)((pvoid)&f), NULL);
    }
@@ -513,7 +513,7 @@ void compare_perf_float(){
 
   plist_dynamic = malloc_list(type_list_dynamic, "FLOAT", 1);
   time = clock();
-  for (i = 0; i < 1000000; i++) {
+  for (i = 0; i < 10000000; i++) {
     insert_first(plist_dynamic, (all_type)(f), 0);
     extract_first(plist_dynamic, (all_type)((pvoid)&f), NULL);
    }
@@ -521,7 +521,8 @@ void compare_perf_float(){
  }
 
 int main(int argc, char *argv[]){
-  test_table_generic();
+  /* test_table_generic(); */
+  compare_perf_float();
 
   return 0;
  }
